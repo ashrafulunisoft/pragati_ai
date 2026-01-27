@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Password;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\InsurancePackageController;
 
 //for create role and permission :
 use App\Http\Controllers\Auth\LoginController;
@@ -103,6 +104,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/role/assign/create', [AdminController::class, 'createAssignRole'])->name('admin.role.assign.create');
     Route::post('/admin/role/assign/store', [AdminController::class, 'storeAssignRole'])->name('admin.role.assign.store');
     Route::post('/admin/role/assign/remove', [AdminController::class, 'removeUserRole'])->name('admin.role.assign.remove');
+
+    // Insurance Package CRUD Routes
+    Route::resource('admin/insurance-packages', InsurancePackageController::class);
+    Route::post('admin/insurance-packages/{insurancePackage}/toggle-status', [InsurancePackageController::class, 'toggleStatus'])->name('admin.insurance-packages.toggle-status');
 });
 
 /*
@@ -179,7 +184,6 @@ Route::get('/public/live-dashboard', [App\Http\Controllers\Visitor\VisitorContro
 
 Route::get('/api/visitors/live-public', [App\Http\Controllers\Visitor\VisitorController::class, 'liveVisitorsApiPublic'])
     ->name('api.visitors.live.public');
-
 
 
 /*
@@ -354,6 +358,27 @@ Route::middleware(['auth'])->group(function () {
     // Live Dashboard Routes
     Route::middleware('permission:view live dashboard')->group(function () {
         Route::get('/visitors/live-dashboard', [App\Http\Controllers\Visitor\VisitorController::class, 'liveDashboard'])->name('visitor.live');
+    });
+
+    // Insurance Packages Routes (Authenticated users only)
+    Route::prefix('packages')->name('packages.')->group(function () {
+        Route::get('/', [InsurancePackageController::class, 'publicIndex'])->name('index');
+        Route::get('/{id}', [InsurancePackageController::class, 'publicShow'])->name('show');
+        Route::post('/{id}/purchase', [InsurancePackageController::class, 'purchase'])->name('purchase');
+    });
+
+    // Orders/Policy Routes (Authenticated users only)
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [InsurancePackageController::class, 'orderList'])->name('index');
+        Route::get('/{order}', [InsurancePackageController::class, 'showOrder'])->name('show');
+        Route::get('/{order}/claim/create', [InsurancePackageController::class, 'createClaim'])->name('claim.create');
+        Route::post('/{order}/claim/store', [InsurancePackageController::class, 'storeClaim'])->name('claim.store');
+    });
+
+    // Claims Routes (Authenticated users only)
+    Route::prefix('claims')->name('claims.')->group(function () {
+        Route::get('/', [InsurancePackageController::class, 'claimList'])->name('index');
+        Route::get('/{claim}', [InsurancePackageController::class, 'showClaim'])->name('show');
     });
 
     // API Routes (no authentication for public access if needed)
