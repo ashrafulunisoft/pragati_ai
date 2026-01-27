@@ -1,24 +1,24 @@
 services:
   mysql:
     image: mysql:8.0
-    container_name: vmsucbl_mysql
+    container_name: pragati_ai_mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: vmsucbl_db_2
-      MYSQL_USER: vmsucbl_user
-      MYSQL_PASSWORD: vmsucbl_password
+      MYSQL_DATABASE: pragati_ai_db_2
+      MYSQL_USER: pragati_ai_user
+      MYSQL_PASSWORD: pragati_ai_password
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - vmsucbl_network
+      - pragati_ai_network
     command: --default-authentication-plugin=mysql_native_password
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: vmsucbl_phpmyadmin
+    container_name: pragati_ai_phpmyadmin
     restart: unless-stopped
     depends_on:
       - mysql
@@ -31,18 +31,18 @@ services:
     ports:
       - "8080:80"
     networks:
-      - vmsucbl_network
+      - pragati_ai_network
 
   redis:
     image: redis:7-alpine
-    container_name: vmsucbl_redis
+    container_name: pragati_ai_redis
     restart: unless-stopped
     ports:
       - "6380:6379"
     volumes:
       - redis_data:/data
     networks:
-      - vmsucbl_network
+      - pragati_ai_network
     command: redis-server --appendonly yes
 
 volumes:
@@ -52,5 +52,5 @@ volumes:
     driver: local
 
 networks:
-  vmsucbl_network:
+  pragati_ai_network:
     driver: bridge
