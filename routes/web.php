@@ -366,6 +366,14 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [InsurancePackageController::class, 'orderList'])->name('index');
         Route::get('/{order}', [InsurancePackageController::class, 'showOrder'])->name('show');
+        Route::get('/{order}/claim/create', [InsurancePackageController::class, 'createClaim'])->name('claim.create');
+        Route::post('/{order}/claim/store', [InsurancePackageController::class, 'storeClaim'])->name('claim.store');
+    });
+
+    // Claims Routes (Authenticated users only)
+    Route::prefix('claims')->name('claims.')->group(function () {
+        Route::get('/', [InsurancePackageController::class, 'claimList'])->name('index');
+        Route::get('/{claim}', [InsurancePackageController::class, 'showClaim'])->name('show');
     });
 
     // API Routes (no authentication for public access if needed)

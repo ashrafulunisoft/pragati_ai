@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\pragati\Claim;
 use App\Models\pragati\InsurancePackage;
 use App\Models\pragati\Order;
 use Illuminate\Http\Request;
@@ -173,5 +174,78 @@ class InsurancePackageController extends Controller
         
         $order->load('package');
         return view('orders.show', compact('order'));
+    }
+
+    // ============ CLAIMS ============
+
+    // List all claims for current user
+    public function claimList()
+    {
+        $claims = Claim::where('user_id', auth()->id())
+            ->with(['package', 'order'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return view('claims.index', compact('claims'));
+    }
+
+    // Show claim form for a specific order
+    public function createClaim(Order $order)
+    {
+        // Ensure user can only file claim for their own orders
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this policy.');
+        }
+
+        // Check if order is active
+        if ($order->status !== 'active') {
+            return redirect()->route('orders.show', $order->id)
+                ->with('error', 'You can only file claims for active policies.');
+        }
+
+        return view('claims.create', compact('order'));
+    }
+
+    // Store new claim
+    public function storeClaim(Request $request, Order $order)
+    {
+        // Ensure user can only file claim for their own orders
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this policy.');
+        }
+
+        $request->validate([
+            'claim_amount' => 'required|numeric|min:1|max:' . $order->package->coverage_amount,
+            'reason' => 'required|string|min:10',
+        ]);
+
+        // Generate unique claim number
+        $claimNumber = 'CLM-' . strtoupper(uniqid()) . '-' . date('Y');
+
+        // Create claim
+        Claim::create([
+            'user_id' => auth()->id(),
+            'insurance_package_id' => $order->insurance_package_id,
+            'order_id' => $order->id,
+            'claim_number' => $claimNumber,
+            'claim_amount' => $request->claim_amount,
+            'reason' => $request->reason,
+            'status' => 'submitted',
+        ]);
+
+        return redirect()->route('claims.index')
+            ->with('success', 'Claim submitted successfully! Claim Number: ' . $claimNumber);
+    }
+
+    // Show claim details
+    public function showClaim(Claim $claim)
+    {
+        // Ensure user can only view their own claims
+        if ($claim->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this claim.');
+        }
+
+        $claim->load(['package', 'order']);
+        return view('claims.show', compact('claim'));
     }
 }

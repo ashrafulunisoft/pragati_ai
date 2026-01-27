@@ -131,6 +131,12 @@
 
                     <!-- Action Buttons -->
                     <div class="d-grid gap-3">
+                        @if($order->status === 'active')
+                        <a href="{{ route('orders.claim.create', $order->id) }}" class="btn btn-warning btn-lg py-3">
+                            <i class="fas fa-file-medical me-2"></i>
+                            File a Claim
+                        </a>
+                        @endif
                         <a href="{{ route('orders.index') }}" class="btn btn-outline-dark btn-lg py-3">
                             <i class="fas fa-list me-2"></i>
                             View All Policies
@@ -219,6 +225,19 @@
     .btn-outline-secondary:hover {
         background: #6c757d;
         color: #fff;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        border: none;
+        color: #212529;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .btn-warning:hover {
+        background: linear-gradient(135deg, #e0a800 0%, #c69500 100%);
+        color: #212529;
     }
 
     @media print {
