@@ -150,6 +150,11 @@ Route::get('/', function(){
     return view('home');
 })->name('home');
 
+// AI Chatbot Route
+Route::get('/ai-chatbot', function(){
+    return view('ai-chatbot');
+})->name('ai.chatbot');
+
 
 
 /*

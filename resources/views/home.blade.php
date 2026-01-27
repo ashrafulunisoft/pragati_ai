@@ -363,7 +363,7 @@
 
                 <!-- AI Assistant Card -->
                 <div class="col-lg-4 col-md-6">
-                    <a href="#" class="role-card">
+                    <a href="{{ route('ai.chatbot') }}" class="role-card">
                         <div class="role-icon ai">
                             <i class="fas fa-robot"></i>
                         </div>
