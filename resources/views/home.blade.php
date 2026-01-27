@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Home - UCB Bank VMS</title>
+    <title>Home - Pragati Life Insurance PLC</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts: Inter -->
@@ -142,6 +142,11 @@
             box-shadow: 0 10px 30px rgba(244, 63, 94, 0.4);
         }
 
+        .role-icon.ai {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.4);
+        }
+
         .role-title {
             font-size: 1.5rem;
             font-weight: 800;
@@ -248,6 +253,7 @@
         .role-card:nth-child(1) { animation-delay: 0.2s; }
         .role-card:nth-child(2) { animation-delay: 0.4s; }
         .role-card:nth-child(3) { animation-delay: 0.6s; }
+        .role-card:nth-child(4) { animation-delay: 0.8s; }
 
         @media (max-width: 991px) {
             .glass-card-dark {
@@ -304,14 +310,19 @@
                 <i class="fas fa-university"></i>
 
             </div> --}}
-             <div class="text-center gap-3 mb-3 ">
+
+              {{-- <div class="text-center gap-3 mb-3 ">
                 <img class="bg-white " src="{{ asset('vms/logo/ucb-bank-logo-bg_removed.png') }}" style="height: 80px; width: 100px; border-radius:10px;" alt="UCB Bank Logo">
+            </div>--}}
+
+             <div class="text-center gap-3 mb-3 ">
+                <img class="bg-white " src="{{ asset('vms/logo/pragati-logo -1.jpg') }}" style="height: 80px; width: 100px; border-radius:10px;" alt="UCB Bank Logo">
             </div>
 
             <!-- Header -->
-            <h1 class="page-title">Visitor Management System</h1>
+            <h1 class="page-title">Pragati Life Insurance PLC.</h1>
             <p class="page-subtitle">
-                Welcome to UCB Bank's Visitor Management System. Please select your role to continue.
+                Welcome to Pragati Life Insurance PLC's . Please select your role to continue.
             </p>
 
             <hr class="divider mb-4">
@@ -350,15 +361,15 @@
                     </a>
                 </div>
 
-                <!-- Live Dashboard Card -->
+                <!-- AI Assistant Card -->
                 <div class="col-lg-4 col-md-6">
-                    <a href="{{ route('visitor.live.public') }}" class="role-card">
-                        <div class="role-icon visitor">
-                            <i class="fas fa-tachometer-alt"></i>
+                    <a href="#" class="role-card">
+                        <div class="role-icon ai">
+                            <i class="fas fa-robot"></i>
                         </div>
-                        <h3 class="role-title">Live Dashboard</h3>
+                        <h3 class="role-title">AI Assistant</h3>
                         <p class="role-description">
-                            View real-time visitor status and live updates
+                            Get intelligent help and support from our AI-powered assistant
                         </p>
                         <div class="role-arrow">
                             <i class="fas fa-arrow-right"></i>
