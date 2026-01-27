@@ -3,11 +3,10 @@
 @section('title', 'Insurance Packages - UCB Bank')
 
 @section('content')
-<div class="glass-card glass-card-dark col-md-8 offset-2 dflex flex-column justify-content-between mt-4">
-    <!-- Header -->
+<div class="glass-card glass-card-dark col-12 mt-4">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem;">
         <div class="d-flex align-items-center gap-3">
-            <div class="logo-vms" style="width: 44px; height: 44px; font-size: 1.2rem;">V</div>
+            <div class="logo-vms" style="width: 44px; height: 44px; font-size: 1.2rem; background: #fff; color: #1e293b; border-radius: 10px; font-weight: 900; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(255,255,255,0.2);">V</div>
             <div>
                 <h6 class="fw-800 mb-0 text-white text-shadow-white">UCB BANK</h6>
                 <span class="permission-title" style="font-size: 0.7rem; margin: 0; text-shadow-blue">ADMIN PANEL</span>
@@ -20,7 +19,6 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
     <div class="row g-4 mb-5">
         <div class="col-md-3">
             <div class="glass-card p-4" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%); border:1px solid rgba(59, 130, 246, 0.3);">
@@ -80,7 +78,6 @@
         </div>
     </div>
 
-    <!-- Packages Table Section -->
     <div class="permission-title">
         <i class="fas fa-list me-2"></i>
         All Insurance Packages
@@ -189,7 +186,6 @@
             </table>
         </div>
 
-        <!-- Pagination -->
         <div class="d-flex justify-content-between align-items-center mt-4 pt-3" style="border-top: 1px solid rgba(255,255,255,0.05);">
             <div class="text-white-50 small">
                 Showing {{ $packages->firstItem() ?? 0 }} to {{ $packages->lastItem() ?? 0 }} of {{ $packages->total() }} packages
@@ -200,7 +196,6 @@
         </div>
     </div>
 
-    <!-- Footer Info -->
     <div class="d-flex justify-content-between align-items-center text-white-50 small" style="padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
         <div>
             <i class="fas fa-cog me-1"></i>
@@ -212,29 +207,25 @@
         </div>
     </div>
 </div>
-
-@if(session('success'))
-<script>
-    Swal.fire({ icon: 'success', title: 'Success', text: '{{ session("success") }}', timer: 3000, showConfirmButton: false });
-</script>
-@endif
-
-@if(session('error'))
-<script>
-    Swal.fire({ icon: 'error', title: 'Error', text: '{{ session("error") }}', timer: 3000, showConfirmButton: false });
-</script>
-@endif
+@endsection
 
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Delete button click handler
+        @if(session('success'))
+            Swal.fire({ icon: 'success', title: 'Success', text: '{{ session("success") }}', timer: 3000, showConfirmButton: false });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({ icon: 'error', title: 'Error', text: '{{ session("error") }}', timer: 3000, showConfirmButton: false });
+        @endif
+
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const id = this.dataset.id;
                 Swal.fire({
                     title: 'Delete Package?',
-                    text: 'This action cannot be undone! All associated orders will be affected.',
+                    text: 'This action cannot be undone!',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, Delete',
@@ -243,7 +234,7 @@
                     cancelButtonColor: '#6b7280'
                 }).then(result => {
                     if (result.isConfirmed) {
-                        document.querySelector(`.delete-form-${id}`).submit();
+                        document.querySelector('.delete-form-' + id).submit();
                     }
                 });
             });
@@ -252,85 +243,17 @@
 </script>
 
 <style>
-    .btn-circle {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        transition: all 0.3s;
-        color: inherit;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .btn-circle:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .btn-success {
-        background: rgba(34, 197, 94, 0.2);
-        color: #4ade80;
-        border:1px solid rgba(34, 197, 94, 0.4);
-    }
-
-    .btn-warning {
-        background: rgba(234, 179, 8, 0.2);
-        color: #facc15;
-        border:1px solid rgba(234, 179, 8, 0.4);
-    }
-
-    .btn-info {
-        background: rgba(59, 130, 246, 0.2);
-        color: #60a5fa;
-        border:1px solid rgba(59, 130, 246, 0.4);
-    }
-
-    .btn-secondary {
-        background: rgba(107, 114, 128, 0.2);
-        color: #9ca3af;
-        border:1px solid rgba(107, 114, 128, 0.4);
-    }
-
-    .btn-danger {
-        background: rgba(239, 68, 68, 0.2);
-        color: #f87171;
-        border:1px solid rgba(239, 68, 68, 0.4);
-    }
-
-    .btn-circle:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-        color: #fff !important;
-    }
-
-    .pagination {
-        margin-bottom: 0;
-    }
-
-    .pagination .page-link {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #fff;
-    }
-
-    .pagination .page-link:hover {
-        background: rgba(59, 130, 246, 0.2);
-        border-color: rgba(59, 130, 246, 0.4);
-        color: #60a5fa;
-    }
-
-    .pagination .page-item.active .page-link {
-        background: #3b82f6;
-        border-color: #3b82f6;
-    }
-
-    .pagination .page-item.disabled .page-link {
-        background: transparent;
-        border-color: rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 0.3);
-    }
+    .btn-circle { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: none; transition: all 0.3s; color: inherit; text-decoration: none; cursor: pointer; }
+    .btn-circle:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
+    .btn-success { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .btn-warning { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .btn-info { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .btn-secondary { background: rgba(107, 114, 128, 0.2); color: #9ca3af; border: 1px solid rgba(107, 114, 128, 0.4); }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .btn-circle:hover { background: rgba(255, 255, 255, 0.1) !important; color: #fff !important; }
+    .pagination .page-link { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; }
+    .pagination .page-link:hover { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); color: #60a5fa; }
+    .pagination .page-item.active .page-link { background: #3b82f6; border-color: #3b82f6; }
+    .pagination .page-item.disabled .page-link { background: transparent; border-color: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.3); }
 </style>
 @endpush

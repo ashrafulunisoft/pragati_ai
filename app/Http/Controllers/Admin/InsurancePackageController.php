@@ -40,8 +40,8 @@ class InsurancePackageController extends Controller
             'is_active' => $request->is_active ?? true,
         ]);
 
-        Session::flash('success', 'Insurance package created successfully!');
-        return redirect()->route('insurance-packages.index');
+        return redirect()->route('insurance-packages.index')
+            ->with('success', 'Insurance package created successfully!');
     }
 
     public function show(InsurancePackage $insurancePackage)
@@ -74,26 +74,30 @@ class InsurancePackageController extends Controller
             'is_active' => $request->is_active ?? true,
         ]);
 
-        Session::flash('success', 'Insurance package updated successfully!');
-        return redirect()->route('insurance-packages.index');
+        return redirect()->route('insurance-packages.index')
+            ->with('success', 'Insurance package updated successfully!');
     }
 
     public function destroy(InsurancePackage $insurancePackage)
     {
         if ($insurancePackage->orders()->exists()) {
-            Session::flash('error', 'Cannot delete package because it has associated orders!');
-            return redirect()->route('insurance-packages.index');
+            return redirect()->route('insurance-packages.index')
+                ->with('error', 'Cannot delete package because it has associated orders!');
         }
 
         $insurancePackage->delete();
-        Session::flash('success', 'Insurance package deleted successfully!');
-        return redirect()->route('insurance-packages.index');
+
+        return redirect()->route('insurance-packages.index')
+            ->with('success', 'Insurance package deleted successfully!');
     }
 
     public function toggleStatus(InsurancePackage $insurancePackage)
     {
-        $insurancePackage->update(['is_active' => !$insurancePackage->is_active]);
-        Session::flash('success', 'Package status updated successfully!');
-        return redirect()->route('insurance-packages.index');
+        $status = !$insurancePackage->is_active;
+        $insurancePackage->update(['is_active' => $status]);
+
+        $statusText = $status ? 'activated' : 'deactivated';
+        return redirect()->route('insurance-packages.index')
+            ->with('success', "Package {$statusText} successfully!");
     }
 }
