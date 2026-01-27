@@ -181,7 +181,6 @@ Route::get('/api/visitors/live-public', [App\Http\Controllers\Visitor\VisitorCon
     ->name('api.visitors.live.public');
 
 
-
 /*
 |--------------------------------------------------------------------------
 | Password Reset (ALLOW AUTH + GUEST)
@@ -354,6 +353,18 @@ Route::middleware(['auth'])->group(function () {
     // Live Dashboard Routes
     Route::middleware('permission:view live dashboard')->group(function () {
         Route::get('/visitors/live-dashboard', [App\Http\Controllers\Visitor\VisitorController::class, 'liveDashboard'])->name('visitor.live');
+    });
+
+    // Insurance Packages Routes (Authenticated users only)
+    Route::prefix('packages')->name('packages.')->group(function () {
+        Route::get('/', [InsurancePackageController::class, 'publicIndex'])->name('index');
+        Route::get('/{id}', [InsurancePackageController::class, 'publicShow'])->name('show');
+        Route::post('/{id}/purchase', [InsurancePackageController::class, 'purchase'])->name('purchase');
+    });
+
+    // Orders/Policy Routes (Authenticated users only)
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/{order}', [InsurancePackageController::class, 'showOrder'])->name('show');
     });
 
     // API Routes (no authentication for public access if needed)

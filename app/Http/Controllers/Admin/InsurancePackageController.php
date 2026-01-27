@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\pragati\InsurancePackage;
+use App\Models\pragati\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Controller;
@@ -99,5 +100,67 @@ class InsurancePackageController extends Controller
         $statusText = $status ? 'activated' : 'deactivated';
         return redirect()->route('insurance-packages.index')
             ->with('success', "Package {$statusText} successfully!");
+    }
+
+    // Public methods for guest users
+    public function publicIndex()
+    {
+        $packages = InsurancePackage::where('is_active', true)
+            ->orderBy('price', 'asc')
+            ->get();
+        return view('packages.index', compact('packages'));
+    }
+
+    public function publicShow($id)
+    {
+        $insurancePackage = InsurancePackage::where('is_active', true)->find($id);
+        
+        if (!$insurancePackage) {
+            abort(404, 'Package not found or is not active');
+        }
+        
+        return view('packages.show', compact('insurancePackage'));
+    }
+
+    // Purchase package and create order with policy
+    public function purchase(Request $request, $packageId)
+    {
+        $package = InsurancePackage::where('is_active', true)->findOrFail($packageId);
+        
+        // Generate unique policy number
+        $policyNumber = 'POL-' . strtoupper(uniqid()) . '-' . date('Y');
+        
+        // Calculate dates
+        $startDate = now()->startOfDay();
+        $endDate = now()->addMonths($package->duration_months)->endOfDay();
+        
+        // Create order/policy
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'insurance_package_id' => $package->id,
+            'policy_number' => $policyNumber,
+            'status' => 'active',
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ]);
+        
+        return redirect()->route('orders.show', $order->id)
+            ->with('success', 'Policy purchased successfully!');
+    }
+
+    // Show order/policy details
+    public function showOrder(Order $order)
+    {
+        // Ensure user can only view their own orders
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this policy.');
+        }
+        
+        // Cast dates to Carbon instances for existing records
+        $order->start_date = \Carbon\Carbon::parse($order->start_date);
+        $order->end_date = \Carbon\Carbon::parse($order->end_date);
+        
+        $order->load('package');
+        return view('orders.show', compact('order'));
     }
 }
