@@ -355,29 +355,39 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/visitors/live-dashboard', [App\Http\Controllers\Visitor\VisitorController::class, 'liveDashboard'])->name('visitor.live');
     });
 
-    // Insurance Packages Routes (Authenticated users only)
+    // API Routes (no authentication for public access if needed)
+    Route::get('/api/visitors/live', [App\Http\Controllers\Visitor\VisitorController::class, 'liveVisitorsApi'])->name('api.visitors.live');
+
+    //--------------------------------------- Insurance Packages Routes (Authenticated users only)------------------------------------------------------------------------
+    //--------------------------------------- Insurance Packages Routes (Authenticated users only)------------------------------------------------------------------------
+
     Route::prefix('packages')->name('packages.')->group(function () {
         Route::get('/', [InsurancePackageController::class, 'publicIndex'])->name('index');
         Route::get('/{id}', [InsurancePackageController::class, 'publicShow'])->name('show');
         Route::post('/{id}/purchase', [InsurancePackageController::class, 'purchase'])->name('purchase');
-    });
-
-    // Orders/Policy Routes (Authenticated users only)
-    Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('/', [InsurancePackageController::class, 'orderList'])->name('index');
-        Route::get('/{order}', [InsurancePackageController::class, 'showOrder'])->name('show');
-        Route::get('/{order}/claim/create', [InsurancePackageController::class, 'createClaim'])->name('claim.create');
+        });
+        
+        // Orders/Policy Routes (Authenticated users only)
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', [InsurancePackageController::class, 'orderList'])->name('index');
+            Route::get('/{order}', [InsurancePackageController::class, 'showOrder'])->name('show');
+            Route::get('/{order}/claim/create', [InsurancePackageController::class, 'createClaim'])->name('claim.create');
         Route::post('/{order}/claim/store', [InsurancePackageController::class, 'storeClaim'])->name('claim.store');
-    });
-
+        });
+        
     // Claims Routes (Authenticated users only)
     Route::prefix('claims')->name('claims.')->group(function () {
         Route::get('/', [InsurancePackageController::class, 'claimList'])->name('index');
         Route::get('/{claim}', [InsurancePackageController::class, 'showClaim'])->name('show');
-    });
+        });
+        
+    //--------------------------------------- End Insurance Packages Routes (Authenticated users only)------------------------------------------------------------------------
 
-    // API Routes (no authentication for public access if needed)
-    Route::get('/api/visitors/live', [App\Http\Controllers\Visitor\VisitorController::class, 'liveVisitorsApi'])->name('api.visitors.live');
+
+
+
+
+  
 });
 
 // -------------------------------------------------------------------------
