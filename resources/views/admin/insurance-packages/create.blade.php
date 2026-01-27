@@ -68,8 +68,8 @@
                 </div>
             </div>
 
-            <div class="col-12 mt-4">
-                <button type="submit" class="btn btn-create btn-primary btn-gradient me-3" style="padding: 14px 32px;">
+            <div class="col-12 mt-4 d-flex gap-3">
+                <button type="submit" class="btn btn-create btn-primary btn-gradient" style="padding: 14px 32px;">
                     <i class="fas fa-check me-2"></i>Create Package
                 </button>
                 <a href="{{ route('insurance-packages.index') }}" class="btn btn-reset btn-outline" style="padding: 14px 32px;">
