@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCB Bank - Visitor Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-page: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --sidebar-bg: rgba(15, 23, 42, 0.95);
+            --accent-blue: #3b82f6;
+            --neon-glow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(25px);
+            border-right: 1px solid rgba(59, 130, 246, 0.2);
+            height: 100vh;
+            position: fixed;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .logo-v {
+            background: #ffffff;
+            color: #1e293b;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .brand-text h2 { font-size: 18px; font-weight: 700; margin: 0; color: #ffffff; letter-spacing: 0.5px;}
+
+        .nav-menu { margin-top: 50px; flex-grow: 1; }
+
+        .nav-item {
+            padding: 14px 18px;
+            color: #cbd5e1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 12px;
+            transition: 0.3s;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(59, 130, 246, 0.25);
+            color: #ffffff;
+            box-shadow: var(--neon-glow);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* --- Main Content --- */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 40px;
+        }
+
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- Section Header --- */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            color: var(--accent-blue);
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: var(--neon-glow);
+        }
+
+        .section-header::after {
+            content: "";
+            flex: 1;
+            height: 1.5px;
+            background: linear-gradient(90deg, var(--accent-blue) 0%, transparent 100%);
+        }
+
+        /* --- Profile Card --- */
+        .glass-card {
+            background-color: var(--bg-card);
+            border-radius: 22px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            box-shadow: var(--neon-glow);
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #ffffff;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-value i {
+            color: var(--accent-blue);
+            text-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        /* --- Table --- */
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .custom-table th { color: #ffffff; font-size: 12px; text-transform: uppercase; padding: 10px 20px; letter-spacing: 1px; }
+        .custom-table td {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 18px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+        }
+        .custom-table tr td:first-child { border-radius: 15px 0 0 15px; border-left: 1px solid rgba(255, 255, 255, 0.05); }
+        .custom-table tr td:last-child { border-radius: 0 15px 15px 0; border-right: 1px solid rgba(255, 255, 255, 0.05); }
+
+        .time-tag {
+            color: var(--accent-blue);
+            font-weight: 700;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* --- Capacity Fix --- */
+        .capacity-section { margin-top: auto; padding-top: 20px; }
+        .progress-custom { background: #334155; height: 8px; border-radius: 10px; }
+        .progress-bar-custom { background: var(--accent-blue); box-shadow: var(--neon-glow); border-radius: 10px; }
+        .capacity-values { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; font-weight: 700; color: #ffffff; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="d-flex align-items-center gap-3">
+            <div class="logo-v">V</div>
+            <div class="brand-text">
+                <h2>UCB BANK</h2>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="#" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="#" class="nav-item active"><i class="fas fa-user"></i> Visitor Profile</a>
+            <a href="#" class="nav-item"><i class="fas fa-users"></i> Visitors</a>
+            <a href="#" class="nav-item"><i class="fas fa-clock"></i> History</a>
+        </nav>
+
+        <div class="capacity-section">
+            <div class="stat-label mb-2" style="font-size: 11px; font-weight: 700; color: var(--text-muted);">OFFICE CAPACITY</div>
+            <div class="progress progress-custom">
+                <div class="progress-bar progress-bar-custom" style="width: 15%;"></div>
+            </div>
+            <div class="capacity-values">
+                <span>Current: 3</span>
+                <span>Max: 20</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <div class="header-top">
+            <h1 class="page-title">Visitor Information</h1>
+            <button class="btn btn-outline-primary" style="border-radius: 10px; font-size: 13px; font-weight: 700;">
+                <i class="fas fa-edit me-2"></i>Edit Profile
+            </button>
+        </div>
+
+        <!-- Visitor Profile Section -->
+        <div class="section-header">Core Profile</div>
+        <div class="glass-card">
+            <div class="row align-items-center">
+                <div class="col-md-auto text-center">
+                    <div class="profile-avatar mx-auto">SC</div>
+                </div>
+                <div class="col-md">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="info-label">Full Name</div>
+                            <div class="info-value"><i class="fas fa-user"></i> Sarah Connor</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-label">Email Address</div>
+                            <div class="info-value"><i class="fas fa-envelope"></i> sarah.c@skynet.com</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-label">Phone Number</div>
+                            <div class="info-value"><i class="fas fa-phone"></i> +1 555-0101</div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="info-label">Residential Address</div>
+                            <div class="info-value"><i class="fas fa-map-marker-alt"></i> 742 Evergreen Terrace, Cyberdyne District, LA</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Log Section -->
+        <div class="section-header">Previous Visit History</div>
+        <div class="glass-card p-0" style="background: transparent; border: none; box-shadow: none;">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Visit Date</th>
+                        <th>Host Name</th>
+                        <th>Purpose of Visit</th>
+                        <th>Check In / Out</th>
+                        <th>Time Stayed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">20 May 2024</td>
+                        <td><i class="fas fa-user-tie me-2" style="color: var(--accent-blue);"></i>John Matrix</td>
+                        <td>Security Audit</td>
+                        <td>
+                            <span class="time-tag">08:30 AM</span>
+                            <span class="mx-1">→</span>
+                            <span class="time-tag">11:00 AM</span>
+                        </td>
+                        <td class="fw-bold text-white">2h 30m</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">12 May 2024</td>
+                        <td><i class="fas fa-user-tie me-2" style="color: var(--accent-blue);"></i>Tess Servopoulos</td>
+                        <td>Financial Consultation</td>
+                        <td>
+                            <span class="time-tag">10:15 AM</span>
+                            <span class="mx-1">→</span>
+                            <span class="time-tag">11:45 AM</span>
+                        </td>
+                        <td class="fw-bold text-white">1h 30m</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">05 Apr 2024</td>
+                        <td><i class="fas fa-user-tie me-2" style="color: var(--accent-blue);"></i>Kyle Reese</td>
+                        <td>General Meeting</td>
+                        <td>
+                            <span class="time-tag">09:00 AM</span>
+                            <span class="mx-1">→</span>
+                            <span class="time-tag">10:00 AM</span>
+                        </td>
+                        <td class="fw-bold text-white">1h 0m</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">15 Mar 2024</td>
+                        <td><i class="fas fa-user-tie me-2" style="color: var(--accent-blue);"></i>John Matrix</td>
+                        <td>Maintenance Check</td>
+                        <td>
+                            <span class="time-tag">02:30 PM</span>
+                            <span class="mx-1">→</span>
+                            <span class="time-tag">05:00 PM</span>
+                        </td>
+                        <td class="fw-bold text-white">2h 30m</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

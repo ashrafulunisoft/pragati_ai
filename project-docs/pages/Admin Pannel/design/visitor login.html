@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCB Bank - Visitor Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-page: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            --bg-card: #0f172a;
+            --accent-blue: #3b82f6;
+            --neon-glow: 0 0 12px rgba(59, 130, 246, 0.8), 0 0 25px rgba(59, 130, 246, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --input-bg: #1e293b;
+            --input-border: #334155;
+        }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .registration-card {
+            background-color: var(--bg-card);
+            border-radius: 28px;
+            width: 100%;
+            max-width: 500px; /* Slimmer for login */
+            padding: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 
+                        0 0 40px rgba(59, 130, 246, 0.05);
+        }
+
+        .header-flex {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .logo-v {
+            background: white;
+            color: #0f172a;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 24px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .brand-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-text span {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+            margin-top: 20px;
+            opacity: 0.95;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 30px 0 20px 0;
+            color: var(--accent-blue);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-shadow: var(--neon-glow);
+        }
+
+        .section-header::after {
+            content: "";
+            flex: 1;
+            height: 1.5px;
+            background: linear-gradient(90deg, var(--accent-blue) 0%, transparent 100%);
+            opacity: 0.5;
+        }
+
+        .form-label {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-control {
+            background-color: var(--input-bg);
+            border: 1.5px solid var(--input-border);
+            border-radius: 12px;
+            color: white;
+            padding: 14px 18px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background-color: var(--input-bg);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            color: white;
+            outline: none;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-blue);
+            text-shadow: 0 0 8px var(--accent-blue);
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        /* Password Toggle Support */
+        .input-wrapper .toggle-btn {
+            position: absolute;
+            right: 45px; /* Shifted so it doesn't overlap the blue icon */
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            z-index: 10;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border: none;
+            width: 100%;
+            margin-top: 25px;
+            box-shadow: 0 12px 24px -6px rgba(37, 99, 235, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 32px -6px rgba(37, 99, 235, 0.6);
+        }
+
+        .form-check-input {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .footer-links {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer-links a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Spinner for loading state */
+        .fa-spin { margin-right: 8px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="registration-card">
+        <!-- Header -->
+        <div class="header-flex">
+            <div class="logo-v">V</div>
+            <div class="brand-text">
+                <h2>UCB BANK</h2>
+                <span>VISITOR SYSTEM</span>
+            </div>
+            <h1 class="page-title">Welcome Back</h1>
+        </div>
+
+        <form id="loginForm">
+            <div class="section-header">Credentials</div>
+            
+            <div class="mb-4">
+                <label class="form-label">Email Address</label>
+                <div class="input-wrapper">
+                    <input type="email" id="email" class="form-control" placeholder="name@email.com" required>
+                    <i class="fas fa-envelope"></i>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                    <button type="button" class="toggle-btn" id="togglePassword">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                    <i class="fas fa-lock"></i>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                    <label class="form-check-label ms-1" for="rememberMe" style="font-size: 13px; color: var(--text-muted);">
+                        Remember me
+                    </label>
+                </div>
+                <a href="#" style="font-size: 13px; color: var(--accent-blue); text-decoration: none;">Forgot password?</a>
+            </div>
+
+            <!-- Action -->
+            <button type="submit" class="btn-approve" id="loginBtn">
+                Sign In
+            </button>
+
+            <div class="footer-links">
+                New visitor? <a href="#" id="registerLink">Register for a new visit</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Password toggle functionality
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            eyeIcon.classList.toggle('fa-eye');
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+
+        // Login Logic
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            
+            // UI Loading State
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            loginBtn.style.opacity = '0.8';
+            loginBtn.disabled = true;
+
+            setTimeout(() => {
+                alert(`Authentication Successful!\nWelcome back, ${email}`);
+                // Reset UI
+                loginBtn.innerHTML = 'Sign In';
+                loginBtn.style.opacity = '1';
+                loginBtn.disabled = false;
+            }, 2000);
+        });
+
+        // Redirect Alert
+        document.getElementById('registerLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Redirecting to secure registration portal...');
+        });
+    </script>
+</body>
+</html>
