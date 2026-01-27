@@ -131,11 +131,15 @@
 
                     <!-- Action Buttons -->
                     <div class="d-grid gap-3">
+                        <a href="{{ route('orders.index') }}" class="btn btn-outline-dark btn-lg py-3">
+                            <i class="fas fa-list me-2"></i>
+                            View All Policies
+                        </a>
                         <a href="{{ route('packages.index') }}" class="btn btn-success btn-lg py-3">
                             <i class="fas fa-shopping-cart me-2"></i>
                             Buy Another Package
                         </a>
-                        <a href="#" class="btn btn-outline-dark btn-lg py-3" onclick="window.print(); return false;">
+                        <a href="#" class="btn btn-outline-secondary btn-lg py-3" onclick="window.print(); return false;">
                             <i class="fas fa-print me-2"></i>
                             Print Policy
                         </a>
@@ -202,6 +206,18 @@
 
     .btn-outline-dark:hover {
         background: #495057;
+        color: #fff;
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #6c757d;
         color: #fff;
     }
 

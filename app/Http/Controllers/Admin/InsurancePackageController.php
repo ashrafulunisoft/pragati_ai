@@ -148,6 +148,17 @@ class InsurancePackageController extends Controller
             ->with('success', 'Policy purchased successfully!');
     }
 
+    // List all orders/policies for current user
+    public function orderList()
+    {
+        $orders = Order::where('user_id', auth()->id())
+            ->with('package')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return view('orders.index', compact('orders'));
+    }
+
     // Show order/policy details
     public function showOrder(Order $order)
     {

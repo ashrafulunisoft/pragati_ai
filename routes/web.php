@@ -364,6 +364,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Orders/Policy Routes (Authenticated users only)
     Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [InsurancePackageController::class, 'orderList'])->name('index');
         Route::get('/{order}', [InsurancePackageController::class, 'showOrder'])->name('show');
     });
 
