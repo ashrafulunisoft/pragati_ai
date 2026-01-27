@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCB Bank - Block Visitor Identity</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #101d42 0%, #060b1d 100%);
+            --sidebar-bg: #111a30;
+            --active-blue: #5046e5;
+            --neon-danger: #ff3131;
+            --neon-glow-red: 0 0 20px rgba(255, 49, 49, 0.5), 0 0 40px rgba(255, 49, 49, 0.2);
+            --neon-glow-white: 0 0 15px rgba(255, 255, 255, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(35px);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: #f1f5f9;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Sidebar Branding */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .logo-box {
+            width: 44px;
+            height: 44px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e3a8a;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .logo-text { font-size: 1.5rem; font-weight: 800; color: white; letter-spacing: -0.5px; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.85rem 1.25rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 14px;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item.active {
+            background: var(--active-blue);
+            color: white;
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Main Area */
+        .main-container {
+            margin-left: 260px;
+            padding: 3rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-titles h1 { font-size: 1.85rem; font-weight: 800; margin-bottom: 4px; }
+        .header-titles p { font-size: 0.85rem; opacity: 0.5; text-transform: uppercase; letter-spacing: 1.2px; }
+
+        .admin-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.4rem 0.4rem 0.4rem 1.5rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Block Identity Modal Card */
+        .block-card-wow {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            max-width: 680px;
+            width: 100%;
+            margin: auto;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+            animation: cardEntrance 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(50px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .card-header-vms {
+            padding: 3rem 3rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .shield-icon-glow {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 49, 49, 0.1);
+            border: 1px solid rgba(255, 49, 49, 0.3);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-danger);
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--neon-glow-red);
+        }
+
+        .card-header-vms h2 { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
+        .card-header-vms p { font-size: 0.95rem; color: rgba(255, 255, 255, 0.45); font-weight: 500; }
+
+        .card-body-vms { padding: 3rem; }
+
+        .vms-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .vms-input-static {
+            background: rgba(0, 0, 0, 0.25) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: white !important;
+            border-radius: 18px;
+            padding: 1.2rem 1.5rem;
+            font-size: 1.05rem;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        .vms-textarea {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            border-radius: 20px;
+            padding: 1.2rem;
+            min-height: 140px;
+            resize: none;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        .vms-textarea:focus {
+            border-color: var(--neon-danger) !important;
+            box-shadow: 0 0 15px rgba(255, 49, 49, 0.15);
+            outline: none;
+        }
+
+        /* NEON ACTION BUTTONS */
+        .card-footer-vms {
+            padding: 0 3rem 3.5rem;
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn-neon {
+            flex: 1;
+            padding: 1.3rem;
+            border-radius: 100px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            font-size: 0.85rem;
+            border: none;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Block Button - High Intensity Neon Red */
+        .btn-neon-block {
+            background: linear-gradient(135deg, #ff3131 0%, #d90429 100%);
+            box-shadow: 0 10px 30px rgba(255, 49, 49, 0.4);
+        }
+
+        .btn-neon-block:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 15px 45px rgba(255, 49, 49, 0.6);
+            filter: brightness(1.2);
+        }
+
+        .btn-neon-block:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        /* Cancel Button - Neon Ghost White */
+        .btn-neon-cancel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-neon-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateY(-6px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .help-center-card { margin-top: auto; background: linear-gradient(180deg, #5046e5 0%, #3b82f6 100%); border-radius: 24px; padding: 1.5rem; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .btn-help { background: white; color: #1e3a8a; border: none; border-radius: 50px; padding: 0.6rem; width: 100%; margin-top: 1rem; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-box">V</div>
+            <span class="logo-text">VMS</span>
+        </div>
+        <nav class="flex-column">
+            <a href="search.html" class="nav-item"><i data-lucide="layout-grid"></i> Dashboard</a>
+            <a href="blocklist.html" class="nav-item active"><i data-lucide="shield-alert"></i> Block Management</a>
+            <a href="#" class="nav-item"><i data-lucide="list"></i> Visitor's Log</a>
+            <a href="#" class="nav-item"><i data-lucide="users"></i> All Users</a>
+            <a href="#" class="nav-item"><i data-lucide="settings"></i> Settings</a>
+        </nav>
+        <div class="help-center-card">
+            <h6 class="fw-800 text-white mb-0">Help Center</h6>
+            <button class="btn-help">Get Help</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <header class="top-header">
+            <div class="header-titles">
+                <h1>Security Governance</h1>
+                <p>Identity & Access Management Portal</p>
+            </div>
+            <div class="admin-pill">
+                <div class="text-end me-3">
+                    <span class="d-block fw-800" style="font-size: 0.75rem;">Admin Clearance</span>
+                    <span class="d-block opacity-50" style="font-size: 0.65rem;">Level 5 Authorized</span>
+                </div>
+                <div style="width: 38px; height: 38px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                    <i data-lucide="user" style="width: 20px;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Block Identity Wow Card -->
+        <div class="block-card-wow">
+            <div class="card-header-vms">
+                <div class="shield-icon-glow">
+                    <i data-lucide="shield-off" style="width: 36px; height: 36px;"></i>
+                </div>
+                <h2>Identity Revocation</h2>
+                <p>Execute mandatory access restriction for this subject.</p>
+            </div>
+
+            <div class="card-body-vms">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="vms-label">Target Name</label>
+                        <input type="text" class="vms-input-static" value="Johnathon Doe" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="vms-label">Registered Phone</label>
+                        <input type="text" class="vms-input-static" value="017XXXXXXXX" readonly>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="vms-label">Assigned RFID ID</label>
+                        <input type="text" class="vms-input-static" value="RFID-V-9921-X-CORP" readonly>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="vms-label">Violation Statement</label>
+                        <textarea class="vms-textarea" placeholder="Explain the security breach or policy violation in detail..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer-vms">
+                <button class="btn-neon btn-neon-cancel" onclick="history.back()">Discard Action</button>
+                <button class="btn-neon btn-neon-block">Block Visitor Identity</button>
+            </div>
+        </div>
+
+        <footer class="mt-auto pt-5 text-center opacity-30 small uppercase tracking-widest font-monospace">
+            © 2026 UCB BANK • SECURITY COMPLIANCE OPERATIONS • V4.5.2
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCB Bank - Smart Access Gateway</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #101827 0%, #030712 100%);
+            --neon-blue: #4f46e5;
+            --bloom-blue: 0 4px 20px rgba(79, 70, 229, 0.4), 0 0 40px rgba(59, 130, 246, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            max-width: 1100px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .glass-portal-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px;
+            padding: 3.5rem 2rem;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .glass-portal-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-15px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+        }
+
+        .glass-portal-card.active-portal {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border-color: var(--neon-blue);
+            box-shadow: var(--bloom-blue);
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            color: var(--neon-blue);
+        }
+
+        .glass-portal-card:hover .icon-box {
+            transform: scale(1.1) rotate(8deg);
+            background: var(--neon-blue);
+            color: white;
+            box-shadow: 0 0 30px rgba(79, 70, 229, 0.6);
+        }
+
+        .btn-portal {
+            border-radius: 50px;
+            padding: 0.8rem 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.75rem;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: transparent;
+            color: white;
+            transition: all 0.3s ease;
+            margin-top: auto;
+        }
+
+        .glass-portal-card:hover .btn-portal {
+            background: var(--neon-blue);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .brand-pill {
+            background: white;
+            border-radius: 18px;
+            padding: 10px;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 30px rgba(79, 70, 229, 0.3);
+        }
+
+        .fade-in { animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="main-container text-center fade-in">
+        <header class="mb-5 pb-4">
+            <div class="d-flex align-items-center justify-content-center gap-4 mb-4">
+                <div class="brand-pill">
+                    <i data-lucide="shield-check" style="width: 36px; height: 36px; color: #1e3a8a;"></i>
+                </div>
+                <h1 class="display-3 fw-800 glow-text mb-0" style="letter-spacing: -2px;">UCB <span style="font-weight: 300; opacity: 0.8;">BANK</span></h1>
+            </div>
+            <p class="h4 fw-light opacity-50 tracking-widest uppercase mb-0" style="font-size: 0.9rem;">Identity & Access Management Portal</p>
+        </header>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="glass-portal-card" onclick="location.href='block-management.html'">
+                    <div class="icon-box">
+                        <i data-lucide="lock" style="width: 32px; height: 32px;"></i>
+                    </div>
+                    <h3 class="h4 fw-800 tracking-tight">Security Admin</h3>
+                    <p class="small text-white-50 px-3">Advanced governance, blacklisting, and real-time security monitoring.</p>
+                    <button class="btn-portal">Authorize</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-portal-card">
+                    <div class="icon-box">
+                        <i data-lucide="user-plus" style="width: 32px; height: 32px;"></i>
+                    </div>
+                    <h3 class="h4 fw-800 tracking-tight">Concierge</h3>
+                    <p class="small text-white-50 px-3">Visitor registration, badge issuance, and host notification center.</p>
+                    <button class="btn-portal">Enter</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-portal-card active-portal">
+                    <div class="icon-box" style="background: var(--neon-blue); color: white; box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);">
+                        <i data-lucide="qr-code" style="width: 32px; height: 32px;"></i>
+                    </div>
+                    <h3 class="h4 fw-800 tracking-tight">Self-Service</h3>
+                    <p class="small text-white-50 px-3">Seamless biometric check-in and fast-pass visitor registration.</p>
+                    <button class="btn-portal" style="background: var(--neon-blue); border-color: var(--neon-blue);">Register</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-5 pt-5 opacity-40 small font-monospace tracking-widest uppercase">
+            © 2026 UCB BANK • SECURE INFRASTRUCTURE • V4.2
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

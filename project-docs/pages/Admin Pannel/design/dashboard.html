@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCB Bank - VMS Professional Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at 0% 0%, #0e1117 0%, #0f172a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --active-blue: #4f46e5;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #fff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Routing Logic */
+        .vms-page { display: none; min-height: 100vh; }
+        .vms-page.active { display: flex; }
+
+        /* General UI */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+
+        /* Admin Dashboard Components */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(40px);
+            border-right: 1px solid var(--glass-border);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1rem;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            margin-bottom: 0.4rem;
+            transition: 0.3s;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .sidebar-item.active { background: var(--active-blue); }
+
+        /* Submenu Styling */
+        .sidebar-submenu {
+            display: none;
+            flex-direction: column;
+            padding-left: 2.8rem;
+            margin-bottom: 0.5rem;
+            animation: fadeInSub 0.3s ease-out;
+        }
+        .sidebar-submenu.active {
+            display: flex;
+        }
+        .submenu-item {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .submenu-item:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+        .chevron-icon {
+            transition: transform 0.3s;
+        }
+        .sidebar-item.active-parent .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        @keyframes fadeInSub {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .help-center-box {
+            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: auto;
+            text-align: center;
+            position: relative;
+        }
+
+        .help-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: -40px auto 1rem;
+            border: 4px solid #1e3a8a;
+            font-size: 1.5rem;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 2rem;
+            max-width: calc(100vw - var(--sidebar-width));
+        }
+
+        /* Top Summary Cards */
+        .summary-card {
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .summary-card h2 { font-size: 2.2rem; font-weight: 800; margin: 0; }
+        .summary-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .add-visitor-btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .add-visitor-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* List Sections */
+        .list-section { padding: 1.5rem; }
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .list-item:last-child { border-bottom: none; }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #08080811;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 10px;
+            background: rgba(21, 21, 21, 0.3);
+            color: #fff;
+        }
+
+        /* Charts */
+        .bar-chart {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            padding: 1rem 0;
+        }
+        .bar-col {
+            flex: 1;
+            background: var(--active-blue);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+        }
+        .bar-col::after {
+            content: attr(data-val);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .donut-container {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #3b82f6 0deg 120deg, 
+                #10b981 120deg 200deg, 
+                #f59e0b 200deg 300deg, 
+                #ef4444 300deg 360deg
+            );
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .donut-container::before {
+            content: '250\A Visits';
+            white-space: pre;
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: #171718;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 800;
+        }
+
+        /* Action Buttons */
+        .btn-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: 0.2s;
+        }
+        .btn-accept { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .btn-reject { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        /* Table */
+        .table { color: #fff !important; --bs-table-bg: transparent; --bs-table-border-color: rgba(255, 255, 255, 0.029); }
+        .table th { font-weight: 400; font-size: 0.8rem; color: rgba(255, 255, 255, 0.972); }
+        .table td { vertical-align: middle; font-size: 0.85rem; }
+
+        .logo-vms {
+            width: 45px; height: 45px;
+            background: #fff; color: #1e3a8a;
+            border-radius: 12px; display: flex;
+            align-items: center; justify-content: center;
+            font-weight: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0"
+  }
+}
+</script>
+</head>
+<body>
+
+    <div id="page-admin-dashboard" class="vms-page active">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="d-flex align-items-center gap-3 mb-5">
+                <div class="logo-vms">V</div>
+                <h4 class="fw-bold mb-0">VMS</h4>
+            </div>
+
+            <nav>
+                <a href="#" class="sidebar-item active"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="#" class="sidebar-item"><i class="fas fa-plus"></i> Create Invite</a>
+                <a href="#" class="sidebar-item"><i class="fas fa-history"></i> View History</a>
+                <a href="#" class="sidebar-item"><i class="fas fa-user-plus"></i> Add New User</a>
+                <a href="#" class="sidebar-item"><i class="fas fa-list"></i> Visitor's Log</a>
+                <a href="#" class="sidebar-item"><i class="fas fa-user"></i> My Profile</a>
+                <a href="#" class="sidebar-item"><i class="fas fa-users"></i> All Users</a>
+                
+                <!-- RBAC Roles with Submenu -->
+                <div class="sidebar-dropdown">
+                    <a href="#" class="sidebar-item d-flex align-items-center" id="rbac-toggle">
+                        <i class="fas fa-user-shield"></i> RBAC Roles
+                        <i class="fas fa-chevron-down ms-auto small opacity-50 chevron-icon"></i>
+                    </a>
+                    <div class="sidebar-submenu" id="rbac-submenu">
+                        <a href="addrole.html" class="submenu-item"><i class="fas fa-plus-circle"></i> Add Role</a>
+                        <a href="assignerole.html" class="submenu-item"><i class="fas fa-user-tag"></i> Assign Role</a>
+                    </div>
+                </div>
+
+                <a href="#" class="sidebar-item"><i class="fas fa-cog"></i> Settings</a>
+            </nav>
+
+            <div class="help-center-box">
+                <div class="help-icon">?</div>
+                <h6 class="fw-bold mb-2">Help Center</h6>
+                <p class="x-small text-white-50 mb-3" style="font-size: 0.7rem;">Getting Problem on Visitor Management? get help from support</p>
+                <button class="btn btn-light btn-sm w-100 rounded-pill fw-bold text-primary">Get Help</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Main Dashboard</h3>
+                <div class="d-flex align-items-center gap-3 glass-card px-3 py-2">
+                    <i class="fas fa-bell text-white-50"></i>
+                    <div class="avatar" style="width: 32px; height: 32px; margin: 0;"></div>
+                    <div>
+                        <p class="small fw-bold mb-0">Pankaj</p>
+                        <span class="text-white-50" style="font-size: 0.6rem;">Staff Management</span>
+                    </div>
+                    <i class="fas fa-cog text-white-50 ms-2"></i>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-md">
+                    <div class="glass-card summary-card">
+                        <div>
+                            <p class="small text-white-50 mb-1">Today</p>
+                            <h2>20</h2>
+                            <p class="small text-white-50">Visitors Expected</p>
+                        </div>
+                        <div class="summary-icon"><i class="fas fa-user"></i></div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="glass-card summary-card">
+                        <div>
+                            <p class="small text-white-50 mb-1">Today</p>
+                            <h2>10</h2>
+                            <p class="small text-white-50">Completed Meetings</p>
+                        </div>
+                        <div class="summary-icon"><i class="fas fa-users"></i></div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="glass-card summary-card">
+                        <div>
+                            <p class="small text-white-50 mb-1">Today</p>
+                            <h2>5</h2>
+                            <p class="small text-white-50">Defaulted Visitors</p>
+                        </div>
+                        <div class="summary-icon"><i class="fas fa-user-xmark"></i></div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="glass-card summary-card">
+                        <div>
+                            <p class="small text-white-50 mb-1">Today</p>
+                            <h2>21</h2>
+                            <p class="small text-white-50">Pending Visits</p>
+                        </div>
+                        <div class="summary-icon"><i class="fas fa-signal"></i></div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="add-visitor-btn">
+                        <i class="fas fa-plus"></i> Add Visitor
+                    </div>
+                </div>
+            </div>
+
+            <!-- Triple List Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4">
+                    <div class="glass-card list-section h-100">
+                        <div class="d-flex justify-content-between mb-4">
+                            <h6 class="fw-bold mb-0">Just Checked-in</h6>
+                            <i class="fas fa-arrow-up-right-from-square text-primary small"></i>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar"></div>
+                            <div class="flex-grow-1">
+                                <p class="small fw-bold mb-0">Adela Parkson</p>
+                                <span class="x-small text-white-50" style="font-size: 0.65rem;">Creative Director</span>
+                            </div>
+                            <div class="text-end">
+                                <p class="x-small mb-1" style="font-size: 0.65rem;">Person to Meet</p>
+                                <span class="status-badge">Vipul Gupta <span class="badge bg-success" style="font-size: 0.5rem;">EPD</span></span>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar"></div>
+                            <div class="flex-grow-1">
+                                <p class="small fw-bold mb-0">Christian Mad</p>
+                                <span class="x-small text-white-50" style="font-size: 0.65rem;">Service Vendor</span>
+                            </div>
+                            <div class="text-end">
+                                <p class="x-small mb-1" style="font-size: 0.65rem;">Person to Meet</p>
+                                <span class="status-badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">Amit Kumar <span class="badge bg-warning" style="font-size: 0.5rem;">Sales</span></span>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar"></div>
+                            <div class="flex-grow-1">
+                                <p class="small fw-bold mb-0">Jason Statham</p>
+                                <span class="x-small text-white-50" style="font-size: 0.65rem;">Delivery Boy</span>
+                            </div>
+                            <div class="text-end">
+                                <p class="x-small mb-1" style="font-size: 0.65rem;">Person to Meet</p>
+                                <span class="status-badge">Pankaj Kumar <span class="badge bg-success" style="font-size: 0.5rem;">EPD</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="glass-card list-section h-100">
+                        <div class="d-flex justify-content-between mb-4">
+                            <h6 class="fw-bold mb-0">Expected Visitors</h6>
+                            <i class="fas fa-arrow-up-right-from-square text-primary small"></i>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar"></div>
+                            <div class="flex-grow-1">
+                                <p class="small fw-bold mb-0">Adela Parkson</p>
+                                <span class="x-small text-white-50" style="font-size: 0.65rem;">Creative Director</span>
+                            </div>
+                            <div class="text-end">
+                                <p class="x-small mb-1" style="font-size: 0.7rem;">Time</p>
+                                <p class="small fw-bold mb-0">01:20 PM</p>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar"></div>
+                            <div class="flex-grow-1">
+                                <p class="small fw-bold mb-0">Christian Mad</p>
+                                <span class="x-small text-white-50" style="font-size: 0.65rem;">Service Vendor</span>
+                            </div>
+                            <div class="text-end">
+                                <p class="x-small mb-1" style="font-size: 0.7rem;">Time</p>
+                                <p class="small fw-bold mb-0">01:20 PM</p>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar"></div>
+                            <div class="flex-grow-1">
+                                <p class="small fw-bold mb-0">Jason Statham</p>
+                                <span class="x-small text-white-50" style="font-size: 0.65rem;">Delivery Boy</span>
+                            </div>
+                            <div class="text-end">
+                                <p class="x-small mb-1" style="font-size: 0.7rem;">Time</p>
+                                <p class="small fw-bold mb-0">01:20 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="glass-card list-section h-100 shadow-lg border-primary border-opacity-25" style="background: rgba(255,255,255,0.12);">
+                        <div class="d-flex justify-content-between mb-4">
+                            <h6 class="fw-bold mb-0">Pending Visits</h6>
+                            <i class="fas fa-arrow-up-right-from-square text-primary small"></i>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar"></div>
+                            <div class="flex-grow-1">
+                                <p class="small fw-bold mb-0">Adela Parkson</p>
+                                <span class="x-small text-white-50" style="font-size: 0.6rem;">Person to Meet: Vipul</span>
+                            </div>
+                            <div class="d-flex gap-2 ms-2">
+                                <button class="btn-circle btn-accept"><i class="fas fa-check"></i></button>
+                                <button class="btn-circle btn-reject"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar"></div>
+                            <div class="flex-grow-1">
+                                <p class="small fw-bold mb-0">Christian Mad</p>
+                                <span class="x-small text-white-50" style="font-size: 0.6rem;">Person to Meet: Amit</span>
+                            </div>
+                            <div class="d-flex gap-2 ms-2">
+                                <button class="btn-circle btn-accept"><i class="fas fa-check"></i></button>
+                                <button class="btn-circle btn-reject"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="avatar"></div>
+                            <div class="flex-grow-1">
+                                <p class="small fw-bold mb-0">Jason Statham</p>
+                                <span class="x-small text-white-50" style="font-size: 0.6rem;">Person to Meet: Pankaj</span>
+                            </div>
+                            <div class="d-flex gap-2 ms-2">
+                                <button class="btn-circle btn-accept"><i class="fas fa-check"></i></button>
+                                <button class="btn-circle btn-reject"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="glass-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h6 class="fw-bold mb-0">Visitor Statistic</h6>
+                            <div class="btn-group btn-group-sm bg-white bg-opacity-10 rounded-3 overflow-hidden">
+                                <button class="btn btn-outline-light border-0 py-1 px-3">Week</button>
+                                <button class="btn btn-primary border-0 py-1 px-3">Month</button>
+                                <button class="btn btn-outline-light border-0 py-1 px-3">Year</button>
+                            </div>
+                        </div>
+                        <div class="bar-chart">
+                            <div class="bar-col" style="height: 70%;" data-val="70"></div>
+                            <div class="bar-col" style="height: 90%; background: #2563eb;" data-val="90"></div>
+                            <div class="bar-col" style="height: 30%;" data-val="30"></div>
+                            <div class="bar-col" style="height: 60%;" data-val="60"></div>
+                            <div class="bar-col" style="height: 80%;" data-val="80"></div>
+                            <div class="bar-col" style="height: 95%; background: #2563eb;" data-val="95"></div>
+                            <div class="bar-col" style="height: 50%;" data-val="50"></div>
+                        </div>
+                        <div class="d-flex justify-content-between text-white-50 small mt-2">
+                            <span>Monday</span><span>Tuesday</span><span>Wednesday</span><span>Thursday</span><span>Friday</span><span>Saturday</span><span>Sunday</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="glass-card p-4 h-100">
+                        <h6 class="fw-bold text-start mb-4">Visits Category</h6>
+                        <div class="donut-container mb-4"></div>
+                        <div class="row g-2 text-start small mt-3">
+                            <div class="col-6"><i class="fas fa-circle me-1 text-primary"></i> Delivery: 40</div>
+                            <div class="col-6"><i class="fas fa-circle me-1 text-success"></i> Medical: 7</div>
+                            <div class="col-6"><i class="fas fa-circle me-1 text-warning"></i> Vendor: 40</div>
+                            <div class="col-6"><i class="fas fa-circle me-1 text-danger"></i> Clients: 40</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last Visits Table -->
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between mb-4">
+                    <h6 class="fw-bold mb-0">Last Visits</h6>
+                    <i class="fas fa-arrow-up-right-from-square text-primary small"></i>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Visitor's Name</th>
+                                <th>Person to Meet</th>
+                                <th>Department</th>
+                                <th>Check-in</th>
+                                <th>Check-out</th>
+                                <th>Date</th>
+                                <th>Visitor Type</th>
+                                <th>Granted by</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar" style="width: 28px; height: 28px; margin: 0;"></div>
+                                        <span class="x-small">Adela Parkson</span>
+                                    </div>
+                                </td>
+                                <td>Vipul Gupta</td>
+                                <td>EPD</td>
+                                <td>01:20 PM</td>
+                                <td>03:05 PM</td>
+                                <td>24/04/2024</td>
+                                <td>Client</td>
+                                <td>Christian Mad</td>
+                                <td><span class="status-badge">EPD</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar" style="width: 28px; height: 28px; margin: 0;"></div>
+                                        <span class="x-small">Jason Statham</span>
+                                    </div>
+                                </td>
+                                <td>Vipul Gupta</td>
+                                <td>Sales</td>
+                                <td>01:20 PM</td>
+                                <td>03:05 PM</td>
+                                <td>24/04/2024</td>
+                                <td>Vendor</td>
+                                <td>Christian Mad</td>
+                                <td><span class="status-badge bg-warning bg-opacity-25 text-warning border-0">Salesforce</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Router Logic (Simplified) -->
+    <script>
+        function navigateTo(pageId) {
+            document.querySelectorAll('.vms-page').forEach(p => p.classList.remove('active'));
+            const req = document.getElementById(pageId);
+            if(req) req.classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        // Submenu Toggle Logic
+        document.getElementById('rbac-toggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            const submenu = document.getElementById('rbac-submenu');
+            const parent = this.parentElement;
+            
+            submenu.classList.toggle('active');
+            parent.classList.toggle('active-parent');
+        });
+    </script>
+</body>
+</html>

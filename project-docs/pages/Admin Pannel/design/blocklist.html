@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCB Bank - Blocked Visitors List</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #101d42 0%, #060b1d 100%);
+            --sidebar-bg: #111a30;
+            --active-blue: #5046e5;
+            --neon-pink: #db2777;
+            --neon-blue: #3b82f6;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(25px);
+            
+            /* High-End Glows */
+            --bloom-cyan: 0 0 20px rgba(59, 130, 246, 0.4);
+            --bloom-pink: 0 0 20px rgba(219, 39, 119, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: #f1f5f9;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar - Exact Replica of Image 2 */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .logo-box {
+            width: 44px;
+            height: 44px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e3a8a;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.85rem 1.25rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            background: var(--active-blue);
+            color: white;
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        }
+
+        .help-center-card {
+            margin-top: auto;
+            background: linear-gradient(180deg, #5046e5 0%, #3b82f6 100%);
+            border-radius: 24px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .help-icon-box {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .btn-help {
+            background: white;
+            color: #1e3a8a;
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.8rem;
+            width: 100%;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-help:hover { transform: scale(1.03); }
+
+        /* Main Area */
+        .main-container {
+            margin-left: 260px;
+            padding: 3rem;
+            min-height: 100vh;
+        }
+
+        /* Header - Match Image 1 */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .header-titles h1 {
+            font-size: 1.85rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-titles p {
+            font-size: 0.85rem;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 500;
+        }
+
+        .admin-pill {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.4rem 0.4rem 0.4rem 1.5rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-label { text-align: right; }
+        .admin-label span:first-child { display: block; font-weight: 800; font-size: 0.75rem; }
+        .admin-label span:last-child { display: block; font-size: 0.65rem; opacity: 0.5; }
+
+        .avatar-glow {
+            width: 38px;
+            height: 38px;
+            background: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
+        }
+
+        /* Table Card Section */
+        .glass-table-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+
+        .table-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .search-field {
+            position: relative;
+            width: 320px;
+        }
+
+        .search-field i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            width: 16px;
+        }
+
+        .search-input {
+            background: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+            border-radius: 50px;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        .search-input::placeholder {
+            color: #ffffff !important;
+            opacity: 0.9 !important;
+        }
+
+        /* Custom Table Design */
+        .vms-table-container {
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .vms-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .vms-table th {
+            background: rgba(255, 255, 255, 0.02);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            color: rgba(255, 255, 255, 0.4);
+            padding: 1.2rem 1.5rem;
+            border: none;
+        }
+
+        .vms-table td {
+            padding: 1.4rem 1.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+
+        .vms-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: #ffffff;
+        }
+
+        /* Status Badge - Neon Pink */
+        .status-badge-blocked {
+            background: rgba(219, 39, 119, 0.1);
+            color: #f472b6;
+            border: 1px solid rgba(219, 39, 119, 0.3);
+            padding: 0.5rem 1.4rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            box-shadow: 0 0 15px rgba(219, 39, 119, 0.15);
+        }
+
+        /* Lucrative Action Icon */
+        .btn-edit-action {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-blue);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .btn-edit-action:hover {
+            background: var(--neon-blue);
+            color: white;
+            box-shadow: 0 0 18px rgba(59, 130, 246, 0.5);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .visitor-primary { font-weight: 700; color: #fff; }
+        .visitor-id { font-size: 0.8rem; opacity: 0.4; font-family: 'Courier New', monospace; letter-spacing: 0.5px; }
+
+        .fade-in { animation: fadeInAnim 0.8s ease-out forwards; }
+        @keyframes fadeInAnim { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 992px) {
+            .sidebar { display: none; }
+            .main-container { margin-left: 0; padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar - Image 2 Style -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-box">V</div>
+            <span class="logo-text">VMS</span>
+        </div>
+        
+        <nav class="flex-column">
+            <a href="index.html" class="nav-item">
+                <i data-lucide="layout-grid"></i> Dashboard
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="plus"></i> Create Invite
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="history"></i> View History
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="user-plus"></i> Add New User
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="list"></i> Visitor's Log
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="user"></i> My Profile
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="users"></i> All Users
+            </a>
+            <a href="blocklist.html" class="nav-item active">
+                <i data-lucide="shield-alert"></i> Blocklist
+            </a>
+            <a href="#" class="nav-item">
+                <i data-lucide="settings"></i> Settings
+            </a>
+        </nav>
+
+        <div class="help-center-card">
+            <div class="help-icon-box">?</div>
+            <h6 class="fw-800 text-white mb-1">Help Center</h6>
+            <p class="x-small text-white-50 mb-0" style="font-size: 0.65rem;">Getting Problem on Visitor Management? get help from support</p>
+            <button class="btn-help">Get Help</button>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-container">
+        <!-- Header - Image 1 Style -->
+        <header class="top-header fade-in">
+            <div class="header-titles">
+                <h1>Security Governance</h1>
+                <p>Identity & Access Management Portal</p>
+            </div>
+            
+            <div class="admin-pill">
+                <div class="admin-label">
+                    <span>Admin Clearance</span>
+                    <span>Level 5 Authorized</span>
+                </div>
+                <div class="avatar-glow">
+                    <i data-lucide="user" style="width: 20px;"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Blocked List Section -->
+        <section class="fade-in">
+            <div class="glass-table-card">
+                <div class="table-header-flex">
+                    <h5 class="fw-800 mb-0">Blocked Visitors Directory</h5>
+                    <div class="search-field">
+                        <i data-lucide="search"></i>
+                        <input type="text" class="search-input" placeholder="Search by name or phone">
+                    </div>
+                </div>
+
+                <div class="table-responsive vms-table-container">
+                    <table class="vms-table">
+                        <thead>
+                            <tr>
+                                <th>Visitor Name</th>
+                                <th>Phone</th>
+                                <th>Block Reason</th>
+                                <th>Last Visit</th>
+                                <th>Host Name</th>
+                                <th>Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dummy Data 1 -->
+                            <tr>
+                                <td>
+                                    <div class="visitor-primary">John Doe</div>
+                                    <div class="visitor-id">#BLK-8291</div>
+                                </td>
+                                <td><span class="opacity-60">017xxxxxxx</span></td>
+                                <td>Security Violation</td>
+                                <td>12 Aug 2025</td>
+                                <td>Mr. Rahman</td>
+                                <td><span class="status-badge-blocked">Blocked</span></td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center">
+                                        <div class="btn-edit-action" title="Edit Security Record">
+                                            <i data-lucide="edit-3" style="width: 16px;"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Dummy Data 2 -->
+                            <tr>
+                                <td>
+                                    <div class="visitor-primary">Jane Smith</div>
+                                    <div class="visitor-id">#BLK-4402</div>
+                                </td>
+                                <td><span class="opacity-60">018xxxxxxx</span></td>
+                                <td>Unauthorized Entry</td>
+                                <td>08 Aug 2025</td>
+                                <td>Ms. Akter</td>
+                                <td><span class="status-badge-blocked">Blocked</span></td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center">
+                                        <div class="btn-edit-action" title="Edit Security Record">
+                                            <i data-lucide="edit-3" style="width: 16px;"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Dummy Data 3 -->
+                            <tr>
+                                <td>
+                                    <div class="visitor-primary">Robert Brown</div>
+                                    <div class="visitor-id">#BLK-1192</div>
+                                </td>
+                                <td><span class="opacity-60">019xxxxxxx</span></td>
+                                <td>Identity Verification Failed</td>
+                                <td>01 Aug 2025</td>
+                                <td>Security-A</td>
+                                <td><span class="status-badge-blocked">Blocked</span></td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center">
+                                        <div class="btn-edit-action" title="Edit Security Record">
+                                            <i data-lucide="edit-3" style="width: 16px;"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Dummy Data 4 -->
+                            <tr>
+                                <td>
+                                    <div class="visitor-primary">Michael Lee</div>
+                                    <div class="visitor-id">#BLK-5501</div>
+                                </td>
+                                <td><span class="opacity-60">016xxxxxxx</span></td>
+                                <td>Host Restriction Policy</td>
+                                <td>28 Jul 2025</td>
+                                <td>Reception-B</td>
+                                <td><span class="status-badge-blocked">Blocked</span></td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center">
+                                        <div class="btn-edit-action" title="Edit Security Record">
+                                            <i data-lucide="edit-3" style="width: 16px;"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-5 pt-4 text-center opacity-30 small uppercase tracking-widest font-monospace">
+            © 2026 UCB BANK • Security Compliance Module • V4.5
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCB Bank - Visitor Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-page: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --sidebar-bg: rgba(15, 23, 42, 0.95);
+            --accent-blue: #3b82f6;
+            --neon-glow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(59, 130, 246, 0.4);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(25px);
+            border-right: 1px solid rgba(59, 130, 246, 0.2);
+            height: 100vh;
+            position: fixed;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .logo-v {
+            background: #ffffff;
+            color: #1e293b;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .brand-text h2 { font-size: 18px; font-weight: 700; margin: 0; color: #ffffff; letter-spacing: 0.5px;}
+
+        .nav-menu { margin-top: 50px; flex-grow: 1; }
+
+        .nav-item {
+            padding: 14px 18px;
+            color: #cbd5e1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 12px;
+            transition: 0.3s;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(59, 130, 246, 0.25);
+            color: #ffffff;
+            box-shadow: var(--neon-glow);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* --- Main Content --- */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 40px;
+        }
+
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- Polished Filter Panel --- */
+        .filter-panel {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            backdrop-filter: blur(20px);
+        }
+
+        .form-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1.5px;
+            display: block;
+        }
+
+        .input-group-custom {
+            position: relative;
+            background: #111827;
+            border: 1px solid var(--input-border);
+            border-radius: 14px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+        }
+
+        .input-group-custom:focus-within {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .input-group-custom i {
+            padding: 0 15px;
+            color: var(--accent-blue);
+            font-size: 14px;
+            text-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        .form-control-custom {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 12px 10px;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-control-custom:focus {
+            outline: none;
+        }
+
+        .form-control-custom::placeholder {
+            color: rgba(148, 163, 184, 0.4);
+        }
+
+        /* --- Buttons --- */
+        .btn-blue {
+            background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4);
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .btn-blue:hover {
+            box-shadow: var(--neon-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-download {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-download:hover {
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+
+        /* --- Table Design --- */
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .custom-table th { color: var(--text-muted); font-size: 11px; text-transform: uppercase; padding: 10px 20px; letter-spacing: 1.5px; }
+        .custom-table td {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 18px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+        }
+        .custom-table tr td:first-child { border-radius: 15px 0 0 15px; border-left: 1px solid rgba(255, 255, 255, 0.05); }
+        .custom-table tr td:last-child { border-radius: 0 15px 15px 0; border-right: 1px solid rgba(255, 255, 255, 0.05); }
+
+        .status-pill {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .status-onsite { color: #4ade80; background: rgba(74, 222, 128, 0.15); border: 1px solid rgba(74, 222, 128, 0.2); }
+        .status-completed { color: #94a3b8; background: rgba(148, 163, 184, 0.15); }
+
+        /* --- Sidebar Capacity --- */
+        .capacity-section { margin-top: auto; padding-top: 20px; }
+        .progress-custom { background: #334155; height: 8px; border-radius: 10px; }
+        .progress-bar-custom { background: var(--accent-blue); box-shadow: var(--neon-glow); border-radius: 10px; }
+        .capacity-values { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; font-weight: 700; color: #ffffff; }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            color: var(--accent-blue);
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: var(--neon-glow);
+        }
+
+        .section-header::after {
+            content: "";
+            flex: 1;
+            height: 1.5px;
+            background: linear-gradient(90deg, var(--accent-blue) 0%, transparent 100%);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="d-flex align-items-center gap-3">
+            <div class="logo-v">V</div>
+            <div class="brand-text">
+                <h2>UCB BANK</h2>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="#" class="nav-item"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="#" class="nav-item active"><i class="fas fa-file-alt"></i> Visitor Report</a>
+            <a href="#" class="nav-item"><i class="fas fa-users"></i> Visitors</a>
+            <a href="#" class="nav-item"><i class="fas fa-clock"></i> History</a>
+        </nav>
+
+        <div class="capacity-section">
+            <div class="stat-label mb-2" style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Office Capacity</div>
+            <div class="progress progress-custom">
+                <div class="progress-bar progress-bar-custom" style="width: 15%;"></div>
+            </div>
+            <div class="capacity-values">
+                <span>Current: 3</span>
+                <span>Max: 20</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        <div class="header-top">
+            <h1 class="page-title">Visitor Analytics</h1>
+            <button class="btn-download" id="downloadPDF">
+                <i class="fas fa-file-pdf me-2"></i>Export PDF
+            </button>
+        </div>
+
+        <!-- Polished Filter Panel -->
+        <div class="filter-panel">
+            <div class="section-header">Filter Registry</div>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <label class="form-label">From Date</label>
+                    <div class="input-group-custom">
+                        <i class="fas fa-calendar-day"></i>
+                        <input type="date" id="fromDate" class="form-control-custom">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To Date</label>
+                    <div class="input-group-custom">
+                        <i class="fas fa-calendar-check"></i>
+                        <input type="date" id="toDate" class="form-control-custom">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Host Employee</label>
+                    <div class="input-group-custom">
+                        <i class="fas fa-user-tie"></i>
+                        <input type="text" id="employeeName" class="form-control-custom" placeholder="Search by host...">
+                    </div>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn-blue" id="generateReport">
+                        <i class="fas fa-search me-2"></i>Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="section-header">Live Registry Results</div>
+        <div class="table-responsive">
+            <table class="custom-table" id="visitorTable">
+                <thead>
+                    <tr>
+                        <th>Visitor Name</th>
+                        <th>Email & Phone</th>
+                        <th>Company</th>
+                        <th>Host Employee</th>
+                        <th>Visit Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="visitorTableBody">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Expanded Dummy Data
+        const sampleVisitors = [
+            { name: "Sarah Connor", email: "sarah.c@skynet.com", phone: "+1 555-0101", company: "Skynet Solutions", host: "John Matrix", date: "2024-05-20", status: "Completed" },
+            { name: "Arthur Dent", email: "a.dent@galaxy.com", phone: "+1 555-4242", company: "Magrathea Const.", host: "Zaphod B.", date: "2024-05-20", status: "On-Site" },
+            { name: "Ellen Ripley", email: "ripley@weyland.com", phone: "+1 555-0909", company: "Weyland-Yutani", host: "Carter Burke", date: "2024-05-19", status: "Completed" },
+            { name: "Joel Miller", email: "j.miller@firefly.org", phone: "+1 555-2013", company: "Firefly Logistics", host: "Tess Serv.", date: "2024-05-19", status: "Completed" },
+            { name: "Dana Scully", email: "scully@fbi.gov", phone: "+1 555-1013", company: "FBI Internal", host: "Fox Mulder", date: "2024-05-18", status: "Completed" },
+            { name: "Tony Stark", email: "tony@stark.com", phone: "+1 555-3000", company: "Stark Industries", host: "Pepper Potts", date: "2024-05-18", status: "On-Site" },
+            { name: "Bruce Wayne", email: "bruce@wayne.com", phone: "+1 555-1939", company: "Wayne Enterprises", host: "Lucius Fox", date: "2024-05-17", status: "Completed" },
+            { name: "Hermione Granger", email: "h.granger@hogwarts.edu", phone: "+44 7700-900", company: "Ministry of Magic", host: "Minerva M.", date: "2024-05-17", status: "Completed" },
+            { name: "Peter Parker", email: "p.parker@bugle.com", phone: "+1 555-0015", company: "Daily Bugle", host: "J. Jonah J.", date: "2024-05-16", status: "Completed" },
+            { name: "Katniss Everdeen", email: "mockingjay@panem.gov", phone: "+1 555-0012", company: "District 12", host: "Haymitch A.", date: "2024-05-16", status: "On-Site" }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('toDate').value = today;
+            
+            displayVisitorData(sampleVisitors);
+        });
+
+        function displayVisitorData(visitors) {
+            const tableBody = document.getElementById('visitorTableBody');
+            if (visitors.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 40px; color: var(--text-muted);">No records found matching your criteria.</td></tr>';
+                return;
+            }
+            tableBody.innerHTML = visitors.map(v => `
+                <tr>
+                    <td class="fw-bold" style="color:#fff">${v.name}</td>
+                    <td>
+                        <div style="font-size:11px; color:var(--accent-blue); font-weight:600;">${v.email}</div>
+                        <div style="color:var(--text-muted); font-size:12px;">${v.phone}</div>
+                    </td>
+                    <td>${v.company}</td>
+                    <td><i class="fas fa-user-circle me-2" style="opacity:0.5"></i>${v.host}</td>
+                    <td style="font-family: monospace; letter-spacing: 0.5px;">${v.date}</td>
+                    <td>
+                        <span class="status-pill ${v.status === 'On-Site' ? 'status-onsite' : 'status-completed'}">
+                            ${v.status}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('generateReport').addEventListener('click', function() {
+            // Simulate filter process
+            const btn = this;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            
+            setTimeout(() => {
+                displayVisitorData(sampleVisitors);
+                btn.innerHTML = originalContent;
+            }, 800);
+        });
+
+        document.getElementById('downloadPDF').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFillColor(15, 23, 42);
+            doc.rect(0, 0, 210, 297, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.text('UCB Bank - Visitor Analytics', 14, 20);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(148, 163, 184);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
+
+            doc.autoTable({
+                startY: 35,
+                head: [['Visitor Name', 'Company', 'Host', 'Visit Date', 'Status']],
+                body: sampleVisitors.map(v => [v.name, v.company, v.host, v.date, v.status]),
+                theme: 'grid',
+                headStyles: { fillColor: [59, 130, 246], textColor: [255, 255, 255], fontStyle: 'bold' },
+                bodyStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255] },
+                alternateRowStyles: { fillColor: [20, 30, 50] },
+                margin: { top: 35 }
+            });
+
+            doc.save('UCB-Visitor-Report.pdf');
+        });
+    </script>
+</body>
+</html>
