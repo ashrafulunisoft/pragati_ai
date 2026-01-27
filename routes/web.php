@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Password;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\InsurancePackageController;
 
 //for create role and permission :
 use App\Http\Controllers\Auth\LoginController;
@@ -103,6 +104,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/role/assign/create', [AdminController::class, 'createAssignRole'])->name('admin.role.assign.create');
     Route::post('/admin/role/assign/store', [AdminController::class, 'storeAssignRole'])->name('admin.role.assign.store');
     Route::post('/admin/role/assign/remove', [AdminController::class, 'removeUserRole'])->name('admin.role.assign.remove');
+
+    // Insurance Package CRUD Routes
+    Route::resource('admin/insurance-packages', InsurancePackageController::class);
+    Route::post('admin/insurance-packages/{insurancePackage}/toggle-status', [InsurancePackageController::class, 'toggleStatus'])->name('admin.insurance-packages.toggle-status');
 });
 
 /*
