@@ -1,8 +1,10 @@
-@extends('layouts.guest')
+@extends('layouts.receptionist')
 
 @section('title', 'My Policies - Pragati AI')
-
+ 
 @section('content')
+  
+
 <div class="container py-5">
     <!-- Header -->
     <div class="text-center mb-5">
@@ -176,5 +178,129 @@
         font-size: 0.75rem;
         padding: 5px 10px;
         border-radius: 20px;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 992px) {
+        .container {
+            max-width: 95%;
+            padding: 0 1rem;
+        }
+        
+        .policy-card {
+            margin-bottom: 1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.75rem !important;
+        }
+
+        .glass-card {
+            padding: 1.5rem !important;
+        }
+
+        .policy-number {
+            font-size: 0.9rem;
+        }
+
+        .policy-details {
+            padding: 10px;
+        }
+
+        .policy-details .small {
+            font-size: 0.8rem !important;
+        }
+
+        .btn-success,
+        .btn-outline-success {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container {
+            padding: 0 0.5rem;
+        }
+
+        .text-center h1 {
+            font-size: 1.5rem !important;
+            line-height: 1.3;
+        }
+
+        .text-center p {
+            font-size: 0.9rem !important;
+        }
+
+        .glass-card {
+            padding: 1.2rem !important;
+            border-radius: 16px !important;
+        }
+
+        .policy-number {
+            font-size: 0.85rem;
+        }
+
+        .policy-details {
+            padding: 8px;
+        }
+
+        .policy-details .d-flex {
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .policy-details .d-flex.justify-content-between {
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .policy-details .fw-bold {
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            font-size: 0.65rem;
+            padding: 4px 8px;
+        }
+
+        .progress {
+            height: 4px !important;
+        }
+
+        .btn-success,
+        .btn-outline-success {
+            width: 100%;
+            padding: 12px;
+            font-size: 0.95rem;
+        }
+
+        .d-flex.justify-content-between.align-items-start {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.5rem;
+        }
+
+        .d-flex.justify-content-between.align-items-start small {
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        h1 {
+            font-size: 1.25rem !important;
+        }
+
+        .fa-5x {
+            font-size: 3rem !important;
+        }
+
+        .btn-success,
+        .btn-outline-success {
+            font-size: 0.85rem;
+            padding: 10px;
+        }
     }
 </style>

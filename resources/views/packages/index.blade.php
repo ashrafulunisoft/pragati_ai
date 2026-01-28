@@ -1,4 +1,4 @@
-@extends('layouts.guest')
+@extends('layouts.receptionist')
 
 @section('title', 'Insurance Packages - Pragati AI')
 

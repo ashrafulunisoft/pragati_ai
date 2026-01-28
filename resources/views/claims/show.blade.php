@@ -1,4 +1,4 @@
-@extends('layouts.guest')
+@extends('layouts.receptionist')
 
 @section('title', 'Claim Details - ' . $claim->claim_number)
 

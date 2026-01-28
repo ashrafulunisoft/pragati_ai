@@ -35,7 +35,8 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0bd696 0%, #f5f7fa 100%);
+            background: var(--bg-page);
+            background-image: var(--bg-gradient);
             background-attachment: fixed;
             min-height: 100vh;
             color: #fff;
@@ -59,7 +60,7 @@
         /* Sidebar Desktop */
         .sidebar {
             width: var(--sidebar-width);
-            background: linear-gradient(135deg, #0bd696 0%, #f5f7fa 100%);
+            background: var(--sidebar-bg);
             border-right: 1px solid var(--glass-border);
             height: 100vh;
             position: fixed;
@@ -70,7 +71,6 @@
             padding: 2rem 1.2rem;
             z-index: 1050;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
         }
 
         .sidebar-item {
@@ -79,7 +79,7 @@
             gap: 12px;
             padding: 0.85rem 1.2rem;
             border-radius: 14px;
-            color: #000000;
+            color: var(--text-muted);
             text-decoration: none;
             margin-bottom: 0.4rem;
             transition: 0.3s;
@@ -88,8 +88,8 @@
         }
 
         .sidebar-item:hover, .sidebar-item.active {
-            color: #000000;
-            background: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .sidebar-item.active {
@@ -108,20 +108,13 @@
         .submenu-item {
             padding: 0.6rem 1rem;
             font-size: 0.85rem;
-            color: #000000;
+            color: var(--text-muted);
             text-decoration: none;
             border-radius: 8px;
             transition: 0.2s;
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        /* Sidebar Logo */
-        .sidebar-logo {
-            max-width: 100%;
-            height: auto;
-            object-fit: contain;
         }
 
         /* Help Center */
@@ -132,7 +125,6 @@
             margin-top: auto;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            flex-shrink: 0;
         }
 
         .help-icon {
@@ -233,19 +225,13 @@
         /* Mobile Header */
         .mobile-top-nav {
             display: none;
-            background: linear-gradient(135deg, #0bd696 0%, #f5f7fa 100%);
-            padding: 0.875rem 1rem;
+            background: var(--sidebar-bg);
+            padding: 1rem;
             position: sticky;
             top: 0;
             z-index: 1000;
             border-bottom: 1px solid var(--glass-border);
             width: 100%;
-        }
-
-        .mobile-top-nav img {
-            max-height: 45px;
-            width: auto;
-            object-fit: contain;
         }
 
         .sidebar-overlay {
@@ -259,201 +245,21 @@
 
         /* RESPONSIVE BREAKPOINTS */
         @media (max-width: 992px) {
-            .sidebar { 
-                left: -320px; 
-                width: 300px;
-                padding: 1.5rem 1rem;
-            }
+            .sidebar { left: -280px; }
             .sidebar.show { left: 0; }
             .sidebar-overlay.show { display: block; }
-            .main-container { margin-left: 0; padding: 1.5rem; width: 100%; }
-            .mobile-top-nav { 
-                display: flex; 
-                align-items: center; 
-                justify-content: space-between;
-                flex-direction: row;
-                flex-wrap: nowrap;
-            }
+            .main-container { margin-left: 0; padding: 1.2rem; width: 100%; }
+            .mobile-top-nav { display: flex; align-items: center; justify-content: space-between; }
             .header-section { flex-direction: column; align-items: flex-start; }
             .header-profile-box { width: 100%; }
-            
-            .sidebar-logo {
-                max-width: 200px;
-                height: auto;
-            }
-            
-            .sidebar-item {
-                padding: 0.75rem 1rem;
-                font-size: 0.85rem;
-                gap: 10px;
-            }
-            
-            .help-center-box {
-                padding: 1.2rem;
-            }
-            
-            .help-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .mobile-top-nav {
-                padding: 0.75rem 0.875rem;
-            }
-            
-            .mobile-top-nav img {
-                max-height: 40px;
-            }
-            
-            .main-container {
-                padding: 1.2rem;
-            }
-            
-            .sidebar {
-                width: 280px;
-                left: -300px;
-            }
-            
-            .sidebar-logo {
-                max-width: 180px;
-            }
-            
-            .sidebar-item {
-                padding: 0.7rem 0.9rem;
-                font-size: 0.85rem;
-                gap: 8px;
-            }
-            
-            .sidebar-item i {
-                font-size: 0.95rem;
-            }
         }
 
         @media (max-width: 576px) {
-            .mobile-top-nav {
-                padding: 0.625rem 0.75rem;
-            }
-            
-            .mobile-top-nav img {
-                max-height: 38px;
-                max-width: 70px;
-            }
-            
-            .sidebar {
-                width: 260px;
-                left: -280px;
-                padding: 1.2rem 0.875rem;
-            }
-            
-            .sidebar-logo {
-                max-width: 150px;
-                height: auto;
-            }
-            
-            .sidebar-item {
-                padding: 0.65rem 0.85rem;
-                font-size: 0.82rem;
-                gap: 8px;
-                margin-bottom: 0.35rem;
-            }
-            
-            .sidebar-item i {
-                font-size: 0.9rem;
-                width: 18px;
-                text-align: center;
-            }
-            
-            .sidebar-submenu {
-                padding-left: 2rem;
-            }
-            
-            .submenu-item {
-                padding: 0.5rem 0.8rem;
-                font-size: 0.78rem;
-                gap: 8px;
-            }
-            
-            .help-center-box {
-                padding: 1rem;
-                border-radius: 18px;
-            }
-            
-            .help-icon {
-                width: 35px;
-                height: 35px;
-                margin: -35px auto 0.75rem;
-                font-size: 0.9rem;
-                border-width: 3px;
-            }
-            
-            .help-center-box h6 {
-                font-size: 0.9rem;
-            }
-            
-            .help-center-box p {
-                font-size: 0.7rem;
-            }
-            
-            .help-center-box .btn {
-                font-size: 0.75rem;
-                padding: 0.5rem 0.75rem;
-            }
-            
             .summary-card h2 { font-size: 1.5rem; }
             .main-container { padding: 1rem; }
             .glass-card { border-radius: 16px; padding: 1.2rem !important; }
             .donut-container { width: 140px !important; height: 140px !important; }
             .donut-inner { width: 100px !important; height: 100px !important; }
-        }
-
-        @media (max-width: 400px) {
-            .mobile-top-nav {
-                padding: 0.5rem 0.625rem;
-            }
-            
-            .mobile-top-nav img {
-                max-height: 35px;
-                max-width: 60px;
-            }
-            
-            .sidebar {
-                width: 240px;
-                left: -260px;
-                padding: 1rem 0.75rem;
-            }
-            
-            .sidebar-logo {
-                max-width: 130px;
-            }
-            
-            .sidebar-item {
-                padding: 0.6rem 0.75rem;
-                font-size: 0.78rem;
-                gap: 6px;
-            }
-            
-            .sidebar-item i {
-                font-size: 0.85rem;
-                width: 16px;
-            }
-            
-            .submenu-item {
-                padding: 0.45rem 0.7rem;
-                font-size: 0.75rem;
-            }
-            
-            .help-center-box {
-                padding: 0.875rem;
-            }
-            
-            .help-icon {
-                width: 32px;
-                height: 32px;
-                margin: -32px auto 0.625rem;
-            }
         }
 
         .logo-vms {
@@ -671,7 +477,7 @@
             right: -400px;
             width: 380px;
             height: 100vh;
-            background: linear-gradient(135deg, #0bd696 0%, #f5f7fa 100%);
+            background: var(--sidebar-bg);
             border-left: 1px solid var(--glass-border);
             padding: 2rem;
             z-index: 1060;
@@ -847,14 +653,10 @@
     <!-- Mobile Navigation Bar -->
     <div class="mobile-top-nav">
 
-      {{--  <div class="d-flex justify-content-end  mb-2 text-white">
+        <div class="d-flex justify-content-end  mb-2 text-white">
                 <img class="bg-white" alt="UCB Bank Logo" src="{{ asset('vms/logo/ucb-3.png') }}" style="height: 52px; width: 82px; border-radius:5px;">
-            </div>
-            --}}
-            <div class="text-center gap-3 mb-3 ">
-                <img class="bg-white " src="{{ asset('vms/logo/pragati-logo -1.jpg') }}" style="height: 80px; width: 100px; border-radius:10px;" alt="UCB Bank Logo">
-            </div>
 
+            </div>
         <button class="btn text-white p-0" onclick="toggleSidebar()">
             <i class="fas fa-bars fs-4"></i>
         </button>
@@ -866,37 +668,17 @@
     <div id="page-receptionist-dashboard" class="vms-page">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
-           {{-- <div class="d-flex align-items-center gap-3 mb-3 ">
+            <div class="d-flex align-items-center gap-3 mb-3 ">
                 <img class="bg-white " src="{{ asset('vms/logo/ucb-bank-logo-bg_removed.png') }}" style="height: 80px; width: 100vh; border-radius:10px;" alt="UCB Bank Logo">
             </div>
-            --}}
-            <div class="text-center gap-3 mb-3 ">
-                <img class="bg-white " src="{{ asset('vms/logo/pragati-logo -1.jpg') }}" style="height: 80px; width: 100px; border-radius:10px;" alt="UCB Bank Logo">
-            </div>
-
 
             <nav>
                 <!-- Dashboard - Always visible -->
                 <a href="{{ route('dashboard') }}" class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <i class="fas fa-home"></i> Dashboard
+                    <i class="fas fa-th-large"></i> Dashboard
                 </a>
 
-             <!-- Dashboard - Always visible -->
-                <a href="{{ route('packages.index') }}" class="sidebar-item {{ request()->routeIs('packages.index') ? 'active' : '' }}">
-                    <i class="fas fa-box"></i> Packages
-                </a>
-                 <!-- Dashboard - Always visible -->
-                <a href="{{ route('claims.index') }}" class="sidebar-item {{ request()->routeIs('claims.index') ? 'active' : '' }}">
-                    <i class="fas fa-file-medical"></i> Claim
-                </a>
-                
-                <!-- Dashboard - Always visible -->
-                <a href="{{ route('orders.index') }}" class="sidebar-item {{ request()->routeIs('orders.index') ? 'active' : '' }}">
-                    <i class="fas fa-shopping-cart"></i> Policies
-                </a>
-                
-
-              {{--  <!-- Visitor Management - Permission Based -->
+                <!-- Visitor Management - Permission Based -->
                 @can('view visitors')
                 <div class="sidebar-dropdown">
                     <a href="#" class="sidebar-item d-flex align-items-center" onclick="toggleSubmenu(event, 'visitor-submenu')">
@@ -909,7 +691,7 @@
                             <i class="fas fa-list"></i> Visitor List
                         </a>
                         @endcan
-                        
+
                         @can('create visitors')
                         <a href="{{ route('visitor.create') }}" class="submenu-item">
                             <i class="fas fa-plus"></i> New Registration
@@ -995,7 +777,6 @@
                     <i class="fas fa-chart-line"></i> Reports
                 </a>
                 @endcan
-                --}}
 
                 <!-- Settings - Permission Based -->
                 @can('manage settings')

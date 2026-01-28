@@ -1,4 +1,4 @@
-@extends('layouts.guest')
+@extends('layouts.receptionist')
 
 @section('title', 'Policy Details - ' . $order->policy_number)
 
@@ -246,7 +246,186 @@
         }
         .glass-card {
             box-shadow: none !important;
-            border: 1px solid #ddd !important;
+            border:1px solid #ddd !important;
+        }
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 992px) {
+        .container {
+            max-width: 95%;
+            padding: 0 1rem;
+        }
+
+        .policy-card {
+            margin-bottom: 1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        h3 {
+            font-size: 1.5rem !important;
+        }
+
+        .card-body {
+            padding: 2rem !important;
+        }
+
+        .detail-box {
+            padding: 1.2rem;
+        }
+
+        .coverage-progress {
+            margin-bottom: 3rem;
+        }
+
+        .policy-features {
+            margin-bottom: 3rem;
+        }
+
+        .btn-lg {
+            padding: 1rem;
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .container {
+            padding: 0 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+
+        .card-header {
+            padding: 1rem !important;
+        }
+
+        .card-header h5 {
+            font-size: 1rem !important;
+        }
+
+        .card-header .badge {
+            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
+        }
+
+        h3 {
+            font-size: 1.25rem !important;
+            line-height: 1.3;
+        }
+
+        .detail-box {
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .detail-box p {
+            font-size: 0.75rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-box h6 {
+            font-size: 0.95rem;
+        }
+
+        .coverage-progress {
+            margin-bottom: 2.5rem;
+        }
+
+        .coverage-progress .d-flex {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start !important;
+        }
+
+        .progress {
+            height: 8px !important;
+        }
+
+        .policy-features {
+            margin-bottom: 2.5rem;
+        }
+
+        .policy-features h6 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .policy-features .row {
+            gap: 0.5rem;
+        }
+
+        .policy-features .feature-item {
+            padding: 0.75rem;
+            gap: 0.5rem;
+        }
+
+        .policy-features .feature-item i {
+            font-size: 0.9rem;
+        }
+
+        .policy-features .feature-item span {
+            font-size: 0.85rem;
+        }
+
+        .d-grid {
+            gap: 0.75rem;
+        }
+
+        .btn-lg {
+            padding: 0.875rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-lg i {
+            font-size: 0.9rem;
+        }
+
+        .footer-note {
+            padding: 0 1rem;
+        }
+
+        .footer-note p {
+            font-size: 0.8rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .card-body {
+            padding: 1.2rem !important;
+        }
+
+        h3 {
+            font-size: 1.1rem !important;
+        }
+
+        .detail-box {
+            padding: 0.8rem;
+        }
+
+        .detail-box h6 {
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+
+        .btn-lg {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .policy-features .row > div {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .coverage-progress .progress {
+            height: 6px !important;
         }
     }
 </style>
