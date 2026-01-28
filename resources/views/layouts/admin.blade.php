@@ -530,10 +530,12 @@
 
             <nav>
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><i class="fas fa-th-large"></i> Dashboard</a>
-                <a href="{{ route('admin.live.dashboard') }}" class="sidebar-item {{ request()->routeIs('admin.live.dashboard') ? 'active' : '' }}"><i class="fas fa-broadcast-tower"></i> Live Dashboard</a>
-                <a href="{{ route('admin.visitor.registration.create') }}" class="sidebar-item {{ request()->routeIs('admin.visitor.registration.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Visitor Registration</a>
-                <a href="{{ route('admin.visitor.list') }}" class="sidebar-item {{ request()->routeIs('admin.visitor.list') ? 'active' : '' }}"><i class="fas fa-users"></i> Visitor List</a>
+                {{-- <a href="{{ route('admin.live.dashboard') }}" class="sidebar-item {{ request()->routeIs('admin.live.dashboard') ? 'active' : '' }}"><i class="fas fa-broadcast-tower"></i> Live Dashboard</a> --}}
+                {{-- <a href="{{ route('admin.visitor.registration.create') }}" class="sidebar-item {{ request()->routeIs('admin.visitor.registration.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Visitor Registration</a> --}}
+                {{-- <a href="{{ route('admin.visitor.list') }}" class="sidebar-item {{ request()->routeIs('admin.visitor.list') ? 'active' : '' }}"><i class="fas fa-users"></i> Visitor List</a> --}}
                 <a href="{{ route('insurance-packages.index') }}" class="sidebar-item {{ request()->routeIs('insurance-packages.*') ? 'active' : '' }}"><i class="fas fa-box"></i> Insurance Packages</a>
+                <a href="{{ route('admin.policies.index') }}" class="sidebar-item {{ request()->routeIs('admin.policies.*') ? 'active' : '' }}"><i class="fas fa-file-contract"></i> Policies</a>
+                <a href="{{ route('admin.claims.index') }}" class="sidebar-item {{ request()->routeIs('admin.claims.*') ? 'active' : '' }}"><i class="fas fa-clipboard-list"></i> Claims</a>
                 <a href="{{ route('admin.profile') }}" class="sidebar-item {{ request()->routeIs('admin.profile') ? 'active' : '' }}"><i class="fas fa-user"></i> My Profile</a>
                 {{-- <a href="#" class="sidebar-item"><i class="fas fa-history"></i> View History</a> --}}
                 {{-- <a href="#" class="sidebar-item"><i class="fas fa-user-plus"></i> Add New User</a> --}}

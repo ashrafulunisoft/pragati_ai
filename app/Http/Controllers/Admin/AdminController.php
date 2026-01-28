@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Visitor;
 use App\Models\Visit;
 use App\Models\VisitType;
+use App\Models\pragati\Claim;
 use App\Notifications\VisitorRegistered;
 use App\Services\EmailNotificationService;
 use App\Services\SmsNotificationService;
@@ -36,6 +37,21 @@ class AdminController extends Controller
             'visits_this_month' => \App\Models\Visit::whereMonth('schedule_time', now()->month)
                 ->whereYear('schedule_time', now()->year)
                 ->count(),
+            
+            // User Statistics
+            'total_users' => \App\Models\User::count(),
+            
+            // Policy/Order Statistics
+            'total_policies' => \App\Models\pragati\Order::count(),
+            'active_policies' => \App\Models\pragati\Order::where('status', 'active')->count(),
+            'pending_policies' => \App\Models\pragati\Order::where('status', 'pending')->count(),
+            'expired_policies' => \App\Models\pragati\Order::where('status', 'expired')->count(),
+            
+            // Claim Statistics
+            'total_claims' => \App\Models\pragati\Claim::count(),
+            'pending_claims' => \App\Models\pragati\Claim::where('status', 'pending')->count(),
+            'approved_claims' => \App\Models\pragati\Claim::where('status', 'approved')->count(),
+            'rejected_claims' => \App\Models\pragati\Claim::where('status', 'rejected')->count(),
         ];
 
         // Get today's visits
@@ -1032,5 +1048,51 @@ class AdminController extends Controller
                 'message' => 'Error: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Display policy list (Order = Policy)
+     */
+    public function policyList()
+    {
+        $orders = \App\Models\pragati\Order::with(['user', 'package'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.policies.index', compact('orders'));
+    }
+
+    /**
+     * Display policy details
+     */
+    public function policyShow($id)
+    {
+        $order = \App\Models\pragati\Order::with(['user', 'package', 'claims'])
+            ->findOrFail($id);
+
+        return view('admin.policies.show', compact('order'));
+    }
+
+    /**
+     * Display claim list
+     */
+    public function claimList()
+    {
+        $claims = Claim::with(['user', 'package', 'order'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.claims.index', compact('claims'));
+    }
+
+    /**
+     * Display claim details
+     */
+    public function claimShow($id)
+    {
+        $claim = Claim::with(['user', 'package', 'order'])
+            ->findOrFail($id);
+
+        return view('admin.claims.show', compact('claim'));
     }
 }

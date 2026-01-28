@@ -20,18 +20,58 @@
         </div>
     </div>
 
-    <!-- Stats Row -->
+    <!-- User & Policy Stats Row -->
     <div class="row g-3 mb-4">
-        <div class="col-6 col-xl">
+        <div class="col-6 col-xl-3">
+            <div class="glass-card summary-card">
+                <div>
+                    <span class="sub-label d-block mb-1">Total Users</span>
+                    <h2>{{ $stats['total_users'] }}</h2>
+                </div>
+                <div class="summary-icon"><i class="fas fa-users"></i></div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="glass-card summary-card">
+                <div>
+                    <span class="sub-label d-block mb-1">Active Policies</span>
+                    <h2>{{ $stats['active_policies'] }}</h2>
+                </div>
+                <div class="summary-icon text-success" style="background:rgba(34,197,94,0.1)"><i class="fas fa-file-contract"></i></div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="glass-card summary-card">
+                <div>
+                    <span class="sub-label d-block mb-1">Pending Policies</span>
+                    <h2>{{ $stats['pending_policies'] }}</h2>
+                </div>
+                <div class="summary-icon text-warning" style="background:rgba(255,193,7,0.1)"><i class="fas fa-clock"></i></div>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="glass-card summary-card">
+                <div>
+                    <span class="sub-label d-block mb-1">Expired Policies</span>
+                    <h2>{{ $stats['expired_policies'] }}</h2>
+                </div>
+                <div class="summary-icon text-danger" style="background:rgba(239,68,68,0.1)"><i class="fas fa-exclamation-circle"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visitor Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3">
             <div class="glass-card summary-card">
                 <div>
                     <span class="sub-label d-block mb-1">Total Visitors</span>
                     <h2>{{ $stats['total_visitors'] }}</h2>
                 </div>
-                <div class="summary-icon"><i class="fas fa-users"></i></div>
+                <div class="summary-icon"><i class="fas fa-user-friends"></i></div>
             </div>
         </div>
-        <div class="col-6 col-xl">
+        <div class="col-6 col-xl-3">
             <div class="glass-card summary-card">
                 <div>
                     <span class="sub-label d-block mb-1">Today's Visits</span>
@@ -40,7 +80,7 @@
                 <div class="summary-icon"><i class="fas fa-calendar-day"></i></div>
             </div>
         </div>
-        <div class="col-6 col-xl">
+        <div class="col-6 col-xl-3">
             <div class="glass-card summary-card">
                 <div>
                     <span class="sub-label d-block mb-1">Pending</span>
@@ -49,7 +89,7 @@
                 <div class="summary-icon text-warning" style="background:rgba(255,193,7,0.1)"><i class="fas fa-clock"></i></div>
             </div>
         </div>
-        <div class="col-6 col-xl">
+        <div class="col-6 col-xl-3">
             <div class="glass-card summary-card">
                 <div>
                     <span class="sub-label d-block mb-1">Active Visits</span>
@@ -58,12 +98,222 @@
                 <div class="summary-icon text-success" style="background:rgba(34,197,94,0.1)"><i class="fas fa-user-check"></i></div>
             </div>
         </div>
-        <div class="col-12 col-xl">
+    </div>
+
+    <!-- Claims Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3">
+            <a href="{{ route('admin.claims.index') }}" class="text-decoration-none">
+                <div class="glass-card summary-card text-decoration-none">
+                    <div>
+                        <span class="sub-label d-block mb-1 text-white">Total Claims</span>
+                        <h2 class="text-white">{{ $stats['total_claims'] }}</h2>
+                    </div>
+                    <div class="summary-icon"><i class="fas fa-clipboard-list"></i></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-xl-3">
+            <a href="{{ route('admin.claims.index') }}" class="text-decoration-none">
+                <div class="glass-card summary-card">
+                    <div>
+                        <span class="sub-label d-block mb-1 text-white">Pending Claims</span>
+                        <h2 class="text-warning">{{ $stats['pending_claims'] }}</h2>
+                    </div>
+                    <div class="summary-icon text-warning" style="background:rgba(255,193,7,0.1)"><i class="fas fa-hourglass-half"></i></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-xl-3">
+            <a href="{{ route('admin.claims.index') }}" class="text-decoration-none">
+                <div class="glass-card summary-card">
+                    <div>
+                        <span class="sub-label d-block mb-1 text-white">Approved Claims</span>
+                        <h2 class="text-success">{{ $stats['approved_claims'] }}</h2>
+                    </div>
+                    <div class="summary-icon text-success" style="background:rgba(34,197,94,0.1)"><i class="fas fa-check-circle"></i></div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-xl-3">
             <div class="glass-card summary-card justify-content-center cursor-pointer border-dashed" style="border-width: 2px;">
                 <a href="{{ route('admin.visitor.registration.create') }}" class="d-flex align-items-center gap-2 text-white text-decoration-none">
                     <i class="fas fa-plus"></i>
                     <span class="fw-bold text-uppercase fs-9">Register New Visitor</span>
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <a href="{{ route('admin.policies.index') }}" class="glass-card p-4 d-flex align-items-center gap-3 text-decoration-none" style="transition: 0.3s;">
+                <div class="summary-icon text-info" style="background:rgba(59,130,246,0.2); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-file-contract" style="font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                    <h6 class="fw-800 text-white mb-0">View All Policies</h6>
+                    <span class="sub-label">{{ $stats['total_policies'] }} total</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ route('admin.claims.index') }}" class="glass-card p-4 d-flex align-items-center gap-3 text-decoration-none" style="transition: 0.3s;">
+                <div class="summary-icon text-warning" style="background:rgba(234,179,8,0.2); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-clipboard-list" style="font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                    <h6 class="fw-800 text-white mb-0">View All Claims</h6>
+                    <span class="sub-label">{{ $stats['pending_claims'] }} pending</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ route('insurance-packages.index') }}" class="glass-card p-4 d-flex align-items-center gap-3 text-decoration-none" style="transition: 0.3s;">
+                <div class="summary-icon text-success" style="background:rgba(34,197,94,0.2); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-box" style="font-size: 1.5rem;"></i>
+                </div>
+                <div>
+                    <h6 class="fw-800 text-white mb-0">Insurance Packages</h6>
+                    <span class="sub-label">Manage packages</span>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ route('admin.live.dashboard') }}" class="glass-card p-4 d-flex align-items-center gap-3 text-decoration-none" style="transition: 0.3s;">
+                <div class="summary-icon" style="background:rgba(139,92,246,0.2); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-broadcast-tower" style="font-size: 1.5rem; color: #8b5cf6;"></i>
+                </div>
+                <div>
+                    <h6 class="fw-800 text-white mb-0">Live Dashboard</h6>
+                    <span class="sub-label">Real-time view</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Policies & Claims Row -->
+    <div class="row g-4 mb-4">
+        <!-- Recent Policies -->
+        <div class="col-lg-6">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="fw-800 sub-label mb-0">Recent Policies</h6>
+                    <a href="{{ route('admin.policies.index') }}" class="text-info small text-decoration-none">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+                <div class="table-responsive log-container">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Policy #</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $recentPolicies = \App\Models\pragati\Order::with('user')->latest()->limit(5)->get();
+                            @endphp
+                            @forelse($recentPolicies as $policy)
+                            <tr>
+                                <td>
+                                    <span class="fw-800 small text-info">{{ $policy->policy_number }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                            <span class="fw-800 small" style="font-size: 0.7rem;">{{ substr($policy->user->name, 0, 1) }}</span>
+                                        </div>
+                                        <span class="small">{{ $policy->user->name }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    @php
+                                        $policyStatusClass = match($policy->status) {
+                                            'active' => 'bg-success bg-opacity-10 text-success',
+                                            'pending' => 'bg-warning bg-opacity-10 text-warning',
+                                            'expired' => 'bg-danger bg-opacity-10 text-danger',
+                                            default => 'bg-secondary bg-opacity-10 text-secondary'
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $policyStatusClass }}" style="font-size: 0.65rem; padding: 0.25rem 0.5rem; font-weight: 800;">
+                                        {{ strtoupper($policy->status) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="3" class="text-center text-white-50 py-4">
+                                    <i class="fas fa-folder-open mb-2" style="font-size: 1.5rem; opacity: 0.5;"></i>
+                                    <p class="mb-0 small">No policies yet</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Claims -->
+        <div class="col-lg-6">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="fw-800 sub-label mb-0">Recent Claims</h6>
+                    <a href="{{ route('admin.claims.index') }}" class="text-info small text-decoration-none">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+                <div class="table-responsive log-container">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Claim #</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $recentClaims = \App\Models\pragati\Claim::with('user')->latest()->limit(5)->get();
+                            @endphp
+                            @forelse($recentClaims as $claim)
+                            <tr>
+                                <td>
+                                    <span class="fw-800 small text-warning">{{ $claim->claim_number }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                            <span class="fw-800 small" style="font-size: 0.7rem;">{{ substr($claim->user->name, 0, 1) }}</span>
+                                        </div>
+                                        <span class="small">{{ $claim->user->name }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    @php
+                                        $claimStatusClass = match($claim->status) {
+                                            'approved' => 'bg-success bg-opacity-10 text-success',
+                                            'pending' => 'bg-warning bg-opacity-10 text-warning',
+                                            'rejected' => 'bg-danger bg-opacity-10 text-danger',
+                                            default => 'bg-secondary bg-opacity-10 text-secondary'
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $claimStatusClass }}" style="font-size: 0.65rem; padding: 0.25rem 0.5rem; font-weight: 800;">
+                                        {{ strtoupper($claim->status) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="3" class="text-center text-white-50 py-4">
+                                    <i class="fas fa-clipboard mb-2" style="font-size: 1.5rem; opacity: 0.5;"></i>
+                                    <p class="mb-0 small">No claims yet</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

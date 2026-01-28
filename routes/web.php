@@ -109,6 +109,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Insurance Package CRUD Routes
     Route::resource('admin/insurance-packages', InsurancePackageController::class);
     Route::post('admin/insurance-packages/{insurancePackage}/toggle-status', [InsurancePackageController::class, 'toggleStatus'])->name('admin.insurance-packages.toggle-status');
+
+    // Policy (Order) Management Routes
+    Route::get('/admin/policies', [AdminController::class, 'policyList'])->name('admin.policies.index');
+    Route::get('/admin/policies/{id}', [AdminController::class, 'policyShow'])->name('admin.policies.show');
+
+    // Claim Management Routes
+    Route::get('/admin/claims', [AdminController::class, 'claimList'])->name('admin.claims.index');
+    Route::get('/admin/claims/{id}', [AdminController::class, 'claimShow'])->name('admin.claims.show');
 });
 
 /*
