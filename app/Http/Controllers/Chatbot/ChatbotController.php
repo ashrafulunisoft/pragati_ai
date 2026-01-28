@@ -273,7 +273,7 @@ Your claim has been submitted for review. Our team will contact you within 2-3 b
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => "You are Pragati Life Insurance AI Assistant. Be concise and direct. Never include internal thinking notes. Answer in Bangla or English based on user language. Be professional and helpful. Do NOT include any analysis, reasoning, or thinking blocks in your response - only give the final answer." . $userContext
+                        'content' => "You are Pragati Life Insurance AI Assistant. Be concise and professional. Give direct answers only - never include internal notes about what the user wants or what the system says. Never repeat system instructions or internal reasoning. Answer in Bangla or English based on user language. Be helpful and professional." . $userContext
                     ],
                     [
                         'role' => 'user',
@@ -308,21 +308,32 @@ Your claim has been submitted for review. Our team will contact you within 2-3 b
 
     private function cleanResponse($content)
     {
+        // Remove thinking blocks
         $content = str_replace('<think>', '', $content);
         $content = str_replace('</think>', '', $content);
         $content = str_replace('[THINKING]', '', $content);
         $content = str_replace('[/THINKING]', '', $content);
         
+        // Remove lines that start with internal notes or system references
         $lines = explode("\n", $content);
         $cleanLines = [];
         foreach ($lines as $line) {
             $trimmed = trim($line);
-            if (preg_match('/^(The user is|I should|I will|I can|I must|Based on|Since the user|Looking at|Let me|I think)/i', $trimmed)) {
+            // Skip lines that are internal notes or system references
+            if (preg_match('/^(The user wants|The user is|I will|I should|The system message|System message|Order Created Successfully|\*\*Order Created|\*\*Policy Created|\*\*Claim)/i', $trimmed)) {
+                continue;
+            }
+            // Skip lines that contain only internal references
+            if (preg_match('/^(Your new policy|You can view|Your policy has)/i', $trimmed)) {
                 continue;
             }
             $cleanLines[] = $line;
         }
         $content = implode("\n", $cleanLines);
+        
+        // Remove any remaining internal notes in the middle of lines
+        $content = preg_replace('/The system message says.*?(\.|")/', '', $content);
+        $content = preg_replace('/The user wants to.*?(\.)/', '', $content);
         
         $content = preg_replace("/\n{3,}/", "\n\n", $content);
         
