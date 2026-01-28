@@ -1,4 +1,4 @@
-@extends('layouts.guest')
+@extends('layouts.receptionist')
 
 @section('title', 'Policy Details - ' . $order->policy_number)
 
