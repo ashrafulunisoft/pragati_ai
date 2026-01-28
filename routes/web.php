@@ -10,14 +10,15 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Password;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\InsurancePackageController;
+use App\Http\Controllers\Auth\LoginController;
 
 //for create role and permission :
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\VisitorExportController;
+use App\Http\Controllers\Chatbot\ChatbotController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Admin\InsurancePackageController;
 
 
 
@@ -378,6 +379,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [InsurancePackageController::class, 'claimList'])->name('index');
         Route::get('/{claim}', [InsurancePackageController::class, 'showClaim'])->name('show');
     });
+
+    //chatbot: _______________________________
+    Route::get('/chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
 
     //---------------------------------------------------------------------------------------
 
