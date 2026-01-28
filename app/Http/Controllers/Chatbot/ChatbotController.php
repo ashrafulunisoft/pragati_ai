@@ -9,6 +9,7 @@ use App\Models\pragati\Claim;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 
 class ChatbotController extends Controller
 {
@@ -21,6 +22,17 @@ class ChatbotController extends Controller
     {
         $message = $request->message;
         $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['reply' => 'Please login first to purchase a policy.']);
+        }
+
+        // Check for order creation command
+        if (preg_match('/(buy|purchase|order|create policy|get policy)\s+(package|plan)?\s*(\d+)/i', $message, $matches)) {
+            $packageId = (int)$matches[3];
+            $orderResult = $this->createOrder($user->id, $packageId);
+            return response()->json(['reply' => $orderResult]);
+        }
 
         // Build user context
         if ($user) {
@@ -64,6 +76,7 @@ If user asks:
 - 'My policies / orders?' → list their orders above
 - 'My claims?' → list their claims above
 - 'Show packages / plans' → list available packages (see below)
+- 'Buy package X' or 'Order package X' → Create an order for that package (call createOrder function)
 ";
         } else {
             $userContext = "
@@ -85,7 +98,7 @@ Tell them politely to login first.
             ->get();
 
         $packagesInfo = $packages->map(function($pkg) {
-            return "- {$pkg->name}: Price: {$pkg->price} | Coverage: {$pkg->coverage_amount} | Duration: {$pkg->duration_months} months";
+            return "- Package ID {$pkg->id}: {$pkg->name} | Price: {$pkg->price} | Coverage: {$pkg->coverage_amount} | Duration: {$pkg->duration_months} months";
         })->implode("\n");
 
         $allContext = $userContext . "
@@ -95,6 +108,53 @@ AVAILABLE INSURANCE PACKAGES:
 
         $reply = $this->callMiniMax($message, $allContext);
         return response()->json(['reply' => $reply]);
+    }
+
+    private function createOrder($userId, $packageId)
+    {
+        DB::beginTransaction();
+        try {
+            $package = InsurancePackage::find($packageId);
+            
+            if (!$package) {
+                return 'Package not found. Please select a valid package.';
+            }
+
+            // Generate policy number
+            $policyNumber = 'PL-' . date('Y') . '-' . strtoupper(uniqid());
+
+            // Calculate dates
+            $startDate = now();
+            $endDate = now()->addMonths($package->duration_months);
+
+            $order = Order::create([
+                'user_id' => $userId,
+                'insurance_package_id' => $packageId,
+                'policy_number' => $policyNumber,
+                'status' => 'active',
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ]);
+
+            DB::commit();
+
+            return "✅ Policy Created Successfully!
+
+**Policy Details:**
+- Policy Number: {$policyNumber}
+- Package: {$package->name}
+- Coverage: ৳{$package->coverage_amount}
+- Price: ৳{$package->price}
+- Valid From: {$startDate->format('d M Y')}
+- Valid Until: {$endDate->format('d M Y')}
+- Status: Active
+
+Your policy is now active! Congratulations on securing your future with Pragati Life Insurance!";
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return 'Error creating order: ' . $e->getMessage();
+        }
     }
 
     private function callMiniMax($message, $userContext)
