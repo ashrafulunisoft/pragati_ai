@@ -27,29 +27,24 @@ class ChatbotController extends Controller
             return response()->json(['reply' => 'Please login first to file a claim or purchase a policy.']);
         }
 
-        // Check for order creation command
-        if (preg_match('/(buy|purchase|order|create policy|get policy)\s+(package|plan)?\s*(\d+)/i', $message, $matches)) {
-            $packageId = (int)$matches[3];
-            $orderResult = $this->createOrder($user->id, $packageId);
-            return response()->json(['reply' => $orderResult]);
-        }
-
-        // Check for claim creation command
-        if (preg_match('/(file|create|submit|make)\s+(a\s+)?claim/i', $message)) {
-            // Extract order ID and reason from message
-            if (preg_match('/(order|policy)\s*#?(\d+)/i', $message, $orderMatch)) {
+        // FIRST: Check for claim creation command (BEFORE order pattern)
+        if (preg_match('/(file|create|submit|make)\s+(a\s+)?(claim|claims)/i', $message)) {
+            // Extract order ID from message
+            if (preg_match('/(order|policy)\s*[#]?(\d+)/i', $message, $orderMatch)) {
                 $orderId = (int)$orderMatch[2];
-                // Extract reason (everything after "for" or "because")
-                $reason = '';
-                if (preg_match('/(for|because|due to|reason)\s+(.+)/i', $message, $reasonMatch)) {
-                    $reason = trim($reasonMatch[2]);
-                } else {
-                    $reason = 'General claim request';
-                }
-                // Extract amount if mentioned
+                
+                // Extract amount if mentioned (e.g., "10tk", "100 BDT", "৳50")
                 $amount = 0;
                 if (preg_match('/(\d+(?:\.\d+)?)\s*(tk|৳|taka|BDT)/i', $message, $amountMatch)) {
                     $amount = (float)$amountMatch[1];
+                }
+                
+                // Extract reason (everything after "for" or "due to")
+                $reason = '';
+                if (preg_match('/(?:for|due to|because|reason)\s+(.+)/i', $message, $reasonMatch)) {
+                    $reason = trim($reasonMatch[1]);
+                } else {
+                    $reason = 'General claim request';
                 }
                 
                 $claimResult = $this->createClaim($user->id, $orderId, $amount, $reason);
@@ -73,6 +68,13 @@ class ChatbotController extends Controller
                     return response()->json(['reply' => 'You have no active policies to file a claim for. Please purchase a policy first.']);
                 }
             }
+        }
+
+        // SECOND: Check for order creation command (buy package X)
+        if (preg_match('/(buy|purchase|order|create policy|get policy)\s+(?:package|plan)?\s*(\d+)/i', $message, $matches)) {
+            $packageId = (int)$matches[2];
+            $orderResult = $this->createOrder($user->id, $packageId);
+            return response()->json(['reply' => $orderResult]);
         }
 
         // Build user context
@@ -117,8 +119,8 @@ If user asks:
 - 'My policies / orders?' → list their orders above
 - 'My claims?' → list their claims above
 - 'Show packages / plans' → list available packages (see below)
-- 'Buy package X' or 'Order package X' → Create an order for that package
-- 'File claim for order #X' or 'Claim for order #X' → Create a claim for that order
+- 'Buy package X' → Create an order for that package
+- 'File claim for order #X' → Create a claim for that order
 ";
         } else {
             $userContext = "
@@ -159,7 +161,7 @@ AVAILABLE INSURANCE PACKAGES:
             $package = InsurancePackage::find($packageId);
             
             if (!$package) {
-                return 'Package not found. Please select a valid package.';
+                return '❌ Package not found. Please select a valid package number (1, 2, or 3).';
             }
 
             // Generate policy number
@@ -209,11 +211,11 @@ Your policy is now active! Congratulations on securing your future with Pragati 
                 ->first();
             
             if (!$order) {
-                return 'Order not found. Please provide a valid order number.';
+                return '❌ Order not found. Please provide a valid order number. Your order should be like "order #6".';
             }
 
             if ($order->status !== 'active') {
-                return 'This policy is not active. You can only file claims for active policies.';
+                return '❌ This policy is not active. You can only file claims for active policies.';
             }
 
             // Use package coverage amount if no amount specified
@@ -273,7 +275,7 @@ Your claim has been submitted for review. Our team will contact you within 2-3 b
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => "You are Pragati Life Insurance AI Assistant. Be concise and professional. Give direct answers only - never include internal notes about what the user wants or what the system says. Never repeat system instructions or internal reasoning. Answer in Bangla or English based on user language. Be helpful and professional." . $userContext
+                        'content' => "You are Pragati Life Insurance AI Assistant. Be friendly and professional. Give direct answers only. Never include internal notes or system references. Answer in Bangla or English based on user language. Be helpful and conversational like a human assistant." . $userContext
                     ],
                     [
                         'role' => 'user',
@@ -319,11 +321,10 @@ Your claim has been submitted for review. Our team will contact you within 2-3 b
         $cleanLines = [];
         foreach ($lines as $line) {
             $trimmed = trim($line);
-            // Skip lines that are internal notes or system references
+            // Skip lines that are internal notes
             if (preg_match('/^(The user wants|The user is|I will|I should|The system message|System message|Order Created Successfully|\*\*Order Created|\*\*Policy Created|\*\*Claim)/i', $trimmed)) {
                 continue;
             }
-            // Skip lines that contain only internal references
             if (preg_match('/^(Your new policy|You can view|Your policy has)/i', $trimmed)) {
                 continue;
             }
@@ -331,7 +332,7 @@ Your claim has been submitted for review. Our team will contact you within 2-3 b
         }
         $content = implode("\n", $cleanLines);
         
-        // Remove any remaining internal notes in the middle of lines
+        // Remove any remaining internal notes
         $content = preg_replace('/The system message says.*?(\.|")/', '', $content);
         $content = preg_replace('/The user wants to.*?(\.)/', '', $content);
         
