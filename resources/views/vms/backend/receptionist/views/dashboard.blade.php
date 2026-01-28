@@ -46,7 +46,7 @@
                     <span class="sub-label d-block mb-1">Pending</span>
                     <h2>{{ $stats['pending_visits'] }}</h2>
                 </div>
-                <div class="summary-icon text-warning" style="background:rgba(255,193,7,0.1)"><i class="fas fa-clock"></i></div>
+                <div class="summary-icon" style="color: var(--accent-amber); background: rgba(245, 158, 11, 0.1);"><i class="fas fa-clock"></i></div>
             </div>
         </div>
         <div class="col-6 col-xl">
@@ -55,7 +55,7 @@
                     <span class="sub-label d-block mb-1">Active Visits</span>
                     <h2>{{ $stats['active_visits'] }}</h2>
                 </div>
-                <div class="summary-icon text-success" style="background:rgba(34,197,94,0.1)"><i class="fas fa-user-check"></i></div>
+                <div class="summary-icon" style="color: var(--accent-emerald); background: rgba(16, 185, 129, 0.1);"><i class="fas fa-user-check"></i></div>
             </div>
         </div>
         <div class="col-12 col-xl">
@@ -105,9 +105,9 @@
                                 <td class="small">{{ \Carbon\Carbon::parse($visit->schedule_time)->format('g:i A') }}</td>
                                 <td>
                                     @if($visit->status == 'approved')
-                                        <span class="status-badge text-success">Active</span>
+                                        <span class="status-badge" style="color: var(--accent-emerald);">Active</span>
                                     @elseif($visit->status == 'pending')
-                                        <span class="status-badge text-warning">Pending</span>
+                                        <span class="status-badge" style="color: var(--accent-amber);">Pending</span>
                                     @elseif($visit->status == 'completed')
                                         <span class="status-badge">Completed</span>
                                     @else
@@ -117,7 +117,7 @@
                                 <td>
                                     <div class="d-flex gap-2">
                                         @can('edit visitors')
-                                        <a href="{{ route('visitor.edit', $visit->id) }}" class="btn btn-circle text-primary" title="Edit">
+                                        <a href="{{ route('visitor.edit', $visit->id) }}" class="btn btn-circle" style="color: var(--accent-emerald);" title="Edit">
                                             <i class="fas fa-edit small"></i>
                                         </a>
                                         @endcan
@@ -169,12 +169,12 @@
                                 <td class="small">{{ $visit->meetingUser->name }}</td>
                                 <td class="small">{{ $visit->created_at->diffForHumans() }}</td>
                                 <td>
-                                    <span class="status-badge text-warning border-orange">Pending</span>
+                                    <span class="status-badge" style="color: var(--accent-amber);">Pending</span>
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
                                         @can('edit visitors')
-                                        <a href="{{ route('visitor.edit', $visit->id) }}" class="btn btn-circle text-primary" title="Edit/Approve">
+                                        <a href="{{ route('visitor.edit', $visit->id) }}" class="btn btn-circle" style="color: var(--accent-emerald);" title="Edit/Approve">
                                             <i class="fas fa-edit small"></i>
                                         </a>
                                         @endcan
@@ -226,9 +226,9 @@
                                 <td class="small">{{ \Carbon\Carbon::parse($visit->schedule_time)->format('M j, Y') }}</td>
                                 <td>
                                     @if($visit->status == 'approved')
-                                        <span class="status-badge text-success">Active</span>
+                                        <span class="status-badge" style="color: var(--accent-emerald);">Active</span>
                                     @elseif($visit->status == 'pending')
-                                        <span class="status-badge text-warning">Pending</span>
+                                        <span class="status-badge" style="color: var(--accent-amber);">Pending</span>
                                     @elseif($visit->status == 'completed')
                                         <span class="status-badge">Completed</span>
                                     @else
@@ -237,11 +237,11 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <a href="{{ route('visitor.show', $visit->id) }}" class="btn btn-circle text-info" title="View Details">
+                                        <a href="{{ route('visitor.show', $visit->id) }}" class="btn btn-circle" style="color: var(--accent-teal);" title="View Details">
                                             <i class="fas fa-eye small"></i>
                                         </a>
                                         @can('edit visitors')
-                                        <a href="{{ route('visitor.edit', $visit->id) }}" class="btn btn-circle text-primary" title="Edit">
+                                        <a href="{{ route('visitor.edit', $visit->id) }}" class="btn btn-circle" style="color: var(--accent-emerald);" title="Edit">
                                             <i class="fas fa-edit small"></i>
                                         </a>
                                         @endcan
