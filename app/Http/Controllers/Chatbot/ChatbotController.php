@@ -27,6 +27,11 @@ class ChatbotController extends Controller
             return response()->json(['reply' => 'Please login first to file a claim or purchase a policy.']);
         }
 
+        // Handle "yes" confirmation
+        if (strtolower($message) === 'yes') {
+            // Could add last action tracking here
+        }
+
         // Check if user just sent a number (likely responding to order/claim question)
         if (preg_match('/^(\d+)$/', $message, $numMatch)) {
             $num = (int)$numMatch[1];
@@ -80,11 +85,28 @@ class ChatbotController extends Controller
             }
         }
 
-        // SECOND: Check for order creation (buy package X)
+        // SECOND: Check for package number in message (for buying)
+        if (preg_match('/(?:package|pkg|pack)(?:\s+number)?\s*(\d+)/i', $message, $matches)) {
+            $packageId = (int)$matches[1];
+            $orderResult = $this->createOrder($user->id, $packageId);
+            return response()->json(['reply' => $orderResult]);
+        }
+
+        // THIRD: Check for direct buy/purchase with package number
         if (preg_match('/(?:buy|purchase|order|get)\s+(?:package\s+)?(\d+)/i', $message, $matches)) {
             $packageId = (int)$matches[1];
             $orderResult = $this->createOrder($user->id, $packageId);
             return response()->json(['reply' => $orderResult]);
+        }
+
+        // FOURTH: Check for "want to buy" or similar intent
+        if (preg_match('/(want|need|like)\s+(to\s+)?(buy|purchase|get)/i', $message)) {
+            $packages = InsurancePackage::where('is_active', true)->orderBy('id')->get();
+            $packagesList = $packages->map(function($pkg) {
+                return "Package {$pkg->id}: {$pkg->name} | Price: ৳{$pkg->price} | Coverage: ৳{$pkg->coverage_amount} | {$pkg->duration_months} months";
+            })->implode("\n");
+            
+            return response()->json(['reply' => "Great! Here are our packages:\n\n" . $packagesList . "\n\nWhich package would you like? Just say the number (like \"1\" or \"Package 1\")."]);
         }
 
         // Build user context
@@ -269,19 +291,36 @@ Your claim has been submitted for review. We will contact you within 2-3 busines
     private function cleanResponse($content)
     {
         // Remove all thinking blocks
-        $content = str_replace(['<think>', '</think>', '[THINKING]', '[/THINKING]'], '', $content);
+        $content = str_replace(['<think>', ']', '[THINKING]', '[/THINKING]'], '', $content);
         
-        // Remove lines starting with internal references
+        // Remove lines starting with internal references or meta-comments
         $lines = explode("\n", $content);
         $cleanLines = [];
         foreach ($lines as $line) {
             $trimmed = trim($line);
-            // Skip lines that are internal notes
-            if (preg_match('/^(Let me|I will|They have|They already|I should|I need|Based on|The system|I understand)/i', $trimmed)) {
+            // Skip lines that are internal notes or meta-comments about user intent
+            if (preg_match('/^(The user just said|The user is|I should|I will|They have|They already|I need|Based on|The system|I understand|Since the user|Looking at|So I|If the user|I should respond|per my instructions|as per my)/i', $trimmed)) {
                 continue;
             }
-            // Skip if line contains "Let me see" or similar
-            if (stripos($trimmed, 'Let me see') !== false || stripos($trimmed, 'Let me check') !== false) {
+            // Skip if line contains any internal thinking phrases
+            if (stripos($trimmed, 'The user just said') !== false || 
+                stripos($trimmed, 'I should respond') !== false ||
+                stripos($trimmed, 'as Pragati') !== false ||
+                stripos($trimmed, 'The user is identified') !== false ||
+                stripos($trimmed, 'Let me see') !== false || 
+                stripos($trimmed, 'Let me check') !== false ||
+                stripos($trimmed, 'I will respond') !== false ||
+                stripos($trimmed, 'Since they said') !== false ||
+                stripos($trimmed, 'They said') !== false ||
+                stripos($trimmed, 'In English') !== false ||
+                stripos($trimmed, 'in Bengali') !== false ||
+                stripos($trimmed, 'in English') !== false ||
+                stripos($trimmed, 'without a clear') !== false ||
+                stripos($trimmed, 'quite ambiguous') !== false ||
+                stripos($trimmed, 'naturally and offer') !== false ||
+                stripos($trimmed, 'welcoming manner') !== false ||
+                stripos($trimmed, 'identified as') !== false ||
+                stripos($trimmed, 'friendly') !== false) {
                 continue;
             }
             $cleanLines[] = $line;
