@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Chatbot;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 class ChatbotController extends Controller
@@ -16,79 +17,109 @@ class ChatbotController extends Controller
     public function chat(Request $request)
     {
         $message = $request->message;
-        
-        // Call MiniMax API directly
-        $reply = $this->callMiniMax($message);
-        
+        $user = Auth::user();
+
+        // Build user context
+        if ($user) {
+            $userContext = "
+User is LOGGED IN.
+User ID: {$user->id}
+Name: {$user->name}
+Email: {$user->email}
+
+If user asks:
+- 'Am I logged in?' → say YES
+- 'What is my user id?' → show user id
+- 'My policy / order / claim?' → say you can check and ask permission
+";
+        } else {
+            $userContext = "
+User is NOT logged in.
+
+If user asks about:
+- policy
+- order
+- claim
+- personal data
+
+Tell them politely to login first.
+";
+        }
+
+        $reply = $this->callMiniMax($message, $userContext);
         return response()->json(['reply' => $reply]);
     }
 
-    private function callMiniMax($message)
+    private function callMiniMax($message, $userContext)
     {
         $apiKey = config('services.minimax.api_key');
         $host = config('services.minimax.host', 'https://api.minimax.io');
         $model = config('services.minimax.model', 'MiniMax-M2.1');
         
         if (empty($apiKey)) {
-            return 'MiniMax API key not configured. Please set MINIMAX_API_KEY in .env file.';
+            return 'Error: MiniMax API key not configured.';
         }
 
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json',
-            ])->timeout(60)->post($host . '/v1/chat/completions', [
+            ])->timeout(30)->post($host . '/v1/chat/completions', [
                 'model' => $model,
                 'messages' => [
-                    ['role' => 'system', 'content' => 'You are a helpful insurance assistant. Answer in the language the user writes.'],
-                    ['role' => 'user', 'content' => $message]
+                    [
+                        'role' => 'system',
+                        'content' => "You are Pragati Life Insurance AI Assistant.
+
+Rules:
+- Answer in Bangla or English based on user language
+- Be polite, professional, human-like
+- Do NOT invent user data
+
+USER CONTEXT:
+" . $userContext
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => $message
+                    ]
                 ],
                 'temperature' => 0.7,
-                'max_tokens' => 2000,
+                'max_tokens' => 2000
             ]);
 
-            $statusCode = $response->status();
-            
-            if ($statusCode === 200) {
+            $status = $response->status();
+
+            if ($status === 200) {
                 $data = $response->json();
                 if (isset($data['choices']) && count($data['choices']) > 0) {
                     $content = $data['choices'][0]['message']['content'];
                     return $this->cleanResponse($content);
                 }
-                return 'Sorry, I did not understand. Please try again.';
+                return 'Error: Empty response from MiniMax.';
             }
-            
-            $errorData = $response->json();
-            if (isset($errorData['error']['message'])) {
-                return 'Error: ' . $errorData['error']['message'];
+
+            if ($status === 500 || $status === 520 || $status === 796) {
+                return 'MiniMax server is temporarily unavailable. Please try again in a moment.';
             }
-            return 'Error: Failed to get response from MiniMax. Status: ' . $statusCode;
+
+            return 'Error: MiniMax returned status ' . $status;
             
         } catch (\Exception $e) {
             return 'Error: ' . $e->getMessage();
         }
     }
 
-    /**
-     * Clean thinking tags from response
-     */
     private function cleanResponse($content)
     {
-        // Remove <think>...</think> tags
-        $content = preg_replace('/<think>.*?<\/think>/s', '', $content);
-        
-        // Remove [THINKING]...[/THINKING] tags
-        $content = preg_replace('/\[THINKING\].*?\[\/THINKING\]/s', '', $content);
-        
-        // Remove any thinking blocks
+        $content = str_replace('<think>', '', $content);
+        $content = str_replace('</think>', '', $content);
+        $content = str_replace('[THINKING]', '', $content);
+        $content = str_replace('[/THINKING]', '', $content);
         $content = preg_replace('/Thinking:.*?(\n\n|$)/s', '', $content);
-        
-        // Remove analysis tags
-        $content = preg_replace('/<analysis>.*?<\/analysis>/s', '', $content);
-        
-        // Remove multiple blank lines
+        $content = str_replace('<analysis>', '', $content);
+        $content = str_replace('</analysis>', '', $content);
         $content = preg_replace('/\n{3,}/s', "\n\n", $content);
-        
         return trim($content);
     }
 }
