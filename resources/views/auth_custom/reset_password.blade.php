@@ -83,7 +83,7 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            color: #94a3b8;
+            color: #ffffff;
             margin-bottom: 0.75rem;
             display: flex;
             align-items: center;

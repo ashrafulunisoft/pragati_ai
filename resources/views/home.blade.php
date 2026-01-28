@@ -18,16 +18,14 @@
 
     <style>
         :root {
-            --bg-page: radial-gradient(circle at center, #101d42 0%, #060b1d 100%);
-            --sidebar-bg: #111a30;
-            --accent-indigo: #4f46e5;
-            --accent-blue: #3b82f6;
-            --accent-pink: #db2777;
-            --glass-card: rgba(15, 23, 42, 0.7);
+            --bg-page: linear-gradient(135deg, #0bd696 0%, #0d5540 100%);
+            --sidebar-bg: #0a3d2a;
+            --accent-green: #0bd696;
+            --accent-dark-green: #0d5540;
+            --glass-card: rgba(13, 85, 64, 0.7);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --neon-blue: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.2);
-            --neon-indigo: 0 8px 25px rgba(79, 70, 229, 0.4);
-            --text-muted: #94a3b8;
+            --neon-green: 0 0 20px rgba(11, 214, 150, 0.4), 0 0 40px rgba(11, 214, 150, 0.2);
+            --text-muted: #a8e6cf;
         }
 
         body {
@@ -53,10 +51,10 @@
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(35px);
             -webkit-backdrop-filter: blur(35px);
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(11, 214, 150, 0.3);
             border-radius: 40px;
             padding: 4rem;
-            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(59, 130, 246, 0.05);
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(11, 214, 150, 0.1);
             position: relative;
         }
 
@@ -64,7 +62,7 @@
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(11, 214, 150, 0.3);
             border-radius: 24px;
             padding: 3rem 2.5rem;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -84,19 +82,34 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--accent-indigo), var(--accent-blue));
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-dark-green));
             transform: scaleX(0);
             transition: transform 0.4s ease;
         }
 
         .role-card:hover {
             transform: translateY(-10px);
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3), inset 0 0 30px rgba(59, 130, 246, 0.1);
+            border-color: rgba(11, 214, 150, 0.8);
+            box-shadow: 0 20px 60px rgba(11, 214, 150, 0.5), inset 0 0 40px rgba(11, 214, 150, 0.15), 0 0 80px rgba(11, 214, 150, 0.3);
+            background: rgba(11, 214, 150, 0.08);
         }
 
         .role-card:hover::before {
             transform: scaleX(1);
+        }
+
+        .role-card:hover .role-icon {
+            transform: scale(1.1);
+            box-shadow: 0 15px 50px rgba(11, 214, 150, 0.6), 0 0 100px rgba(11, 214, 150, 0.3);
+        }
+
+        .role-card:hover .role-title {
+            color: #0bd696;
+            text-shadow: 0 0 30px rgba(11, 214, 150, 0.5);
+        }
+
+        .role-card:hover .role-description {
+            color: #ffffff;
         }
 
         .role-icon {
@@ -117,7 +130,7 @@
             position: absolute;
             inset: -4px;
             border-radius: 24px;
-            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue));
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-dark-green));
             z-index: -1;
             opacity: 0;
             transition: opacity 0.4s ease;
@@ -127,19 +140,19 @@
             opacity: 1;
         }
 
-        .role-icon.admin {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+        .role-icon.registration {
+            background: linear-gradient(135deg, #0bd696, #0d5540);
+            box-shadow: 0 10px 30px rgba(11, 214, 150, 0.4);
         }
 
-        .role-icon.reception {
-            background: linear-gradient(135deg, #3b82f6, #06b6d4);
-            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.4);
+        .role-icon.login {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
         }
 
-        .role-icon.visitor {
-            background: linear-gradient(135deg, #db2777, #f43f5e);
-            box-shadow: 0 10px 30px rgba(244, 63, 94, 0.4);
+        .role-icon.dashboard {
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            box-shadow: 0 10px 30px rgba(20, 184, 166, 0.4);
         }
 
         .role-title {
@@ -148,10 +161,11 @@
             margin-bottom: 0.75rem;
             letter-spacing: -0.5px;
             text-align: center;
+            color: #ffffff;
         }
 
         .role-description {
-            color: #94a3b8;
+            color: #a8e6cf;
             font-size: 0.9rem;
             line-height: 1.6;
             text-align: center;
@@ -165,36 +179,12 @@
             opacity: 0;
             transform: translateX(-10px);
             transition: all 0.4s ease;
+            color: var(--accent-green);
         }
 
         .role-card:hover .role-arrow {
             opacity: 1;
             transform: translateX(0);
-        }
-
-        .logo-vms {
-            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue));
-            color: #fff;
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
-            font-weight: 900;
-            font-size: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 2rem;
-            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
-            }
-            50% {
-                box-shadow: 0 15px 60px rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.4);
-            }
         }
 
         .page-title {
@@ -203,14 +193,14 @@
             text-align: center;
             margin-bottom: 1rem;
             letter-spacing: -1px;
-            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #a8e6cf 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .page-subtitle {
-            color: #94a3b8;
+            color: #ffffff;
             text-align: center;
             font-size: 1.1rem;
             margin-bottom: 3.5rem;
@@ -218,11 +208,12 @@
             margin-left: auto;
             margin-right: auto;
             line-height: 1.7;
+            opacity: 0.9;
         }
 
         .divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(11, 214, 150, 0.3), transparent);
             margin: 0;
         }
 
@@ -269,11 +260,6 @@
                 padding: 2rem 1.5rem;
                 border-radius: 24px;
             }
-            .logo-vms {
-                width: 50px;
-                height: 50px;
-                font-size: 1.5rem;
-            }
             .page-title {
                 font-size: 1.75rem;
             }
@@ -300,12 +286,8 @@
     <div class="main-container">
         <div class="glass-card-dark">
             <!-- Logo -->
-            {{-- <div class="logo-vms " style="height: 80px; width: 100vh;">
-                <i class="fas fa-university"></i>
-
-            </div> --}}
-             <div class="text-center gap-3 mb-3 ">
-                <img class="bg-white " src="{{ asset('vms/logo/ucb-bank-logo-bg_removed.png') }}" style="height: 80px; width: 100px; border-radius:10px;" alt="UCB Bank Logo">
+            <div class="text-center gap-3 mb-3">
+                <img class="bg-white" src="{{ asset('vms/logo/ucb-bank-logo-bg_removed.png') }}" style="height: 80px; width: 100px; border-radius:10px;" alt="UCB Bank Logo">
             </div>
 
             <!-- Header -->
@@ -321,7 +303,7 @@
                 <!-- Registration Card -->
                 <div class="col-lg-4 col-md-6">
                     <a href="{{ route('register') }}" class="role-card">
-                        <div class="role-icon admin">
+                        <div class="role-icon registration">
                             <i class="fas fa-user-plus"></i>
                         </div>
                         <h3 class="role-title">Registration</h3>
@@ -337,7 +319,7 @@
                 <!-- Login Card -->
                 <div class="col-lg-4 col-md-6">
                     <a href="{{ route('login') }}" class="role-card">
-                        <div class="role-icon reception">
+                        <div class="role-icon login">
                             <i class="fas fa-sign-in-alt"></i>
                         </div>
                         <h3 class="role-title">Login</h3>
@@ -353,7 +335,7 @@
                 <!-- Live Dashboard Card -->
                 <div class="col-lg-4 col-md-6">
                     <a href="{{ route('visitor.live.public') }}" class="role-card">
-                        <div class="role-icon visitor">
+                        <div class="role-icon dashboard">
                             <i class="fas fa-tachometer-alt"></i>
                         </div>
                         <h3 class="role-title">Live Dashboard</h3>
@@ -369,7 +351,7 @@
 
             <!-- Footer Info -->
             <div class="text-center mt-5 pt-4">
-                <p class="text-white-50 mb-0" style="font-size: 0.85rem;">
+                <p class="mb-0" style="font-size: 0.85rem; color: #a8e6cf;">
                     <i class="fas fa-shield-alt me-2"></i>
                     Secure &bull; Reliable &bull; Efficient Visitor Management
                 </p>
