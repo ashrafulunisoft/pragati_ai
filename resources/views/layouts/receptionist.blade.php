@@ -678,7 +678,7 @@
                 </a>
 
                 <!-- Visitor Management - Permission Based -->
-                @can('view visitors')
+                {{-- @can('view visitors')
                 <div class="sidebar-dropdown">
                     <a href="#" class="sidebar-item d-flex align-items-center" onclick="toggleSubmenu(event, 'visitor-submenu')">
                         <i class="fas fa-users"></i> Visitor Management
@@ -722,10 +722,10 @@
                         @endcan
                     </div>
                 </div>
-                @endcan
+                @endcan --}}
 
                 <!-- Notification Bell for Hosts -->
-                @can('approve visit')
+                {{-- @can('approve visit')
                 <a href="#" class="sidebar-item d-flex align-items-center justify-content-between" onclick="event.preventDefault(); toggleNotificationPanel()">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-bell"></i>
@@ -733,10 +733,10 @@
                     </div>
                     <span id="notification-badge" class="badge bg-danger rounded-pill" style="display: none;">0</span>
                 </a>
-                @endcan
+                @endcan --}}
 
                 <!-- Visit Management - Permission Based -->
-                @can('view visitors')
+                {{-- @can('view visitors')
                 <div class="sidebar-dropdown">
                     <a href="#" class="sidebar-item d-flex align-items-center" onclick="toggleSubmenu(event, 'visit-submenu')">
                         <i class="fas fa-calendar-check"></i> Visit Management
@@ -768,14 +768,14 @@
                         @endcan
                     </div>
                 </div>
-                @endcan
+                @endcan --}}
 
                 <!-- Reports - Permission Based -->
-                @can('view visitors')
+                {{-- @can('view visitors')
                 <a href="{{ route('visitor.report') }}" class="sidebar-item {{ request()->routeIs('visitor.report') ? 'active' : '' }}">
                     <i class="fas fa-chart-line"></i> Reports
                 </a>
-                @endcan
+                @endcan --}}
 
                 <!-- Settings - Permission Based -->
                 @can('manage settings')
@@ -787,6 +787,21 @@
                 <!-- Profile - Always visible -->
                 <a href="{{ route('profile') }}" class="sidebar-item {{ request()->routeIs('profile') ? 'active' : '' }}">
                     <i class="fas fa-user"></i> My Profile
+                </a>
+
+                <!-- Insurance - Packages -->
+                <a href="{{ route('packages.index') }}" class="sidebar-item {{ request()->routeIs('packages.*') ? 'active' : '' }}">
+                    <i class="fas fa-box"></i> Packages
+                </a>
+
+                <!-- Insurance - My Policies -->
+                <a href="{{ route('orders.index') }}" class="sidebar-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-file-contract"></i> My Policies
+                </a>
+
+                <!-- Insurance - My Claims -->
+                <a href="{{ route('claims.index') }}" class="sidebar-item {{ request()->routeIs('claims.*') ? 'active' : '' }}">
+                    <i class="fas fa-clipboard-list"></i> My Claims
                 </a>
 
                 <!-- Settings - Always visible -->

@@ -355,6 +355,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/visitors/live-dashboard', [App\Http\Controllers\Visitor\VisitorController::class, 'liveDashboard'])->name('visitor.live');
     });
 
+
+    //----------------------------------------------------------------------------------------
+
     // Insurance Packages Routes (Authenticated users only)
     Route::prefix('packages')->name('packages.')->group(function () {
         Route::get('/', [InsurancePackageController::class, 'publicIndex'])->name('index');
@@ -375,6 +378,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [InsurancePackageController::class, 'claimList'])->name('index');
         Route::get('/{claim}', [InsurancePackageController::class, 'showClaim'])->name('show');
     });
+
+    //---------------------------------------------------------------------------------------
 
     // API Routes (no authentication for public access if needed)
     Route::get('/api/visitors/live', [App\Http\Controllers\Visitor\VisitorController::class, 'liveVisitorsApi'])->name('api.visitors.live');
