@@ -137,30 +137,34 @@ Respond with ONLY valid JSON:";
     private static function callAiForInterpretation(string $prompt): string
     {
         // Try MiniMax first
-        $apiKey = config('services.minimax.api_key', env('MINIMAX_API_KEY'));
+        $apiKey = config('services.minimax.api_key');
+        $host = config('services.minimax.host', 'https://api.minimax.io');
+        $model = config('services.minimax.model', 'MiniMax-M2.1');
         
         if ($apiKey) {
             try {
                 $response = Http::withHeaders([
                     'Authorization' => 'Bearer ' . $apiKey,
                     'Content-Type' => 'application/json',
-                ])->timeout(30)->post('https://api.minimax.io/v1/chat/completions', [
-                    'model' => config('services.minimax.model', 'minimax-2.1'),
+                ])->timeout(30)->post($host . '/v1/chat/completions', [
+                    'model' => $model,
                     'messages' => [
                         ['role' => 'user', 'content' => $prompt]
                     ],
                     'temperature' => 0.1,
                 ]);
 
-                $content = $response->json('choices.0.message.content');
-                
-                // Clean up response
-                $content = preg_replace('/```json\s*/', '', $content);
-                $content = preg_replace('/```\s*/', '', $content);
-                $content = trim($content);
-                
-                if (json_decode($content, true)) {
-                    return $content;
+                if ($response->successful()) {
+                    $content = $response->json('choices.0.message.content');
+                    
+                    // Clean up response
+                    $content = preg_replace('/```json\s*/', '', $content);
+                    $content = preg_replace('/```\s*/', '', $content);
+                    $content = trim($content);
+                    
+                    if (json_decode($content, true)) {
+                        return $content;
+                    }
                 }
             } catch (\Exception $e) {
                 // Fall back to local parsing
