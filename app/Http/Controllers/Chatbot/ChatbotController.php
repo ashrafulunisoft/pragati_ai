@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Chatbot;
 
 use App\Http\Controllers\Controller;
+use App\Models\pragati\Order;
+use App\Models\pragati\InsurancePackage;
+use App\Models\pragati\Claim;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -21,16 +24,46 @@ class ChatbotController extends Controller
 
         // Build user context
         if ($user) {
+            // Fetch user's orders
+            $orders = Order::where('user_id', $user->id)
+                ->with('package')
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
+
+            // Fetch user's claims
+            $claims = Claim::where('user_id', $user->id)
+                ->with(['package', 'order'])
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
+
+            $ordersInfo = $orders->map(function($order) {
+                return "- Order #{$order->id}: {$order->package->name} | Policy: {$order->policy_number} | Status: {$order->status} | Valid: {$order->start_date} to {$order->end_date}";
+            })->implode("\n");
+
+            $claimsInfo = $claims->map(function($claim) {
+                return "- Claim #{$claim->claim_number}: {$claim->package->name} | Amount: {$claim->claim_amount} | Status: {$claim->status} | Reason: {$claim->reason}";
+            })->implode("\n");
+
             $userContext = "
 User is LOGGED IN.
 User ID: {$user->id}
 Name: {$user->name}
 Email: {$user->email}
 
+USER ORDERS (Policies):
+" . ($ordersInfo ?: "No orders found.") . "
+
+USER CLAIMS:
+" . ($claimsInfo ?: "No claims found.") . "
+
 If user asks:
 - 'Am I logged in?' → say YES
 - 'What is my user id?' → show user id
-- 'My policy / order / claim?' → say you can check and ask permission
+- 'My policies / orders?' → list their orders above
+- 'My claims?' → list their claims above
+- 'Show packages / plans' → list available packages (see below)
 ";
         } else {
             $userContext = "
@@ -46,7 +79,21 @@ Tell them politely to login first.
 ";
         }
 
-        $reply = $this->callMiniMax($message, $userContext);
+        // Get all available packages
+        $packages = InsurancePackage::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $packagesInfo = $packages->map(function($pkg) {
+            return "- {$pkg->name}: Price: {$pkg->price} | Coverage: {$pkg->coverage_amount} | Duration: {$pkg->duration_months} months";
+        })->implode("\n");
+
+        $allContext = $userContext . "
+
+AVAILABLE INSURANCE PACKAGES:
+" . ($packagesInfo ?: "No packages available.");
+
+        $reply = $this->callMiniMax($message, $allContext);
         return response()->json(['reply' => $reply]);
     }
 
@@ -69,23 +116,15 @@ Tell them politely to login first.
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => "You are Pragati Life Insurance AI Assistant.
-
-Rules:
-- Answer in Bangla or English based on user language
-- Be polite, professional, human-like
-- Do NOT invent user data
-
-USER CONTEXT:
-" . $userContext
+                        'content' => "You are Pragati Life Insurance AI Assistant. Be concise and direct. Never include internal thinking notes. Answer in Bangla or English based on user language. Be professional and helpful. Do NOT include any analysis, reasoning, or thinking blocks in your response - only give the final answer." . $userContext
                     ],
                     [
                         'role' => 'user',
                         'content' => $message
                     ]
                 ],
-                'temperature' => 0.7,
-                'max_tokens' => 2000
+                'temperature' => 0.3,
+                'max_tokens' => 1000
             ]);
 
             $status = $response->status();
@@ -112,14 +151,28 @@ USER CONTEXT:
 
     private function cleanResponse($content)
     {
+        // Remove thinking blocks
         $content = str_replace('<think>', '', $content);
         $content = str_replace('</think>', '', $content);
         $content = str_replace('[THINKING]', '', $content);
         $content = str_replace('[/THINKING]', '', $content);
-        $content = preg_replace('/Thinking:.*?(\n\n|$)/s', '', $content);
-        $content = str_replace('<analysis>', '', $content);
-        $content = str_replace('</analysis>', '', $content);
-        $content = preg_replace('/\n{3,}/s', "\n\n", $content);
+        
+        // Remove lines that start with thinking/internal notes
+        $lines = explode("\n", $content);
+        $cleanLines = [];
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            // Skip lines that are internal notes
+            if (preg_match('/^(The user is|I should|I will|I can|I must|Based on|Since the user|Looking at|Let me|I think)/i', $trimmed)) {
+                continue;
+            }
+            $cleanLines[] = $line;
+        }
+        $content = implode("\n", $cleanLines);
+        
+        // Remove multiple blank lines
+        $content = preg_replace("/\n{3,}/", "\n\n", $content);
+        
         return trim($content);
     }
 }
