@@ -3,6 +3,7 @@
 namespace App\Models\pragati;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Claim extends Model
 {

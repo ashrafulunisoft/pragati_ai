@@ -20,17 +20,17 @@
 
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
-            --bg-page: #06533E;
-            --sidebar-bg: #0a4d3c;
-            --accent-green: #2dc99b;
-            --accent-green-light: #4ae0b0;
-            --accent-green-dark: #1a8f6b;
-            --glass-card: rgba(255, 255, 255, 0.12);
-            --glass-border: rgba(45, 201, 155, 0.25);
-            --neon-green: 0 0 20px rgba(45, 201, 155, 0.4), 0 0 40px rgba(45, 201, 155, 0.2);
+            --bg-page: linear-gradient(135deg, #4ab59a 0%, #0d5540 100%);
+            --sidebar-bg: #0a4232;
+            --accent-emerald: #10b981;
+            --accent-teal: #14b8a6;
+            --accent-green: #22c55e;
+            --glass-card: rgba(13, 85, 64, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --neon-emerald: 0 0 20px rgba(16, 185, 129, 0.4), 0 0 40px rgba(16, 185, 129, 0.2);
+            --neon-teal: 0 8px 25px rgba(20, 184, 166, 0.4);
             --sidebar-width: 280px;
-            --text-muted: #94a3b8;
+            --text-muted: #a7f3d0;
         }
 
         body {
@@ -93,8 +93,8 @@
         }
 
         .sidebar-item.active {
-            background: var(--accent-green);
-            box-shadow: var(--neon-green);
+            background: var(--accent-emerald);
+            box-shadow: var(--neon-emerald);
         }
 
         .sidebar-submenu {
@@ -126,7 +126,7 @@
 
         /* Help Center */
         .help-center-box {
-            background: linear-gradient(180deg, var(--accent-green) 0%, var(--accent-green-dark) 100%);
+            background: linear-gradient(180deg, var(--accent-emerald) 0%, var(--accent-teal) 100%);
             border-radius: 24px;
             padding: 1.5rem;
             margin-top: auto;
@@ -143,7 +143,7 @@
             display: flex;
             align-items: center; justify-content: center;
             margin: -40px auto 1rem;
-            border: 4px solid #111a30;
+            border: 4px solid #0a4232;
             font-size: 1.2rem; font-weight: 800;
         }
 
@@ -178,10 +178,10 @@
         .summary-card h2 { font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
         .summary-icon {
             width: 42px; height: 42px;
-            background: rgba(45, 201, 155, 0.15);
+            background: rgba(16, 185, 129, 0.15);
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            color: var(--accent-green-light);
+            color: var(--accent-emerald);
         }
 
         /* Charts */
@@ -194,9 +194,9 @@
         }
         .bar-col {
             flex: 1;
-            background: linear-gradient(180deg, var(--accent-green), var(--accent-green-dark));
+            background: linear-gradient(180deg, var(--accent-emerald), var(--accent-teal));
             border-radius: 8px 8px 0 0;
-            box-shadow: var(--neon-green);
+            box-shadow: var(--neon-emerald);
         }
 
         /* Recent Visits Log Container & Font Fix */
@@ -477,7 +477,7 @@
             width: 160px;
             height: 160px;
             border-radius: 50%;
-            background: conic-gradient(var(--accent-blue) 0% 40%, #10b981 40% 60%, #f59e0b 60% 80%, #ef4444 80% 100%);
+            background: conic-gradient(var(--accent-emerald) 0% 40%, var(--accent-teal) 40% 60%, var(--accent-green) 60% 80%, #ef4444 80% 100%);
             position: relative;
             display: flex;
             align-items: center;
@@ -522,8 +522,8 @@
         }
 
         .input-custom:focus {
-            border-color: var(--accent-green) !important;
-            box-shadow: 0 0 20px rgba(45, 201, 155, 0.6), 0 0 40px rgba(45, 201, 155, 0.3) !important;
+            border-color: var(--accent-emerald) !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.3) !important;
             background: rgba(0, 0, 0, 0.45) !important;
             transform: translateY(-2px);
         }
@@ -538,10 +538,10 @@
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(35px);
             -webkit-backdrop-filter: blur(35px);
-            border: 1px solid rgba(45, 201, 155, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.2);
             border-radius: 40px;
             padding: 3.5rem;
-            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(45, 201, 155, 0.05);
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(16, 185, 129, 0.05);
             position: relative;
         }
 
@@ -594,7 +594,7 @@
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark));
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal));
             border: none;
             border-radius: 100px;
             padding: 16px;
@@ -604,12 +604,12 @@
             letter-spacing: 2px;
             font-size: 0.85rem;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 20px rgba(45, 201, 155, 0.6), 0 0 40px rgba(45, 201, 155, 0.3);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.3);
         }
 
         .btn-gradient:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(45, 201, 155, 0.5);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
             filter: brightness(1.1);
         }
 
@@ -640,7 +640,7 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: var(--accent-green);
+            color: var(--accent-emerald);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
@@ -652,7 +652,7 @@
             right: 18px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--accent-green);
+            color: var(--accent-emerald);
             opacity: 0.6;
             font-size: 0.9rem;
             pointer-events: none;
@@ -715,7 +715,7 @@
         .notification-avatar {
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark));
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal));
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -807,17 +807,17 @@
         }
 
         .page-link:hover {
-            background: rgba(45, 201, 155, 0.2);
-            border-color: rgba(45, 201, 155, 0.3);
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
             color: #fff !important;
             transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(45, 201, 155, 0.3);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
         }
 
         .page-item.active .page-link {
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark));
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal));
             border-color: transparent;
-            box-shadow: 0 0 20px rgba(45, 201, 155, 0.4);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
             color: #fff !important;
         }
 
@@ -881,23 +881,8 @@
                     <i class="fas fa-home"></i> Dashboard
                 </a>
 
-             <!-- Dashboard - Always visible -->
-                <a href="{{ route('packages.index') }}" class="sidebar-item {{ request()->routeIs('packages.index') ? 'active' : '' }}">
-                    <i class="fas fa-box"></i> Packages
-                </a>
-                 <!-- Dashboard - Always visible -->
-                <a href="{{ route('claims.index') }}" class="sidebar-item {{ request()->routeIs('claims.index') ? 'active' : '' }}">
-                    <i class="fas fa-file-medical"></i> Claim
-                </a>
-                
-                <!-- Dashboard - Always visible -->
-                <a href="{{ route('orders.index') }}" class="sidebar-item {{ request()->routeIs('orders.index') ? 'active' : '' }}">
-                    <i class="fas fa-shopping-cart"></i> Policies
-                </a>
-                
-
-              {{--  <!-- Visitor Management - Permission Based -->
-                @can('view visitors')
+                <!-- Visitor Management - Permission Based -->
+                {{-- @can('view visitors')
                 <div class="sidebar-dropdown">
                     <a href="#" class="sidebar-item d-flex align-items-center" onclick="toggleSubmenu(event, 'visitor-submenu')">
                         <i class="fas fa-users"></i> Visitor Management
@@ -941,10 +926,10 @@
                         @endcan
                     </div>
                 </div>
-                @endcan
+                @endcan --}}
 
                 <!-- Notification Bell for Hosts -->
-                @can('approve visit')
+                {{-- @can('approve visit')
                 <a href="#" class="sidebar-item d-flex align-items-center justify-content-between" onclick="event.preventDefault(); toggleNotificationPanel()">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-bell"></i>
@@ -952,10 +937,10 @@
                     </div>
                     <span id="notification-badge" class="badge bg-danger rounded-pill" style="display: none;">0</span>
                 </a>
-                @endcan
+                @endcan --}}
 
                 <!-- Visit Management - Permission Based -->
-                @can('view visitors')
+                {{-- @can('view visitors')
                 <div class="sidebar-dropdown">
                     <a href="#" class="sidebar-item d-flex align-items-center" onclick="toggleSubmenu(event, 'visit-submenu')">
                         <i class="fas fa-calendar-check"></i> Visit Management
@@ -987,15 +972,14 @@
                         @endcan
                     </div>
                 </div>
-                @endcan
+                @endcan --}}
 
                 <!-- Reports - Permission Based -->
-                @can('view visitors')
+                {{-- @can('view visitors')
                 <a href="{{ route('visitor.report') }}" class="sidebar-item {{ request()->routeIs('visitor.report') ? 'active' : '' }}">
                     <i class="fas fa-chart-line"></i> Reports
                 </a>
-                @endcan
-                --}}
+                @endcan --}}
 
                 <!-- Settings - Permission Based -->
                 @can('manage settings')
@@ -1007,6 +991,21 @@
                 <!-- Profile - Always visible -->
                 <a href="{{ route('profile') }}" class="sidebar-item {{ request()->routeIs('profile') ? 'active' : '' }}">
                     <i class="fas fa-user"></i> My Profile
+                </a>
+
+                <!-- Insurance - Packages -->
+                <a href="{{ route('packages.index') }}" class="sidebar-item {{ request()->routeIs('packages.*') ? 'active' : '' }}">
+                    <i class="fas fa-box"></i> Packages
+                </a>
+
+                <!-- Insurance - My Policies -->
+                <a href="{{ route('orders.index') }}" class="sidebar-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-file-contract"></i> My Policies
+                </a>
+
+                <!-- Insurance - My Claims -->
+                <a href="{{ route('claims.index') }}" class="sidebar-item {{ request()->routeIs('claims.*') ? 'active' : '' }}">
+                    <i class="fas fa-clipboard-list"></i> My Claims
                 </a>
 
                 <!-- Settings - Always visible -->

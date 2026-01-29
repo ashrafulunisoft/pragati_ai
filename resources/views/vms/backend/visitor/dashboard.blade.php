@@ -24,6 +24,56 @@
         </div>
     </div>
 
+    <!-- Insurance Stats Row -->
+    @if(isset($insuranceStats) && ($insuranceStats['total_policies'] > 0 || $insuranceStats['total_claims'] > 0))
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="glass-card summary-card">
+                <div>
+                    <span class="sub-label d-block mb-1">Total Policies</span>
+                    <h2>{{ $insuranceStats['total_policies'] }}</h2>
+                </div>
+                <div class="summary-icon text-success" style="background: rgba(11, 214, 150, 0.1);">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card summary-card">
+                <div>
+                    <span class="sub-label d-block mb-1">Active Policies</span>
+                    <h2>{{ $insuranceStats['active_policies'] }}</h2>
+                </div>
+                <div class="summary-icon text-primary" style="background: rgba(59, 130, 246, 0.1);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card summary-card">
+                <div>
+                    <span class="sub-label d-block mb-1">Total Claims</span>
+                    <h2>{{ $insuranceStats['total_claims'] }}</h2>
+                </div>
+                <div class="summary-icon text-warning" style="background: rgba(255, 193, 7, 0.1);">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card summary-card">
+                <div>
+                    <span class="sub-label d-block mb-1">Pending Claims</span>
+                    <h2>{{ $insuranceStats['pending_claims'] }}</h2>
+                </div>
+                <div class="summary-icon text-info" style="background: rgba(13, 202, 240, 0.1);">
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Stats Row - Based on permissions -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-xl">
@@ -81,190 +131,115 @@
         </div>
     </div>
 
-    <!-- Today's Visits -->
-    @if($todayVisits->count() > 0)
+    <!-- My Policies Section -->
+    @if(isset($userOrders) && $userOrders->count() > 0)
     <div class="row g-4 mb-4">
         <div class="col-12">
             <div class="glass-card p-4">
-                <h6 class="fw-800 sub-label mb-4">Today's Visits</h6>
-                <div class="table-responsive log-container">
-                    <table class="table align-middle">
-                        <thead>
-                            <tr>
-                                <th>Visitor</th>
-                                <th>Host</th>
-                                <th>Visit Type</th>
-                                <th>Time</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($todayVisits as $visit)
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                            <span class="fw-800 small">{{ substr($visit->visitor->name, 0, 1) }}</span>
-                                        </div>
-                                        <div>
-                                            <span class="small fw-800 d-block">{{ $visit->visitor->name }}</span>
-                                            <span class="fs-9 text-white-50">{{ $visit->visitor->phone ?? 'N/A' }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="small">{{ $visit->meetingUser->name }}</td>
-                                <td class="small">{{ $visit->type->name ?? 'N/A' }}</td>
-                                <td class="small">{{ \Carbon\Carbon::parse($visit->schedule_time)->format('g:i A') }}</td>
-                                <td>
-                                    @if($visit->status == 'approved')
-                                        <span class="status-badge text-success">Active</span>
-                                    @elseif($visit->status == 'pending')
-                                        <span class="status-badge text-warning">Pending</span>
-                                    @elseif($visit->status == 'completed')
-                                        <span class="status-badge">Completed</span>
-                                    @else
-                                        <span class="status-badge text-danger">Cancelled</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('visitor.show', $visit->id) }}" class="btn btn-circle text-info" title="View Details">
-                                            <i class="fas fa-eye small"></i>
-                                        </a>
-                                        @can('edit visitors')
-                                        <a href="{{ route('visitor.edit', $visit->id) }}" class="btn btn-circle text-primary" title="Edit">
-                                            <i class="fas fa-edit small"></i>
-                                        </a>
-                                        @endcan
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="fw-800 sub-label mb-0">My Insurance Policies</h6>
+                    <a href="{{ route('orders.index') }}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-external-link-alt me-1"></i>View All
+                    </a>
+                </div>
+                <div class="row g-3">
+                    @foreach($userOrders as $order)
+                    <div class="col-md-6 col-lg-4">
+                        <div class="policy-mini-card p-3 rounded-3" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-{{ $order->status == 'active' ? 'success' : ($order->status == 'pending' ? 'warning' : 'secondary') }}">
+                                    {{ ucfirst($order->status) }}
+                                </span>
+                                <small class="text-muted">{{ $order->created_at->format('M j, Y') }}</small>
+                            </div>
+                            <h6 class="fw-bold text-white mb-1" style="font-family: 'Courier New', monospace; font-size: 0.85rem;">
+                                {{ $order->policy_number }}
+                            </h6>
+                            <p class="text-success small mb-2">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                {{ $order->package->name ?? 'N/A' }}
+                            </p>
+                            <div class="d-flex justify-content-between small">
+                                <span class="text-muted">Coverage</span>
+                                <span class="fw-bold">${{ number_format($order->package->coverage_amount ?? 0, 2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between small mt-1">
+                                <span class="text-muted">Premium</span>
+                                <span class="fw-bold">${{ number_format($order->package->price ?? 0, 2) }}</span>
+                            </div>
+                            <div class="mt-2">
+                                <a href="{{ route('orders.show', $order->id) }}" class="btn btn-sm btn-outline-success w-100">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
     </div>
     @endif
 
-    <!-- Pending Visits -->
-    @if($pendingVisits->count() > 0)
+    <!-- My Claims Section -->
+    @if(isset($userClaims) && $userClaims->count() > 0)
     <div class="row g-4 mb-4">
         <div class="col-12">
             <div class="glass-card p-4">
-                <h6 class="fw-800 sub-label mb-4">Pending Approvals</h6>
-                <div class="table-responsive log-container">
-                    <table class="table align-middle">
-                        <thead>
-                            <tr>
-                                <th>Visitor</th>
-                                <th>Purpose</th>
-                                <th>Host</th>
-                                <th>Requested</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($pendingVisits as $visit)
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                            <span class="fw-800 small">{{ substr($visit->visitor->name, 0, 1) }}</span>
-                                        </div>
-                                        <div>
-                                            <span class="small fw-800 d-block">{{ $visit->visitor->name }}</span>
-                                            <span class="fs-9 text-white-50">{{ $visit->visitor->email }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="small">{{ substr($visit->purpose, 0, 30) }}...</td>
-                                <td class="small">{{ $visit->meetingUser->name }}</td>
-                                <td class="small">{{ $visit->created_at->diffForHumans() }}</td>
-                                <td>
-                                    <span class="status-badge text-warning border-orange">Pending</span>
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('visitor.show', $visit->id) }}" class="btn btn-circle text-info" title="View Details">
-                                            <i class="fas fa-eye small"></i>
-                                        </a>
-                                        @can('edit visitors')
-                                        <a href="{{ route('visitor.edit', $visit->id) }}" class="btn btn-circle text-primary" title="Edit/Approve">
-                                            <i class="fas fa-edit small"></i>
-                                        </a>
-                                        @endcan
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="fw-800 sub-label mb-0">My Insurance Claims</h6>
+                    <a href="{{ route('claims.index') }}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-external-link-alt me-1"></i>View All
+                    </a>
                 </div>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    <!-- Recent Visits -->
-    <div class="row g-4 mb-4">
-        <div class="col-12">
-            <div class="glass-card p-4">
-                <h6 class="fw-800 sub-label mb-4">Recent Visits Log</h6>
-                <div class="table-responsive log-container">
+                <div class="table-responsive">
                     <table class="table align-middle">
                         <thead>
                             <tr>
-                                <th>Visitor</th>
-                                <th>Host</th>
-                                <th>Purpose</th>
+                                <th>Claim #</th>
+                                <th>Package</th>
+                                <th>Amount</th>
+                                <th>Status</th>
                                 <th>Date</th>
-                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($recentVisits as $visit)
+                            @foreach($userClaims as $claim)
                             <tr>
                                 <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                            <span class="fw-800 small">{{ substr($visit->visitor->name, 0, 1) }}</span>
-                                        </div>
-                                        <div>
-                                            <span class="small fw-800 d-block">{{ $visit->visitor->name }}</span>
-                                            <span class="fs-9 text-white-50">{{ $visit->visitor->email }}</span>
-                                        </div>
-                                    </div>
+                                    <span class="fw-bold text-white" style="font-family: 'Courier New', monospace;">
+                                        {{ $claim->claim_number }}
+                                    </span>
                                 </td>
-                                <td class="small">{{ $visit->meetingUser->name }}</td>
-                                <td class="small">{{ substr($visit->purpose, 0, 25) }}...</td>
-                                <td class="small">{{ \Carbon\Carbon::parse($visit->schedule_time)->format('M j, Y') }}</td>
-                                <td>
-                                    @if($visit->status == 'approved')
-                                        <span class="status-badge text-success">Active</span>
-                                    @elseif($visit->status == 'pending')
-                                        <span class="status-badge text-warning">Pending</span>
-                                    @elseif($visit->status == 'completed')
-                                        <span class="status-badge">Completed</span>
-                                    @else
-                                        <span class="status-badge text-danger">Cancelled</span>
-                                    @endif
+                                <td class="small text-success">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    {{ $claim->package->name ?? 'N/A' }}
                                 </td>
+                                <td class="fw-bold">${{ number_format($claim->claim_amount, 2) }}</td>
                                 <td>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('visitor.show', $visit->id) }}" class="btn btn-circle text-info" title="View Details">
-                                            <i class="fas fa-eye small"></i>
-                                        </a>
-                                        @can('edit visitors')
-                                        <a href="{{ route('visitor.edit', $visit->id) }}" class="btn btn-circle text-primary" title="Edit">
-                                            <i class="fas fa-edit small"></i>
-                                        </a>
-                                        @endcan
-                                    </div>
+                                    @switch($claim->status)
+                                        @case('submitted')
+                                            <span class="badge bg-info">Submitted</span>
+                                            @break
+                                        @case('under_review')
+                                            <span class="badge bg-warning text-dark">Under Review</span>
+                                            @break
+                                        @case('approved')
+                                            <span class="badge bg-success">Approved</span>
+                                            @break
+                                        @case('rejected')
+                                            <span class="badge bg-danger">Rejected</span>
+                                            @break
+                                        @default
+                                            <span class="badge bg-secondary">{{ ucfirst($claim->status) }}</span>
+                                    @endswitch
+                                </td>
+                                <td class="small">{{ $claim->created_at->format('M j, Y') }}</td>
+                                <td>
+                                    <a href="{{ route('claims.show', $claim->id) }}" class="btn btn-circle btn-sm text-info" title="View Details">
+                                        <i class="fas fa-eye small"></i>
+                                    </a>
                                 </td>
                             </tr>
                             @endforeach
@@ -274,4 +249,7 @@
             </div>
         </div>
     </div>
+    @endif
+
+   
 @endsection

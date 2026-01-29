@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant</title>
+    <meta name="csrf-token" content="">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chat-container {
+            height: calc(100vh - 200px);
+        }
+        .message-content {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .message-content code {
+            background-color: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .message-content pre {
+            background-color: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+        }
+        .message-content pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+        }
+        .message-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+        .message-content table th,
+        .message-content table td {
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        .message-content table th {
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen py-8">
+        <div class="max-w-4xl mx-auto px-4">
+            <!-- Chat Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-lg px-6 py-4 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2h14a2 2 0 012 2v8a2 2 0 01-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-white font-semibold text-lg">AI Assistant</h1>
+                            <p class="text-blue-100 text-sm" id="ai-provider">Powered by MiniMax</p>
+                        </div>
+                    </div>
+                    <button onclick="clearChat()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Clear Chat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="chat-container bg-gray-50 overflow-y-auto p-6 space-y-4 border-x border-gray-200" style="height: calc(100vh - 200px);">
+                <!-- Welcome Message -->
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1 1-.75-3M3 13h18M5 17h14a2 2 0 01-2 2V6a2 2 0 012 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="bg-white rounded-lg px-4 py-3 shadow-sm max-w-md">
+                        <p class="text-gray-800 message-content">Hello! I'm your AI assistant. 
+
+You can ask me:
+• General questions - I'll use AI to answer
+• Database questions - Just say "from pragati_ai_db_2" or "from database" followed by your question
+
+Examples:
+• "What is Laravel?"
+• "How many visitors from pragati_ai_db_2?"
+• "Show me all roles from database"</p>
+                        <p class="text-gray-400 text-xs mt-2">Just now</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="hidden px-6 py-4 bg-gray-50 border-x border-gray-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 18-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    <div class="bg-white rounded-lg px-4 py-3 shadow-sm">
+                        <p class="text-gray-600">AI is thinking...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="bg-white border border-gray-200 rounded-b-lg px-4 py-4 shadow-lg">
+                <form id="chat-form" class="flex items-end space-x-3">
+                    <div class="flex-1 relative">
+                        <textarea
+                            id="message-input"
+                            rows="1"
+                            placeholder="Type your message... (mention 'from database' for DB queries)"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                            required
+                        ></textarea>
+                    </div>
+                    <button
+                        type="submit"
+                        id="send-button"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                    >
+                        <span>Send</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18 9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                </form>
+                <p class="text-gray-400 text-xs mt-2 text-center">Press Enter to send, Shift+Enter for new line</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize CSRF token from cookie on page load
+        (function initCsrfToken() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'XSRF-TOKEN') {
+                    const metaToken = document.querySelector('meta[name="csrf-token"]');
+                    if (metaToken) {
+                        metaToken.setAttribute('content', decodeURIComponent(value));
+                    }
+                    break;
+                }
+            }
+        })();
+
+        const chatMessages = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const aiProviderText = document.getElementById('ai-provider');
+
+        // Get CSRF token from meta tag or cookie
+        function getCsrfToken() {
+            const metaToken = document.querySelector('meta[name="csrf-token"]');
+            if (metaToken) {
+                return metaToken.getAttribute('content');
+            }
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'XSRF-TOKEN') {
+                    return decodeURIComponent(value);
+                }
+            }
+            return '';
+        }
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+
+        // Handle Enter key
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Submit form
+        chatForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            // Show loading
+            loadingIndicator.classList.remove('hidden');
+            sendButton.disabled = true;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let responseText = data.response;
+                    
+                    // Add database info if available
+                    if (data.database) {
+                        responseText += '\n\n---\n*Data retrieved from: ' + data.database + '*';
+                    }
+                    
+                    // Update provider text based on response
+                    if (data.provider === 'database') {
+                        aiProviderText.textContent = 'Database: pragati_ai_db_2';
+                    } else {
+                        aiProviderText.textContent = 'Powered by MiniMax';
+                    }
+                    
+                    addMessage(responseText, 'ai');
+                } else {
+                    addMessage('Error: ' + (data.error || 'Failed to get response'), 'ai', true);
+                }
+            } catch (error) {
+                addMessage('Error: Failed to connect to the server. Please try again.', 'ai', true);
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                sendButton.disabled = false;
+                messageInput.focus();
+            }
+        });
+
+        function addMessage(text, sender, isError = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start space-x-3';
+
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="bg-blue-600 rounded-lg px-4 py-3 shadow-sm max-w-md ml-auto">
+                        <p class="text-white message-content">${escapeHtml(text)}</p>
+                        <p class="text-blue-200 text-xs mt-2 text-right">${time}</p>
+                    </div>
+                    <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 18 9 18 9 2zm0 0v-8"></path>
+                        </svg>
+                    </div>
+                `;
+                messageDiv.classList.add('flex-row-reverse', 'space-x-reverse');
+            } else {
+                const bgColor = isError ? 'bg-red-50 border-red-200' : 'bg-white';
+                const textColor = isError ? 'text-red-800' : 'text-gray-800';
+                const iconColor = isError ? 'bg-red-600' : 'bg-blue-600';
+
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 ${iconColor} rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1 1-.75-3M3 13h18M5 17h14a2 2 0 01-2 2V6a2 2 0 012 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="${bgColor} rounded-lg px-4 py-3 shadow-sm max-w-md border ${isError ? 'border' : ''}">
+                        <p class="${textColor} message-content">${formatMessage(text)}</p>
+                        <p class="text-gray-400 text-xs mt-2">${time}</p>
+                    </div>
+                `;
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function clearChat() {
+            if (confirm('Are you sure you want to clear the chat history?')) {
+                chatMessages.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1 1-.75-3M3 13h18M5 17h14a2 2 0 01-2 2V6a2 2 0 012 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="bg-white rounded-lg px-4 py-3 shadow-sm max-w-md">
+                            <p class="text-gray-800 message-content">Hello! I'm your AI assistant. 
+
+You can ask me:
+• General questions - I'll use AI to answer
+• Database questions - Just say "from pragati_ai_db_2" or "from database" followed by your question
+
+Examples:
+• "What is Laravel?"
+• "How many visitors from pragati_ai_db_2?"
+• "Show me all roles from database"</p>
+                            <p class="text-gray-400 text-xs mt-2">Just now</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatMessage(text) {
+            // First, escape HTML
+            let formatted = escapeHtml(text);
+            
+            // Handle markdown tables
+            formatted = formatted.replace(/\| ([\s\S]*?) \|<br>\| --- \|[\s\S]*? \|<br>([\s\S]*?)(?=<br><br>|$)/g, function(match, header, body) {
+                // Parse table
+                const rows = body.split('<br>').filter(r => r.trim());
+                let tableHtml = '<div class="overflow-x-auto"><table class="min-w-full border-collapse border border-gray-300 mt-2 mb-2 text-sm">';
+                
+                // Header row
+                const headers = header.split(' | ').map(h => h.trim());
+                tableHtml += '<thead class="bg-gray-100"><tr>';
+                headers.forEach(h => {
+                    tableHtml += `<th class="border border-gray-300 px-3 py-2 text-left font-semibold">${h}</th>`;
+                });
+                tableHtml += '</tr></thead>';
+                
+                // Body rows
+                tableHtml += '<tbody>';
+                rows.forEach((row, index) => {
+                    const cells = row.split(' | ').map(c => c.trim());
+                    const bgClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                    tableHtml += `<tr class="${bgClass}">`;
+                    cells.forEach(cell => {
+                        tableHtml += `<td class="border border-gray-300 px-3 py-2">${cell}</td>`;
+                    });
+                    tableHtml += '</tr>';
+                });
+                tableHtml += '</tbody></table></div>';
+                
+                return tableHtml;
+            });
+            
+            // Handle line breaks
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            // Handle code blocks
+            formatted = formatted.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-800 text-white p-3 rounded mt-2 mb-2 overflow-x-auto"><code>$2</code></pre>');
+            
+            // Handle inline code
+            formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-gray-100 px-1 rounded text-red-600">$1</code>');
+            
+            // Bold text
+            formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            
+            return formatted;
+        }
+    </script>
+</body>
+</html>

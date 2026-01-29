@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'minimax' => [
+        'api_key' => env('MINIMAX_API_KEY', env('AI_API_KEY')),
+        'host' => env('MINIMAX_API_HOST', 'https://api.minimax.io'),
+        'model' => env('MCP_MODEL', env('AI_MODEL', 'MiniMax-M2.1')),
+        'provider' => env('MCP_PROVIDER', 'minimax'),
+    ],
+
 ];

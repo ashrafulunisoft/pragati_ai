@@ -10,14 +10,15 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Password;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\InsurancePackageController;
+use App\Http\Controllers\Auth\LoginController;
 
 //for create role and permission :
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\VisitorExportController;
+use App\Http\Controllers\Chatbot\ChatbotController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Admin\InsurancePackageController;
 
 
 
@@ -108,6 +109,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Insurance Package CRUD Routes
     Route::resource('admin/insurance-packages', InsurancePackageController::class);
     Route::post('admin/insurance-packages/{insurancePackage}/toggle-status', [InsurancePackageController::class, 'toggleStatus'])->name('admin.insurance-packages.toggle-status');
+
+    // Policy (Order) Management Routes
+    Route::get('/admin/policies', [AdminController::class, 'policyList'])->name('admin.policies.index');
+    Route::get('/admin/policies/{id}', [AdminController::class, 'policyShow'])->name('admin.policies.show');
+
+    // Claim Management Routes
+    Route::get('/admin/claims', [AdminController::class, 'claimList'])->name('admin.claims.index');
+    Route::get('/admin/claims/{id}', [AdminController::class, 'claimShow'])->name('admin.claims.show');
 });
 
 /*
@@ -360,12 +369,19 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/visitors/live-dashboard', [App\Http\Controllers\Visitor\VisitorController::class, 'liveDashboard'])->name('visitor.live');
     });
 
+<<<<<<< HEAD
     // API Routes (no authentication for public access if needed)
     Route::get('/api/visitors/live', [App\Http\Controllers\Visitor\VisitorController::class, 'liveVisitorsApi'])->name('api.visitors.live');
 
     //--------------------------------------- Insurance Packages Routes (Authenticated users only)------------------------------------------------------------------------
     //--------------------------------------- Insurance Packages Routes (Authenticated users only)------------------------------------------------------------------------
 
+=======
+
+    //----------------------------------------------------------------------------------------
+
+    // Insurance Packages Routes (Authenticated users only)
+>>>>>>> 3645379b2052b969840d1bd83ca6d9043a0f3d75
     Route::prefix('packages')->name('packages.')->group(function () {
         Route::get('/', [InsurancePackageController::class, 'publicIndex'])->name('index');
         Route::get('/{id}', [InsurancePackageController::class, 'publicShow'])->name('show');
@@ -388,11 +404,24 @@ Route::middleware(['auth'])->group(function () {
         
     //--------------------------------------- End Insurance Packages Routes (Authenticated users only)------------------------------------------------------------------------
 
+<<<<<<< HEAD
 
 
 
 
   
+=======
+    //chatbot: _______________________________
+    Route::get('/chat', [ChatbotController::class, 'index'])->name('chatbot.index');
+
+    // Route::view('/chat', '');
+    Route::post('/chat', [ChatbotController::class, 'chat']);
+
+    //---------------------------------------------------------------------------------------
+
+    // API Routes (no authentication for public access if needed)
+    Route::get('/api/visitors/live', [App\Http\Controllers\Visitor\VisitorController::class, 'liveVisitorsApi'])->name('api.visitors.live');
+>>>>>>> 3645379b2052b969840d1bd83ca6d9043a0f3d75
 });
 
 // -------------------------------------------------------------------------

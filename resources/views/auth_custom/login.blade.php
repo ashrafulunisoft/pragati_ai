@@ -18,16 +18,14 @@
 
     <style>
         :root {
-            --bg-page: radial-gradient(circle at center, #101d42 0%, #060b1d 100%);
-            --sidebar-bg: #111a30;
-            --accent-indigo: #4f46e5;
-            --accent-blue: #3b82f6;
-            --accent-pink: #db2777;
-            --glass-card: rgba(15, 23, 42, 0.7);
+            --bg-page: linear-gradient(135deg, #0bd696 0%, #0d5540 100%);
+            --sidebar-bg: #0a3d2a;
+            --accent-green: #0bd696;
+            --accent-dark-green: #0d5540;
+            --glass-card: rgba(13, 85, 64, 0.7);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --neon-blue: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.2);
-            --neon-indigo: 0 8px 25px rgba(79, 70, 229, 0.4);
-            --text-muted: #94a3b8;
+            --neon-green: 0 0 20px rgba(11, 214, 150, 0.4), 0 0 40px rgba(11, 214, 150, 0.2);
+            --text-muted: #a8e6cf;
         }
 
         body {
@@ -47,10 +45,10 @@
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(35px);
             -webkit-backdrop-filter: blur(35px);
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(11, 214, 150, 0.3);
             border-radius: 40px;
             padding: 3.5rem;
-            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(59, 130, 246, 0.05);
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(11, 214, 150, 0.1);
             position: relative;
             max-width: 500px;
             width: 100%;
@@ -69,8 +67,8 @@
         }
 
         .input-dark:focus {
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.3) !important;
+            border-color: #0bd696 !important;
+            box-shadow: 0 0 20px rgba(11, 214, 150, 0.6), 0 0 40px rgba(11, 214, 150, 0.3) !important;
             background: rgba(0, 0, 0, 0.45) !important;
             transform: translateY(-2px);
         }
@@ -85,7 +83,7 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            color: #94a3b8;
+            color: #ffffff;
             margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
@@ -97,14 +95,14 @@
             right: 18px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--accent-blue);
+            color: var(--accent-green);
             opacity: 0.6;
             font-size: 0.9rem;
             pointer-events: none;
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, #5046e5, #3b82f6);
+            background: linear-gradient(135deg, #0bd696, #0d5540);
             border: none;
             border-radius: 100px;
             padding: 16px;
@@ -114,18 +112,18 @@
             letter-spacing: 2px;
             font-size: 0.85rem;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 20px rgba(11, 214, 150, 0.6), 0 0 40px rgba(11, 214, 150, 0.3);
             width: 100%;
         }
 
         .btn-gradient:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 15px 40px rgba(11, 214, 150, 0.5);
             filter: brightness(1.1);
         }
 
         .logo-vms {
-            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue));
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-dark-green));
             color: #fff;
             width: 50px;
             height: 50px;
@@ -136,7 +134,7 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 1.5rem;
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 30px rgba(11, 214, 150, 0.4);
         }
 
         .alert-danger-custom {
@@ -192,18 +190,18 @@
 
         .form-check-custom:hover {
             background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(59, 130, 246, 0.3);
+            border-color: rgba(11, 214, 150, 0.3);
         }
 
         .form-check-input-custom {
             width: 20px;
             height: 20px;
-            accent-color: #3b82f6;
+            accent-color: #0bd696;
             cursor: pointer;
         }
 
         .form-check-label-custom {
-            color: #94a3b8;
+            color: #ffffff;
             font-size: 0.85rem;
             font-weight: 500;
             margin: 0;

@@ -9,8 +9,8 @@
     <!-- Header -->
     <div class="text-center mb-5">
         <div class="glass-card d-inline-block px-5 py-4 mb-4">
-            <h1 class="fw-bold text-dark mb-2">
-                <i class="fas fa-file-contract text-success me-2"></i>
+            <h1 class="fw-bold text-white mb-2">
+                <i class="fas fa-file-contract me-2" style="color: var(--accent-emerald);"></i>
                 My Insurance Policies
             </h1>
             <p class="text-muted mb-0">View and manage your insurance policies</p>
@@ -20,11 +20,11 @@
     @if($orders->isEmpty())
         <div class="glass-card p-5 text-center mx-auto" style="max-width: 500px;">
             <div class="text-muted mb-4">
-                <i class="fas fa-folder-open fa-5x" style="color: #0bd696;"></i>
+                <i class="fas fa-folder-open fa-5x" style="color: var(--accent-emerald);"></i>
             </div>
-            <h3 class="fw-bold text-dark mb-3">No Policies Found</h3>
+            <h3 class="fw-bold text-white mb-3">No Policies Found</h3>
             <p class="text-muted mb-4">You haven't purchased any insurance policies yet.</p>
-            <a href="{{ route('packages.index') }}" class="btn btn-success btn-lg">
+            <a href="{{ route('packages.index') }}" class="btn btn-gradient btn-lg">
                 <i class="fas fa-shopping-cart me-2"></i>Browse Packages
             </a>
         </div>
@@ -56,10 +56,10 @@
                             </div>
 
                             <!-- Policy Number -->
-                            <h5 class="fw-bold text-dark mb-2 policy-number">{{ $order->policy_number }}</h5>
+                            <h5 class="fw-bold text-white mb-2 policy-number">{{ $order->policy_number }}</h5>
 
                             <!-- Package Name -->
-                            <h6 class="text-success mb-3">
+                            <h6 class="mb-3" style="color: var(--accent-emerald);">
                                 <i class="fas fa-shield-alt me-1"></i>
                                 {{ $order->package->name }}
                             </h6>
@@ -103,7 +103,7 @@
                             </div>
 
                             <!-- View Details Button -->
-                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-outline-success w-100">
+                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-outline w-100" style="border: 2px solid var(--accent-emerald); color: var(--accent-emerald); border-radius: 10px; padding: 12px 24px; font-weight: 600;">
                                 <i class="fas fa-eye me-2"></i>View Policy
                             </a>
                         </div>
@@ -114,7 +114,7 @@
 
         <!-- Browse More -->
         <div class="text-center mt-5">
-            <a href="{{ route('packages.index') }}" class="btn btn-success btn-lg">
+            <a href="{{ route('packages.index') }}" class="btn btn-gradient btn-lg">
                 <i class="fas fa-plus-circle me-2"></i>Purchase Another Policy
             </a>
         </div>
@@ -138,40 +138,14 @@
     }
 
     .policy-details {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
         padding: 12px;
         border-radius: 10px;
     }
 
     .progress {
-        background: rgba(0, 0, 0, 0.1);
+        background: rgba(0, 0, 0, 0.2);
         border-radius: 10px;
-    }
-
-    .btn-success {
-        background: linear-gradient(135deg, #0bd696 0%, #09a87e 100%);
-        border: none;
-        border-radius: 10px;
-        padding: 12px 24px;
-        font-weight: 600;
-    }
-
-    .btn-success:hover {
-        background: linear-gradient(135deg, #09a87e 0%, #088a6a 100%);
-        color: #fff;
-    }
-
-    .btn-outline-success {
-        border: 2px solid #0bd696;
-        color: #0bd696;
-        border-radius: 10px;
-        padding: 12px 24px;
-        font-weight: 600;
-    }
-
-    .btn-outline-success:hover {
-        background: #0bd696;
-        color: #fff;
     }
 
     .badge {

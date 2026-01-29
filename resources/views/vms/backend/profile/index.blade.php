@@ -76,10 +76,10 @@
                         @foreach(auth()->user()->getAllPermissions() as $permission)
                         <div class="col-6">
                             <div class="checkbox-label">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="fas fa-check-circle text-success"></i>
-                                    <span class="small fw-600">{{ ucfirst($permission->name) }}</span>
-                                </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-check-circle" style="color: var(--accent-emerald);"></i>
+                                <span class="small fw-600 text-white">{{ ucfirst($permission->name) }}</span>
+                            </div>
                             </div>
                         </div>
                         @endforeach
@@ -191,7 +191,7 @@
                     @can('view visitors')
                     <div class="col-6 col-md-3">
                         <div class="text-center">
-                            <h3 class="fw-800 mb-1 text-primary">
+                            <h3 class="fw-800 mb-1" style="color: var(--accent-emerald);">
                                 {{ App\Models\Visit::where('meeting_user_id', Auth::id())->count() }}
                             </h3>
                             <p class="sub-label mb-0">Total Visits Hosted</p>
@@ -200,7 +200,7 @@
                     @endcan
                     <div class="col-6 col-md-3">
                         <div class="text-center">
-                            <h3 class="fw-800 mb-1 text-success">
+                            <h3 class="fw-800 mb-1" style="color: var(--accent-emerald);">
                                 {{ App\Models\Visit::where('status', 'completed')->where('meeting_user_id', Auth::id())->count() }}
                             </h3>
                             <p class="sub-label mb-0">Completed Visits</p>
@@ -208,7 +208,7 @@
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="text-center">
-                            <h3 class="fw-800 mb-1 text-warning">
+                            <h3 class="fw-800 mb-1" style="color: var(--accent-amber);">
                                 {{ App\Models\Visit::where('status', 'pending')->where('meeting_user_id', Auth::id())->count() }}
                             </h3>
                             <p class="sub-label mb-0">Pending Requests</p>
@@ -216,7 +216,7 @@
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="text-center">
-                            <h3 class="fw-800 mb-1 text-info">
+                            <h3 class="fw-800 mb-1" style="color: var(--accent-teal);">
                                 {{ App\Models\Visit::whereDate('schedule_time', today())->where('meeting_user_id', Auth::id())->count() }}
                             </h3>
                             <p class="sub-label mb-0">Today's Visits</p>
