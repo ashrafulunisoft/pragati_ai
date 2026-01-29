@@ -369,19 +369,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/visitors/live-dashboard', [App\Http\Controllers\Visitor\VisitorController::class, 'liveDashboard'])->name('visitor.live');
     });
 
-<<<<<<< HEAD
-    // API Routes (no authentication for public access if needed)
-    Route::get('/api/visitors/live', [App\Http\Controllers\Visitor\VisitorController::class, 'liveVisitorsApi'])->name('api.visitors.live');
-
-    //--------------------------------------- Insurance Packages Routes (Authenticated users only)------------------------------------------------------------------------
-    //--------------------------------------- Insurance Packages Routes (Authenticated users only)------------------------------------------------------------------------
-
-=======
 
     //----------------------------------------------------------------------------------------
 
     // Insurance Packages Routes (Authenticated users only)
->>>>>>> 3645379b2052b969840d1bd83ca6d9043a0f3d75
     Route::prefix('packages')->name('packages.')->group(function () {
         Route::get('/', [InsurancePackageController::class, 'publicIndex'])->name('index');
         Route::get('/{id}', [InsurancePackageController::class, 'publicShow'])->name('show');
@@ -404,13 +395,6 @@ Route::middleware(['auth'])->group(function () {
         
     //--------------------------------------- End Insurance Packages Routes (Authenticated users only)------------------------------------------------------------------------
 
-<<<<<<< HEAD
-
-
-
-
-  
-=======
     //chatbot: _______________________________
     Route::get('/chat', [ChatbotController::class, 'index'])->name('chatbot.index');
 
@@ -421,7 +405,6 @@ Route::middleware(['auth'])->group(function () {
 
     // API Routes (no authentication for public access if needed)
     Route::get('/api/visitors/live', [App\Http\Controllers\Visitor\VisitorController::class, 'liveVisitorsApi'])->name('api.visitors.live');
->>>>>>> 3645379b2052b969840d1bd83ca6d9043a0f3d75
 });
 
 // -------------------------------------------------------------------------
