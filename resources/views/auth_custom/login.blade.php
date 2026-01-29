@@ -16,16 +16,21 @@
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    @php
+        // dd("login"); 
+    @endphp
+
     <style>
         :root {
-            --bg-page: linear-gradient(135deg, #0bd696 0%, #0d5540 100%);
+            /* --bg-page: linear-gradient(135deg, #0bd696 0%, #0d5540 100%); */
+            --bg-page: linear-gradient(135deg, #4ab59a 0%, #0d5540 100%);
             --sidebar-bg: #0a3d2a;
             --accent-green: #0bd696;
             --accent-dark-green: #0d5540;
             --glass-card: rgba(13, 85, 64, 0.7);
             --glass-border: rgba(255, 255, 255, 0.08);
             --neon-green: 0 0 20px rgba(11, 214, 150, 0.4), 0 0 40px rgba(11, 214, 150, 0.2);
-            --text-muted: #a8e6cf;
+            --text-muted: #000000;
         }
 
         body {
@@ -33,7 +38,7 @@
             background: var(--bg-page);
             background-attachment: fixed;
             min-height: 100vh;
-            color: #fff;
+            color: #000000;
             margin: 0;
             display: flex;
             align-items: center;
@@ -102,7 +107,7 @@
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, #0bd696, #0d5540);
+            background: linear-gradient(135deg, #000000, #0d5540);
             border: none;
             border-radius: 100px;
             padding: 16px;

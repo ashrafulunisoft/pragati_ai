@@ -21,16 +21,16 @@
     <style>
         :root {
             --bg-page: linear-gradient(135deg, #4ab59a 0%, #0d5540 100%);
-            --sidebar-bg: #0a4232;
+            --sidebar-bg: #4ab697;
             --accent-emerald: #10b981;
             --accent-teal: #14b8a6;
             --accent-green: #22c55e;
-            --glass-card: rgba(13, 85, 64, 0.7);
+            --glass-card: rgba(52, 135, 116, 0.7);
             --glass-border: rgba(255, 255, 255, 0.15);
-            --neon-emerald: 0 0 20px rgba(16, 185, 129, 0.4), 0 0 40px rgba(16, 185, 129, 0.2);
+            --neon-emerald: 0 0 20px rgba(117, 242, 200, 0.4), 0 0 40px rgba(16, 185, 129, 0.2);
             --neon-teal: 0 8px 25px rgba(20, 184, 166, 0.4);
             --sidebar-width: 280px;
-            --text-muted: #a7f3d0;
+            --text-muted: #000000;
         }
 
         body {
@@ -38,7 +38,7 @@
             background: var(--bg-page);
             background-attachment: fixed;
             min-height: 100vh;
-            color: #fff;
+            color: #fff6f6;
             margin: 0;
             overflow-x: hidden;
         }

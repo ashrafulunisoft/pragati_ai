@@ -36,7 +36,7 @@
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 @switch($order->status)
                                     @case('active')
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge bg-">Active</span>
                                         @break
                                     @case('pending')
                                         <span class="badge bg-warning text-dark">Pending</span>

@@ -155,20 +155,20 @@
                             <h6 class="fw-bold text-white mb-1" style="font-family: 'Courier New', monospace; font-size: 0.85rem;">
                                 {{ $order->policy_number }}
                             </h6>
-                            <p class="text-success small mb-2">
+                            <p class="text-dark small mb-2">
                                 <i class="fas fa-shield-alt me-1"></i>
                                 {{ $order->package->name ?? 'N/A' }}
                             </p>
                             <div class="d-flex justify-content-between small">
-                                <span class="text-muted">Coverage</span>
+                                <span class="text-white">Coverage</span>
                                 <span class="fw-bold">${{ number_format($order->package->coverage_amount ?? 0, 2) }}</span>
                             </div>
                             <div class="d-flex justify-content-between small mt-1">
-                                <span class="text-muted">Premium</span>
+                                <span class="text-white">Premium</span>
                                 <span class="fw-bold">${{ number_format($order->package->price ?? 0, 2) }}</span>
                             </div>
                             <div class="mt-2">
-                                <a href="{{ route('orders.show', $order->id) }}" class="btn btn-sm btn-outline-success w-100">
+                                <a href="{{ route('orders.show', $order->id) }}" class="btn btn-sm btn-outline-dark w-100">
                                     <i class="fas fa-eye me-1"></i>View Details
                                 </a>
                             </div>
