@@ -1008,6 +1008,11 @@
                     <i class="fas fa-clipboard-list"></i> My Claims
                 </a>
 
+                <!-- AI Agent - Always visible -->
+                <a href="{{ route('chatbot.index') }}" class="sidebar-item {{ request()->routeIs('chat*') ? 'active' : '' }}">
+                    <i class="fas fa-comment-dots"></i> AI Agent
+                </a>
+
                 <!-- Settings - Always visible -->
                 {{-- <a href="#" class="sidebar-item">
                     <i class="fas fa-cog"></i> Settings

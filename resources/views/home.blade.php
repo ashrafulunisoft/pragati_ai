@@ -286,6 +286,7 @@
             }
         }
     </style>
+
 </head>
 <body>
 
@@ -349,19 +350,20 @@
 
                 <!-- AI Assistant Card -->
                 <div class="col-lg-4 col-md-6">
-                    <a href="{{ route('visitor.live.public') }}" class="role-card">
+                    <a href="{{ route('chatbot.index') }}" class="role-card">
                         <div class="role-icon dashboard">
-                            <i class="fas fa-tachometer-alt"></i>
+                            <i class="fas fa-comment-dots"></i> 
                         </div>
                         <h3 class="role-title">AI Assistant</h3>
                         <p class="role-description">
-                            Get intelligent help and support from our AI-powered assistant
+                            Chat with our smart AI assistant for instant help, support, and answers
                         </p>
                         <div class="role-arrow">
                             <i class="fas fa-arrow-right"></i>
                         </div>
                     </a>
                 </div>
+
             </div>
 
             <!-- Footer Info -->
