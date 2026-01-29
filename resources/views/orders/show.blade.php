@@ -145,7 +145,7 @@
                             <i class="fas fa-shopping-cart me-2"></i>
                             Buy Another Package
                         </a>
-                        <a href="#" class="btn btn-outline-secondary btn-lg py-3" onclick="window.print(); return false;">
+                        <a href="#" class="btn btn-outline-dark btn-lg py-3" onclick="window.print(); return false;">
                             <i class="fas fa-print me-2"></i>
                             Print Policy
                         </a>

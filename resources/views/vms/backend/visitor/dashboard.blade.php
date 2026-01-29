@@ -1,6 +1,7 @@
 @extends('layouts.receptionist')
 
-@section('title', 'Dashboard - UCB Bank')
+
+@section('title', 'Dashboard - Pragati')
 
 @section('content')
     <!-- Header -->
@@ -138,7 +139,7 @@
             <div class="glass-card p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h6 class="fw-800 sub-label mb-0">My Insurance Policies</h6>
-                    <a href="{{ route('orders.index') }}" class="btn btn-sm btn-outline-success">
+                    <a href="{{ route('orders.index') }}" class="btn btn-sm btn-outline-dark">
                         <i class="fas fa-external-link-alt me-1"></i>View All
                     </a>
                 </div>
@@ -212,7 +213,7 @@
                                         {{ $claim->claim_number }}
                                     </span>
                                 </td>
-                                <td class="small text-success">
+                                <td class="small text-dark">
                                     <i class="fas fa-shield-alt me-1"></i>
                                     {{ $claim->package->name ?? 'N/A' }}
                                 </td>
