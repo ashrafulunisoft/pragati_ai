@@ -186,9 +186,9 @@
 </head>
 <body>
 
-  <div class="container py-5">
+  <div class="container pb-5">
     <!-- Header -->
-    <header class="glass-card mb-5 p-3 d-flex justify-content-between align-items-center">
+    <header class="glass-card mt-3 mb-4 p-3 d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center gap-3 ps-2">
         <div class="bg-white rounded-3 p-1 shadow-sm" style="width: 44px; height: 44px; display: grid; place-items: center;">
           <i class="fas fa-leaf text-success fs-4"></i>
@@ -207,15 +207,15 @@
     <!-- Main Content Grid -->
     <div class="row g-5 align-items-start">
       <!-- Left Column: Info & Actions -->
-      <div class="col-lg-5">
-        <div class="glass-card p-4 mb-4" style="border-left: 5px solid #10b981;">
+      <div class="col-lg-4">
+        {{-- <div class="glass-card p-4 mb-4" style="border-left: 5px solid #10b981;">
           <h2 class="fw-bold mb-3 lh-base">Secure Your Future Today</h2>
           <p class="opacity-80 mb-4 fs-5">Empowering thousands of families in Bangladesh with trusted insurance solutions. Start a conversation to find your perfect plan.</p>
           <div class="d-flex gap-3">
             <span class="badge rounded-pill bg-white bg-opacity-10 border border-white border-opacity-20 py-2 px-3"><i class="fas fa-check-circle me-1 text-success"></i> Fast Claims</span>
             <span class="badge rounded-pill bg-white bg-opacity-10 border border-white border-opacity-20 py-2 px-3"><i class="fas fa-shield-alt me-1 text-success"></i> Trusted</span>
           </div>
-        </div>
+        </div> --}}
 
         <div class="d-flex flex-column gap-3">
           <div class="glass-card p-4 action-card d-flex align-items-center gap-4" onclick="triggerAction('Calculate Premium')">
@@ -261,7 +261,7 @@
       </div>
 
       <!-- Right Column: Chatbot -->
-      <div class="col-lg-7">
+      <div class="col-lg-8">
         <div class="glass-card chat-container shadow-lg">
           <!-- Chat Header -->
           <div class="chat-header d-flex justify-content-between align-items-center">
