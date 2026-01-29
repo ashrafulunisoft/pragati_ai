@@ -287,8 +287,8 @@
     <div class="main-container">
         <div class="glass-card-dark">
             <!-- Logo -->
-            <div class="text-center gap-3 mb-3">
-                <img class="bg-white" src="{{ asset('vms/logo/ucb-bank-logo-bg_removed.png') }}" style="height: 80px; width: 100px; border-radius:10px;" alt="UCB Bank Logo">
+            <div class="text-center gap-3 mb-3 ">
+                <img class="bg-white " src="{{ asset('vms/logo/pragatiLogo.png') }}" style="height: 80px; width: 150px; border-radius:10px;" alt="UCB Bank Logo">
             </div>
 
             <!-- Header -->

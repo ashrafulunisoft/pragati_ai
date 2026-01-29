@@ -652,10 +652,9 @@
     <!-- Mobile Navigation Bar -->
     <div class="mobile-top-nav">
 
-        <div class="d-flex justify-content-end  mb-2 text-white">
-                <img class="bg-white" alt="UCB Bank Logo" src="{{ asset('vms/logo/ucb-3.png') }}" style="height: 52px; width: 82px; border-radius:5px;">
-
-            </div>
+        <div class="text-center gap-3 mb-3 ">
+                <img class="bg-white " src="{{ asset('vms/logo/pragatiLogo.png') }}" style="height: 80px; width: 150px; border-radius:10px;" alt="UCB Bank Logo">
+        </div>
         <button class="btn text-white p-0" onclick="toggleSidebar()">
             <i class="fas fa-bars fs-4"></i>
         </button>
@@ -667,8 +666,8 @@
     <div id="page-receptionist-dashboard" class="vms-page">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
-            <div class="d-flex align-items-center gap-3 mb-3 ">
-                <img class="bg-white " src="{{ asset('vms/logo/ucb-bank-logo-bg_removed.png') }}" style="height: 80px; width: 100vh; border-radius:10px;" alt="UCB Bank Logo">
+            <div class="text-center gap-3 mb-3 ">
+                <img class="bg-white " src="{{ asset('vms/logo/pragatiLogo.png') }}" style="height: 80px; width: 150px; border-radius:10px;" alt="UCB Bank Logo">
             </div>
 
             <nav>
