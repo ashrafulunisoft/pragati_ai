@@ -199,8 +199,8 @@
         </div>
       </div>
       <div class="d-flex gap-3 pe-2">
-        <a href="#" class="glass-button"><i class="fas fa-globe"></i> English</a>
-        <a href="#" class="glass-button d-none d-md-flex"><i class="fas fa-user-circle"></i> Login</a>
+        <a href="{{ route('dashboard') }}" class="glass-button"><i class="fas fa-home"></i>  Dashboard</a>
+        {{-- <a href="#" class="glass-button d-none d-md-flex"><i class="fas fa-user-circle"></i> Login</a> --}}
       </div>
     </header>
 
