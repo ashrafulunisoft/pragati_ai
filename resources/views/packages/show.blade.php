@@ -22,7 +22,7 @@
                         <div class="col-md-6">
                             <div class="price-box p-4 rounded-4 text-center h-100">
                                 <span class="text-muted small text-uppercase fw-bold d-block mb-2">Price</span>
-                                <div class="display-4 fw-bold text-success">${{ number_format($insurancePackage->price, 2) }}</div>
+                                <div class="display-4 fw-bold text-dark">${{ number_format($insurancePackage->price, 2) }}</div>
                                 <span class="text-muted">per {{ $insurancePackage->duration_months }} months</span>
                             </div>
                         </div>
@@ -42,7 +42,7 @@
                             <div class="col-md-6">
                                 <div class="feature-item d-flex align-items-center p-3 rounded-3 bg-light">
                                     <i class="fas fa-check-circle text-success me-3 fa-lg"></i>
-                                    <div>
+                                    <div class="text-dark">
                                         <strong>Duration</strong>
                                         <p class="mb-0 text-muted small">{{ $insurancePackage->duration_months }} Months Coverage</p>
                                     </div>
@@ -51,7 +51,7 @@
                             <div class="col-md-6">
                                 <div class="feature-item d-flex align-items-center p-3 rounded-3 bg-light">
                                     <i class="fas fa-check-circle text-success me-3 fa-lg"></i>
-                                    <div>
+                                    <div class="text-dark">
                                         <strong>Coverage Limit</strong>
                                         <p class="mb-0 text-muted small">Up to ${{ number_format($insurancePackage->coverage_amount, 2) }}</p>
                                     </div>
@@ -60,7 +60,7 @@
                             <div class="col-md-6">
                                 <div class="feature-item d-flex align-items-center p-3 rounded-3 bg-light">
                                     <i class="fas fa-check-circle text-success me-3 fa-lg"></i>
-                                    <div>
+                                    <div class="text-dark">
                                         <strong>24/7 Support</strong>
                                         <p class="mb-0 text-muted small">Round the clock customer service</p>
                                     </div>
@@ -69,7 +69,7 @@
                             <div class="col-md-6">
                                 <div class="feature-item d-flex align-items-center p-3 rounded-3 bg-light">
                                     <i class="fas fa-check-circle text-success me-3 fa-lg"></i>
-                                    <div>
+                                    <div class="text-dark">
                                         <strong>Quick Claims</strong>
                                         <p class="mb-0 text-muted small">Fast and easy claim processing</p>
                                     </div>

@@ -57,8 +57,8 @@
                             <h5 class="fw-bold text-white mb-2 claim-number">{{ $claim->claim_number }}</h5>
 
                             <!-- Package Name -->
-                            <h6 class="mb-3" style="color: var(--accent-emerald);">
-                                <i class="fas fa-shield-alt me-1"></i>
+                            <h6 class="mb-3 text-dark" style="color: var(--accent-emerald);">
+                                <i class="fas fa-shield-alt me-1 "></i>
                                 {{ $claim->package->name }}
                             </h6>
 
@@ -66,7 +66,7 @@
                             <div class="claim-details mb-3">
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted small">Claim Amount</span>
-                                    <span class="fw-bold" style="color: var(--accent-emerald);">${{ number_format($claim->claim_amount, 2) }}</span>
+                                    <span class="fw-bold text-white" style="color: var(--accent-emerald);">${{ number_format($claim->claim_amount, 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted small">Policy</span>
@@ -85,7 +85,7 @@
                             </div>
 
                             <!-- View Details Button -->
-                            <a href="{{ route('claims.show', $claim->id) }}" class="btn btn-outline w-100" style="border: 2px solid var(--accent-emerald); color: var(--accent-emerald); border-radius: 10px; padding: 12px 24px; font-weight: 600;">
+                            <a href="{{ route('claims.show', $claim->id) }}" class="btn btn-outline w-100 bg-dark" style="border: 2px solid var(--accent-emerald); color: var(--accent-emerald); border-radius: 10px; padding: 12px 24px; font-weight: 600;">
                                 <i class="fas fa-eye me-2"></i>View Details
                             </a>
                         </div>

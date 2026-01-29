@@ -57,7 +57,7 @@
                             <h5 class="fw-bold text-white mb-2 policy-number">{{ $order->policy_number }}</h5>
 
                             <!-- Package Name -->
-                            <h6 class="mb-3" style="color: var(--accent-emerald);">
+                            <h6 class="mb-3 text-dark" style="color: var(--accent-emerald);">
                                 <i class="fas fa-shield-alt me-1"></i>
                                 {{ $order->package->name }}
                             </h6>
@@ -101,8 +101,8 @@
                             </div>
 
                             <!-- View Details Button -->
-                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-outline w-100" style="border: 2px solid var(--accent-emerald); color: var(--accent-emerald); border-radius: 10px; padding: 12px 24px; font-weight: 600;">
-                                <i class="fas fa-eye me-2"></i>View Policy
+                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-outline w-100 bg-dark" style="border: 2px solid var(--accent-emerald); color: var(--accent-emerald); border-radius: 10px; padding: 12px 24px; font-weight: 600;">
+                                <i class="fas fa-eye me-2 "></i>View Policy
                             </a>
                         </div>
                     </div>

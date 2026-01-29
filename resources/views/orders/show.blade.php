@@ -17,7 +17,7 @@
 
             <!-- Policy Card -->
             <div class="glass-card policy-card">
-                <div class="card-header bg-success text-white py-3">
+                <div class="card-header bg-dark text-white py-3">
                     <div class="d-flex justify-content-between align-items-center px-4">
                         <h5 class="mb-0">
                             <i class="fas fa-file-contract me-2"></i>

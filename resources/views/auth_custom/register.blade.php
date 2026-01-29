@@ -444,7 +444,7 @@
         <!-- Header -->
         <div class="text-center mb-4">
             <h2 class="fw-800 text-white mb-2" style="letter-spacing: -1px;">Create an Account</h2>
-            <p class="text-dark-50 mb-0" style="font-size: 0.9rem;">Join Pragati Insurance Management System</p>
+            <p class="text-dark-50 mb-0" style="font-size: 0.9rem;">Join Pragati Insurance PLC</p>
         </div>
 
         <!-- Validation Errors -->

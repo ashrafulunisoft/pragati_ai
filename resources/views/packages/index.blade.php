@@ -66,7 +66,7 @@
 
                             <!-- Buttons -->
                             <div class="d-grid gap-2">
-                                <a href="{{ route('packages.show', $package->id) }}" class="btn btn-outline" style="border: 2px solid var(--accent-emerald); color: var(--accent-emerald); border-radius: 10px; padding: 12px 24px; font-weight: 600;">
+                                <a href="{{ route('packages.show', $package->id) }}" class="btn btn-outline bg-dark" style="border: 2px solid var(--accent-emerald); color: var(--accent-emerald); border-radius: 10px; padding: 12px 24px; font-weight: 600;">
                                     <i class="fas fa-eye me-2"></i>View Details
                                 </a>
                                 <form action="{{ route('packages.purchase', $package->id) }}" method="POST">

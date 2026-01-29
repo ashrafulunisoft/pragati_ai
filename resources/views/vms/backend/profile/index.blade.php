@@ -32,28 +32,28 @@
                     @csrf
                     <div class="row g-3">
                         <div class="col-12">
-                            <label class="form-label">Full Name</label>
+                            <label class="form-label text-white">Full Name</label>
                             <input type="text"
                                    class="input-dark"
                                    value="{{ Auth::user()->name }}"
                                    readonly>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Email Address</label>
+                            <label class="form-label text-white">Email Address</label>
                             <input type="email"
                                    class="input-dark"
                                    value="{{ Auth::user()->email }}"
                                    readonly>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Role</label>
+                            <label class="form-label text-white">Role</label>
                             <input type="text"
                                    class="input-dark"
                                    value="{{ ucfirst(auth()->user()->getRoleNames()->first()) ?? 'User' }}"
                                    readonly>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Member Since</label>
+                            <label class="form-label text-white">Member Since</label>
                             <input type="text"
                                    class="input-dark"
                                    value="{{ Auth::user()->created_at->format('F j, Y') }}"
@@ -101,9 +101,9 @@
                 </h6>
                 <form action="{{ route('profile.send-reset-email') }}" method="POST">
                     @csrf
-                    <div class="row g-3">
+                    <div class="row g-3 ">
                         <div class="col-md-6">
-                            <label class="form-label">Current Password</label>
+                            <label class="form-label text-white">Current Password</label>
                             <div class="position-relative">
                                 <input type="password"
                                        class="input-dark"
@@ -113,7 +113,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">New Password</label>
+                            <label class="form-label text-white">New Password</label>
                             <div class="position-relative">
                                 <input type="password"
                                        class="input-dark"
@@ -123,7 +123,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Confirm New Password</label>
+                            <label class="form-label text-white">Confirm New Password</label>
                             <div class="position-relative">
                                 <input type="password"
                                        class="input-dark"

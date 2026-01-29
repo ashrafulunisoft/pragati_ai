@@ -559,9 +559,9 @@
             </div>
 
             <!-- Header -->
-            <h1 class="page-title">Visitor Management System</h1>
-            <p class="page-subtitle">
-                Welcome to UCB Bank's Visitor Management System. Please select your role to continue.
+            <h1 class="page-title ">Pragati Life Insurance</h1>
+            <p class="page-subtitle text-dark">
+                Welcome to Pragati Life Insurance. Please select your role to continue.
             </p>
 
             <hr class="divider mb-4">
@@ -576,7 +576,7 @@
                         </div>
                         <h3 class="role-title">Registration</h3>
                         <p class="role-description">
-                            Create a new account to access visitor management system
+                            Create a new account to access Pragati Life Insurance
                         </p>
                         <div class="role-arrow">
                             <i class="fas fa-arrow-right"></i>
@@ -620,9 +620,9 @@
 
             <!-- Footer Info -->
             <div class="text-center mt-5 pt-4">
-                <p class="mb-0" style="font-size: 0.85rem; color: #a8e6cf;">
+                <p class="mb-0 text-dark" style="font-size: 0.85rem; color: #a8e6cf;">
                     <i class="fas fa-shield-alt me-2"></i>
-                    Secure &bull; Reliable &bull; Efficient Visitor Management
+                    Secure &bull; Reliable &bull; Efficient
                 </p>
             </div>
         </div>
