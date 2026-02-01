@@ -42,4 +42,15 @@ return [
         'provider' => env('MCP_PROVIDER', 'minimax'),
     ],
 
+//    'minimax' => [
+//     'api_key' => env('MCP_PROVIDER') === 'glm' 
+//         ? env('GLM_API_KEY')
+//         : env('MINIMAX_API_KEY'),
+//     'host' => env('MCP_PROVIDER') === 'glm'
+//         ? env('GLM_API_HOST')
+//         : env('MINIMAX_API_HOST'),
+//     'model' => env('MCP_MODEL', 'MiniMax-M2.1'),
+//     'provider' => env('MCP_PROVIDER', 'minimax'),
+// ],
+
 ];
