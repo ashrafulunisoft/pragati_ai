@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Log;
 use App\Services\McpSecurityService;
+use App\Events\McpAttackDetected;
 use Symfony\Component\HttpFoundation\Response;
 
 class McpMaliciousLoginMiddleware
@@ -32,13 +33,6 @@ class McpMaliciousLoginMiddleware
         $ipAttempts    = Redis::get($ipKey) ?? 0;
         $emailAttempts = Redis::get($emailKey) ?? 0;
 
-        Log::info('[MCP Middleware] Login attempt check', [
-            'ip' => $ip,
-            'email' => $email,
-            'ip_attempts' => $ipAttempts,
-            'email_attempts' => $emailAttempts
-        ]);
-
         // Basic threshold trigger (IP: 5+, Email: 3+)
         if ($ipAttempts >= 5 || $emailAttempts >= 3) {
 
@@ -49,21 +43,45 @@ class McpMaliciousLoginMiddleware
                 'email_attempts' => $emailAttempts
             ]);
 
-            $isMalicious = McpSecurityService::analyzeLogin([
+            // Get full MCP response with decision, attack_type, risk_score, confidence, recommended_action
+            $mcp = McpSecurityService::analyzeLogin([
                 'ip' => $ip,
                 'email' => $email,
                 'ip_attempts' => $ipAttempts,
                 'email_attempts' => $emailAttempts,
+            ]);u
+
+            // Log MCP decision to separate security log file
+            Log::channel('mcp_security')->info('MCP_DECISION', [
+                'ip' => $ip,
+                'email' => $email,
+                'decision' => $mcp['decision'],
+                'attack_type' => $mcp['attack_type'],
+                'risk_score' => $mcp['risk_score'],
+                'confidence' => $mcp['confidence'],
+                'recommended_action' => $mcp['recommended_action'],
             ]);
 
-            if ($isMalicious) {
+            if ($mcp['decision'] === 'MALICIOUS') {
                 // Block for 1 hour
                 Redis::setex("blocked:ip:$ip", 3600, 1);
 
+                // Log warning
                 Log::warning('[MCP Middleware] IP blocked for malicious activity', [
                     'ip' => $ip,
-                    'email' => $email
+                    'email' => $email,
+                    'attack_type' => $mcp['attack_type'],
+                    'risk_score' => $mcp['risk_score']
                 ]);
+
+                // Trigger event for email alert
+                event(new McpAttackDetected(
+                    [
+                        'ip' => $ip,
+                        'email' => $email
+                    ],
+                    $mcp
+                ));
 
                 return response()->json([
                     'error' => 'AI Security System: Malicious activity detected. Access blocked.'

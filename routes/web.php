@@ -439,3 +439,15 @@ Route::get('/test-sms', function () {
     //         return view('dashboard');
     //     })->name('dashboard');
     // });
+
+// MCP Security Logs Route (Live View)
+Route::get('/security-logs', function () {
+    $logPath = storage_path('logs/mcp_security.log');
+    
+    if (!file_exists($logPath)) {
+        return response('<pre>No security logs found yet.</pre>');
+    }
+    
+    $log = file_get_contents($logPath);
+    return response("<pre>$log</pre>");
+});

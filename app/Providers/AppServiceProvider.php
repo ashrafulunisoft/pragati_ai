@@ -26,4 +26,15 @@ class AppServiceProvider extends ServiceProvider
     {
         Visit::observe(VisitObserver::class);
     }
+
+    /**
+     * The event listener mappings for the application.
+     *
+     * @return array<class-string, array<int, class-string>>
+     */
+    protected $listen = [
+        \App\Events\McpAttackDetected::class => [
+            \App\Listeners\SendSecurityAlertEmail::class,
+        ],
+    ];
 }

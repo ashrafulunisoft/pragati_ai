@@ -127,6 +127,14 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        // MCP Security Log Channel
+        'mcp_security' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/mcp_security.log'),
+            'level' => 'info',
+            'replace_placeholders' => true,
+        ],
+
     ],
 
 ];
