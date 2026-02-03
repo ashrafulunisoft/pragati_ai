@@ -80,6 +80,16 @@ PROMPT;
                 Log::warning('[MCP Security] Invalid JSON response, using defaults', [
                     'raw_response' => $content
                 ]);
+                // Still log the default response
+                Log::channel('mcp_security')->info('MCP_DECISION', [
+                    'ip' => $data['ip'],
+                    'email' => $data['email'],
+                    'decision' => $defaultResponse['decision'],
+                    'attack_type' => $defaultResponse['attack_type'],
+                    'risk_score' => $defaultResponse['risk_score'],
+                    'confidence' => $defaultResponse['confidence'],
+                    'recommended_action' => $defaultResponse['recommended_action'],
+                ]);
                 return $defaultResponse;
             }
 
@@ -90,6 +100,17 @@ PROMPT;
                 'mcp' => $mcp
             ]);
 
+            // Always log to mcp_security channel for every analysis
+            Log::channel('mcp_security')->info('MCP_DECISION', [
+                'ip' => $data['ip'],
+                'email' => $data['email'],
+                'decision' => $mcp['decision'],
+                'attack_type' => $mcp['attack_type'],
+                'risk_score' => $mcp['risk_score'],
+                'confidence' => $mcp['confidence'],
+                'recommended_action' => $mcp['recommended_action'],
+            ]);
+
             return $mcp;
 
         } catch (\Exception $e) {
@@ -97,6 +118,16 @@ PROMPT;
                 'error' => $e->getMessage(),
                 'ip' => $data['ip'],
                 'email' => $data['email']
+            ]);
+            // Still log on error
+            Log::channel('mcp_security')->info('MCP_DECISION', [
+                'ip' => $data['ip'],
+                'email' => $data['email'],
+                'decision' => $defaultResponse['decision'],
+                'attack_type' => $defaultResponse['attack_type'],
+                'risk_score' => $defaultResponse['risk_score'],
+                'confidence' => $defaultResponse['confidence'],
+                'recommended_action' => $defaultResponse['recommended_action'],
             ]);
             // fail-open (don't block legit users if AI fails)
             return $defaultResponse;
