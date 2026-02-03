@@ -451,3 +451,38 @@ Route::get('/security-logs', function () {
     $log = file_get_contents($logPath);
     return response("<pre>$log</pre>");
 });
+
+// MCP Security Logs API (JSON - for live monitoring)
+Route::get('/api/security-logs', function () {
+    $logPath = storage_path('logs/mcp_security.log');
+    
+    if (!file_exists($logPath)) {
+        return response()->json([
+            'status' => 'success',
+            'logs' => [],
+            'message' => 'No security logs found yet'
+        ]);
+    }
+    
+    $content = file_get_contents($logPath);
+    $lines = array_filter(explode("\n", trim($content)));
+    
+    $logs = array_map(function($line) {
+        // Parse log line
+        if (preg_match('/^\[(.+?)\] (\w+)\.(\w+): (.*)$/', $line, $matches)) {
+            return [
+                'timestamp' => $matches[1],
+                'level' => $matches[2],
+                'channel' => $matches[3],
+                'message' => json_decode($matches[4], true) ?: $matches[4]
+            ];
+        }
+        return ['raw' => $line];
+    }, $lines);
+    
+    return response()->json([
+        'status' => 'success',
+        'count' => count($logs),
+        'logs' => array_reverse($logs)
+    ]);
+})->name('api.security.logs');
