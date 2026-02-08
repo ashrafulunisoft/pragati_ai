@@ -49,7 +49,7 @@ class McpMaliciousLoginMiddleware
                 'email' => $email,
                 'ip_attempts' => $ipAttempts,
                 'email_attempts' => $emailAttempts,
-            ]);u
+            ]);
 
             // Log MCP decision to separate security log file
             Log::channel('mcp_security')->info('MCP_DECISION', [
