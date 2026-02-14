@@ -19,6 +19,7 @@ use App\Http\Controllers\VisitorExportController;
 use App\Http\Controllers\Chatbot\ChatbotController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Admin\InsurancePackageController;
+use App\Http\Controllers\VideoCallController;
 
 
 
@@ -439,3 +440,6 @@ Route::get('/test-sms', function () {
     //         return view('dashboard');
     //     })->name('dashboard');
     // });
+
+// Video Call Routes
+require __DIR__ . '/video.php';

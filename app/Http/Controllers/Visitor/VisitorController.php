@@ -31,6 +31,7 @@ class VisitorController extends Controller
      */
     public function dashboard()
     {
+        // dd("Hello"); 
         // Get visitor statistics based on user permissions
         $stats = [
             'total_visitors' => Visitor::count(),
@@ -100,6 +101,7 @@ class VisitorController extends Controller
             'pending_claims' => Claim::where('user_id', auth()->id())->whereIn('status', ['submitted', 'under_review'])->count(),
         ];
 
+        //  dd("Hello"); 
         return view('vms.backend.visitor.dashboard', compact(
             'stats',
             'recentVisits',
