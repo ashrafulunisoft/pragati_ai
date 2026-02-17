@@ -4,6 +4,26 @@
 @section('title', 'Dashboard - Pragati')
 
 @section('content')
+    
+    @if(auth()->user()->hasRole('visitor'))
+    <!-- Video Call Section - Only for Visitors/Customers -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h6 class="fw-800 sub-label mb-1">🎥 Video Call Support</h6>
+                        <p class="text-muted small mb-0">Connect with a customer care representative via video call</p>
+                    </div>
+                    <a href="{{ route('video.call') }}" class="btn btn-primary">
+                        <i class="fas fa-video me-2"></i>Start Video Call
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Header -->
     <div class="header-section">
         <div>

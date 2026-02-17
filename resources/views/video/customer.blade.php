@@ -1,9 +1,19 @@
-@extends('layouts.app')
+    @extends('layouts.receptionist')
 
 @section('title', 'Video Call - Customer Support')
 
 @push('styles')
-<script src="https://cdn.agora.io/sdk/web/AgoraRTC_N-4.22.0.js"></script>
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.22.0.js" onerror="console.error('Failed to load Agora SDK')"></script>
+<script>
+    window.checkAgoraLoaded = function() {
+        if (typeof AgoraRTC === 'undefined') {
+            console.error('AgoraRTC is not loaded!');
+            return false;
+        }
+        console.log('AgoraRTC loaded successfully');
+        return true;
+    };
+</script>
 <style>
     .video-container {
         display: grid;
@@ -253,16 +263,57 @@
 
     // Request Call
     async function requestCall() {
+        // Check if Agora SDK is loaded
+        if (typeof AgoraRTC === 'undefined') {
+            alert('Video call SDK not loaded. Please refresh the page or check your internet connection.');
+            console.error('AgoraRTC is undefined. SDK failed to load from CDN.');
+            return;
+        }
+        
         try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            console.log('Requesting call... CSRF token exists:', !!csrfToken);
+            
+            if (!csrfToken) {
+                alert('CSRF token not found. Please refresh the page.');
+                return;
+            }
+            
             const response = await fetch('/video/request-call', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Content-Type': 'application/json'
-                }
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
             });
             
-            const data = await response.json();
+            console.log('Response status:', response.status);
+            const responseText = await response.text();
+            console.log('Response text preview:', responseText.substring(0, 500));
+            
+            // Check if response is HTML (error page)
+            if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+                alert('Server returned HTML error page (Status: ' + response.status + '). Check console for details.');
+                console.error('Full HTML response:', responseText);
+                return;
+            }
+            
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                alert('Server returned invalid JSON. Check console for details.');
+                console.error('JSON parse error:', e);
+                console.error('Response text:', responseText);
+                return;
+            }
+            
+            if (data.error) {
+                alert('Error: ' + data.error);
+                return;
+            }
             
             if (data.type === 'connect') {
                 await joinChannel(data);
@@ -270,22 +321,36 @@
                 queueId = data.queue_id;
                 showQueueStatus(data.position);
                 startQueuePolling();
+            } else {
+                alert('Unexpected response: ' + JSON.stringify(data));
             }
         } catch (error) {
             console.error('Error requesting call:', error);
-            alert('Failed to request call. Please try again.');
+            alert('Failed to request call: ' + error.message);
         }
     }
 
     // Join Channel
     async function joinChannel(data) {
+        console.log('Joining channel with data:', data);
+        console.log('App ID:', data.app_id);
+        console.log('Channel:', data.channel);
+        console.log('UID:', data.uid);
+        console.log('Token:', data.token ? 'present' : 'missing');
+        
         await initAgora();
         
         channel = data.channel;
         uid = data.uid;
         sessionId = data.session_id;
         
-        await client.join(data.app_id, channel, null, uid);
+        if (!data.app_id) {
+            alert('Error: App ID is missing from server response');
+            console.error('Missing app_id in data:', data);
+            return;
+        }
+        
+        await client.join(data.app_id, channel, data.token, uid);
         
         // Create local tracks
         localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();

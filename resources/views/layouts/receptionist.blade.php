@@ -808,6 +808,11 @@
                     <i class="fas fa-comment-dots"></i> AI Agent
                 </a>
 
+                <!-- Video Call - Always visible -->
+                <a href="{{ route('video.agent.dashboard') }}" class="sidebar-item {{ request()->routeIs('video.*') ? 'active' : '' }}">
+                    <i class="fas fa-video"></i> Video Call
+                </a>
+
                 <!-- Settings - Always visible -->
                 {{-- <a href="#" class="sidebar-item">
                     <i class="fas fa-cog"></i> Settings

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.receptionist')
 
 @section('title', 'Rate Your Experience')
 

@@ -27,51 +27,94 @@ class VideoCallController extends Controller
     }
 
     /**
+     * Customer video call page.
+     */
+    public function customerCall()
+    {
+        $user = Auth::user();
+        
+        // Check if user has active queue or session
+        $activeQueue = CallQueue::where('user_id', $user->id)
+            ->whereIn('status', ['waiting', 'connected'])
+            ->latest()
+            ->first();
+
+        $activeSession = CallSession::where('user_id', $user->id)
+            ->whereIn('status', ['ringing', 'connected'])
+            ->latest()
+            ->first();
+
+        return view('video.customer', compact('activeQueue', 'activeSession'));
+    }
+
+    /**
      * Customer page - request a video call.
      */
     public function customerRequestCall(Request $request)
     {
-        $user = Auth::user();
+        Log::info('Video call request received', ['user_id' => Auth::id()]);
         
-        // Check if already in queue
-        $existingQueue = CallQueue::where('user_id', $user->id)
-            ->where('status', 'waiting')
-            ->first();
+        try {
+            $user = Auth::user();
+            
+            // Check if already in queue
+            $existingQueue = CallQueue::where('user_id', $user->id)
+                ->where('status', 'waiting')
+                ->first();
 
-        if ($existingQueue) {
-            return response()->json([
-                'type' => 'queue',
-                'position' => $existingQueue->position,
-                'queue_id' => $existingQueue->id,
-                'message' => 'You are already in the queue. Position: ' . $existingQueue->position,
+            if ($existingQueue) {
+                return response()->json([
+                    'type' => 'queue',
+                    'position' => $existingQueue->position,
+                    'queue_id' => $existingQueue->id,
+                    'message' => 'You are already in the queue. Position: ' . $existingQueue->position,
+                ]);
+            }
+
+            // Check if already in an active call
+            $activeSession = CallSession::where('user_id', $user->id)
+                ->whereIn('status', ['ringing', 'connected'])
+                ->first();
+
+            if ($activeSession) {
+                $tokenData = $this->agoraService->generateSimpleToken(
+                    $activeSession->channel_name,
+                    (int) $user->id
+                );
+                
+                return response()->json([
+                    'type' => 'connect',
+                    'channel' => $activeSession->channel_name,
+                    'token' => $tokenData['token'],
+                    'uid' => $tokenData['uid'],
+                    'app_id' => $tokenData['appId'],
+                    'session_id' => $activeSession->id,
+                    'message' => 'You have an active call session.',
+                ]);
+            }
+
+            // Find available agent
+            $agent = Agent::where('status', 'free')
+                ->orderBy('average_rating', 'desc')
+                ->first();
+
+            if ($agent) {
+                // Connect directly
+                return $this->connectToAgent($user, $agent);
+            } else {
+                // Add to queue
+                return $this->addToQueue($user);
+            }
+        } catch (\Exception $e) {
+            Log::error('Video call request error', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-        }
-
-        // Check if already in an active call
-        $activeSession = CallSession::where('user_id', $user->id)
-            ->whereIn('status', ['ringing', 'connected'])
-            ->first();
-
-        if ($activeSession) {
+            
             return response()->json([
-                'type' => 'connect',
-                'channel' => $activeSession->channel_name,
-                'session_id' => $activeSession->id,
-                'message' => 'You have an active call session.',
-            ]);
-        }
-
-        // Find available agent
-        $agent = Agent::where('status', 'free')
-            ->orderBy('average_rating', 'desc')
-            ->first();
-
-        if ($agent) {
-            // Connect directly
-            return $this->connectToAgent($user, $agent);
-        } else {
-            // Add to queue
-            return $this->addToQueue($user);
+                'error' => 'Server error: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -212,7 +255,20 @@ class VideoCallController extends Controller
      */
     public function agentDashboard()
     {
-        $agent = Agent::where('user_id', Auth::id())->first();
+        $user = Auth::user();
+        $agent = Agent::where('user_id', $user->id)->first();
+        
+        // Auto-create agent record for staff/receptionist users
+        if (!$agent && ($user->hasRole('staff') || $user->hasRole('receptionist'))) {
+            $agent = Agent::create([
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone ?? null,
+                'department' => 'Customer Support',
+                'status' => 'offline',
+            ]);
+        }
         
         if (!$agent) {
             return redirect()->route('home')->with('error', 'You are not registered as an agent.');
@@ -265,12 +321,23 @@ class VideoCallController extends Controller
             $nextInQueue = CallQueue::getNext();
             if ($nextInQueue) {
                 // Connect to next customer
-                $this->connectQueueToAgent($nextInQueue, $agent);
+                $session = $this->connectQueueToAgent($nextInQueue, $agent);
+                
+                // Generate token for agent
+                $tokenData = $this->agoraService->generateSimpleToken(
+                    $session->channel_name,
+                    (int) $agent->user_id
+                );
                 
                 return response()->json([
                     'status' => $status,
                     'call_started' => true,
                     'customer_name' => $nextInQueue->customer_name,
+                    'channel' => $session->channel_name,
+                    'token' => $tokenData['token'],
+                    'uid' => $tokenData['uid'],
+                    'app_id' => $tokenData['appId'],
+                    'session_id' => $session->id,
                 ]);
             }
         }

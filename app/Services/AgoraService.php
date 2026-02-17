@@ -3,34 +3,48 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
-use App\Models\CallSession;
+use Monyxie\Agora\TokenBuilder\TokenFactory;
+use Monyxie\Agora\TokenBuilder\AccessControl\Privilege;
 
 class AgoraService
 {
     protected $appId;
     protected $appCertificate;
-    protected $baseUrl = 'https://api.agora.io/v1';
+    protected $tokenFactory;
 
     public function __construct()
     {
         $this->appId = config('services.agora.app_id');
         $this->appCertificate = config('services.agora.app_certificate');
+        $this->tokenFactory = new TokenFactory($this->appId, $this->appCertificate);
     }
 
     /**
      * Generate RTC token for video call.
      */
-    public function generateRtcToken(string $channelName, int $uid, int $privilegeExpiredTs = 0): string
+    public function generateRtcToken(string $channelName, int $uid, int $expireTimeInSeconds = 3600): string
     {
-        $token = $this->buildTokenWithUid($channelName, $uid, 1, $privilegeExpiredTs);
-        
+        $privileges = [
+            Privilege::JOIN_CHANNEL => time() + $expireTimeInSeconds,
+            Privilege::PUBLISH_AUDIO_STREAM => time() + $expireTimeInSeconds,
+            Privilege::PUBLISH_VIDEO_STREAM => time() + $expireTimeInSeconds,
+        ];
+
+        $token = $this->tokenFactory->create(
+            $channelName,
+            (string) $uid,
+            $privileges,
+            time() + $expireTimeInSeconds
+        );
+
+        $tokenString = $token->toString();
+
         Log::info('Generated Agora RTC token', [
             'channel' => $channelName,
             'uid' => $uid,
         ]);
 
-        return $token;
+        return $tokenString;
     }
 
     /**
@@ -38,71 +52,20 @@ class AgoraService
      */
     public function generateRtmToken(string $userAccount): string
     {
-        $token = $this->buildTokenWithAccount($userAccount, 2);
-        
+        $token = $this->tokenFactory->createRtmToken($userAccount);
+
         Log::info('Generated Agora RTM token', [
             'user_account' => $userAccount,
         ]);
 
-        return $token;
+        return $token->toString();
     }
 
     /**
-     * Build token with UID.
-     */
-    protected function buildTokenWithUid(string $channelName, int $uid, int $role, int $privilegeExpiredTs): string
-    {
-        $token = \Illuminate\Support\Facades\Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode($this->appId . ':' . $this->appCertificate),
-            'Content-Type' => 'application/json',
-        ])->post("{$this->baseUrl}/projects/{$this->appId}/tokens", [
-            'uid' => $uid,
-            'channel_name' => $channelName,
-            'role' => $role,
-            'privilege_expired_ts' => $privilegeExpiredTs,
-            'token_type' => 1,
-        ]);
-
-        if ($token->successful()) {
-            return $token->json()['rtc_token'];
-        }
-
-        Log::error('Failed to generate Agora token', ['response' => $token->body()]);
-        
-        throw new \Exception('Failed to generate Agora token: ' . $token->body());
-    }
-
-    /**
-     * Build token with account name.
-     */
-    protected function buildTokenWithAccount(string $userAccount, int $role, int $privilegeExpiredTs = 0): string
-    {
-        $token = \Illuminate\Support\Facades\Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode($this->appId . ':' . $this->appCertificate),
-            'Content-Type' => 'application/json',
-        ])->post("{$this->baseUrl}/projects/{$this->appId}/tokens", [
-            'user_account' => $userAccount,
-            'role' => $role,
-            'privilege_expired_ts' => $privilegeExpiredTs,
-            'token_type' => 2,
-        ]);
-
-        if ($token->successful()) {
-            return $token->json()['rtm_token'];
-        }
-
-        Log::error('Failed to generate Agora RTM token', ['response' => $token->body()]);
-        
-        throw new \Exception('Failed to generate Agora RTM token: ' . $token->body());
-    }
-
-    /**
-     * Generate simple token for demo (client-side generation not recommended for production).
+     * Generate simple token for demo.
      */
     public function generateSimpleToken(string $channelName, int $uid): array
     {
-        // This is a simplified token for demo purposes
-        // In production, use the REST API method above
         return [
             'appId' => $this->appId,
             'channel' => $channelName,

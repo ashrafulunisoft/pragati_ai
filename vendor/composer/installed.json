@@ -3225,6 +3225,49 @@
             "install-path": "../monolog/monolog"
         },
         {
+            "name": "monyxie/agora-token-builder",
+            "version": "v0.1",
+            "version_normalized": "0.1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/monyxie/agora-token-builder.git",
+                "reference": "9d68ed159d2d879a944dac999f6d358af79750f9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/monyxie/agora-token-builder/zipball/9d68ed159d2d879a944dac999f6d358af79750f9",
+                "reference": "9d68ed159d2d879a944dac999f6d358af79750f9",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "7"
+            },
+            "time": "2019-07-24T10:46:21+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Monyxie\\Agora\\TokenBuilder\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "monyxie",
+                    "email": "monyxie@gmail.com"
+                }
+            ],
+            "description": "Agora Token Builder",
+            "support": {
+                "issues": "https://github.com/monyxie/agora-token-builder/issues",
+                "source": "https://github.com/monyxie/agora-token-builder/tree/v0.1"
+            },
+            "install-path": "../monyxie/agora-token-builder"
+        },
+        {
             "name": "myclabs/deep-copy",
             "version": "1.13.4",
             "version_normalized": "1.13.4.0",

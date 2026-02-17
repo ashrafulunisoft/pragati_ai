@@ -9,6 +9,8 @@ class CallQueue extends Model
 {
     use HasFactory;
 
+    protected $table = 'call_queue';
+
     protected $fillable = [
         'user_id',
         'customer_name',

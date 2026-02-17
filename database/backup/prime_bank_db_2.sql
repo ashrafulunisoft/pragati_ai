@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql:3306
--- Generation Time: Feb 14, 2026 at 04:28 AM
+-- Generation Time: Feb 14, 2026 at 05:42 AM
 -- Server version: 8.0.44
 -- PHP Version: 8.3.26
 
@@ -20,6 +20,35 @@ SET time_zone = "+00:00";
 --
 -- Database: `prime_bank_db_2`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `agents`
+--
+
+CREATE TABLE `agents` (
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `department` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('free','busy','offline') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'offline',
+  `last_seen` timestamp NULL DEFAULT NULL,
+  `total_calls` int NOT NULL DEFAULT '0',
+  `total_duration` int NOT NULL DEFAULT '0',
+  `average_rating` double NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `agents`
+--
+
+INSERT INTO `agents` (`id`, `user_id`, `name`, `email`, `phone`, `department`, `status`, `last_seen`, `total_calls`, `total_duration`, `average_rating`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Receptionist', 'ashrafulinstasure@gmail.com', '+8801234567890', 'Customer Care', 'busy', '2026-02-14 04:46:53', 1, 0, 0, '2026-02-14 04:45:32', '2026-02-14 05:10:47');
 
 -- --------------------------------------------------------
 
@@ -44,6 +73,110 @@ CREATE TABLE `cache_locks` (
   `owner` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `call_feedback`
+--
+
+CREATE TABLE `call_feedback` (
+  `id` bigint UNSIGNED NOT NULL,
+  `call_session_id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `agent_id` bigint UNSIGNED DEFAULT NULL,
+  `rating` int NOT NULL COMMENT '1-5 stars',
+  `comment` text COLLATE utf8mb4_unicode_ci,
+  `customer_name` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `call_metrics`
+--
+
+CREATE TABLE `call_metrics` (
+  `id` bigint UNSIGNED NOT NULL,
+  `date` date NOT NULL DEFAULT (curdate()),
+  `total_calls` int NOT NULL DEFAULT '0',
+  `connected_calls` int NOT NULL DEFAULT '0',
+  `missed_calls` int NOT NULL DEFAULT '0',
+  `total_duration` int NOT NULL DEFAULT '0',
+  `total_wait_time` int NOT NULL DEFAULT '0',
+  `average_wait_time` double NOT NULL DEFAULT '0',
+  `average_rating` double NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `call_metrics`
+--
+
+INSERT INTO `call_metrics` (`id`, `date`, `total_calls`, `connected_calls`, `missed_calls`, `total_duration`, `total_wait_time`, `average_wait_time`, `average_rating`, `created_at`, `updated_at`) VALUES
+(1, '2026-02-14', 1, 0, 1, 0, 0, 0, 0, '2026-02-14 04:46:53', '2026-02-14 04:46:53');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `call_queue`
+--
+
+CREATE TABLE `call_queue` (
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `customer_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `customer_phone` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `customer_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('waiting','connected','cancelled','timeout') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'waiting',
+  `position` int NOT NULL DEFAULT '0',
+  `joined_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `connected_at` timestamp NULL DEFAULT NULL,
+  `ended_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `call_queue`
+--
+
+INSERT INTO `call_queue` (`id`, `user_id`, `customer_name`, `customer_phone`, `customer_email`, `status`, `position`, `joined_at`, `connected_at`, `ended_at`, `created_at`, `updated_at`) VALUES
+(1, 4, 'Visitor', '', 'kali1212hit@gmail.com', 'connected', 0, '2026-02-14 05:05:17', '2026-02-14 05:05:17', NULL, '2026-02-14 05:05:17', '2026-02-14 05:05:17'),
+(2, 1, 'Receptionist', '', 'ashrafulinstasure@gmail.com', 'connected', 0, '2026-02-14 05:10:47', '2026-02-14 05:10:47', NULL, '2026-02-14 05:10:47', '2026-02-14 05:10:47');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `call_sessions`
+--
+
+CREATE TABLE `call_sessions` (
+  `id` bigint UNSIGNED NOT NULL,
+  `channel_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `agora_uid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `agent_id` bigint UNSIGNED DEFAULT NULL,
+  `call_queue_id` bigint UNSIGNED DEFAULT NULL,
+  `status` enum('ringing','connected','ended') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ringing',
+  `started_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ended_at` timestamp NULL DEFAULT NULL,
+  `duration` int NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `call_sessions`
+--
+
+INSERT INTO `call_sessions` (`id`, `channel_name`, `agora_uid`, `user_id`, `agent_id`, `call_queue_id`, `status`, `started_at`, `ended_at`, `duration`, `created_at`, `updated_at`) VALUES
+(1, 'call_698ffe3ce59e6', NULL, 4, 1, NULL, 'ended', '2026-02-14 04:46:52', '2026-02-14 04:46:53', 0, '2026-02-14 04:46:52', '2026-02-14 04:46:53'),
+(2, 'call_6990028da2f97_1771045517', NULL, 4, 1, 1, 'ringing', '2026-02-14 05:05:17', NULL, 0, '2026-02-14 05:05:17', '2026-02-14 05:05:17'),
+(3, 'call_699003d75f557_1771045847', NULL, 1, 1, 2, 'ringing', '2026-02-14 05:10:47', NULL, 0, '2026-02-14 05:10:47', '2026-02-14 05:10:47');
 
 -- --------------------------------------------------------
 
@@ -178,7 +311,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (20, '2026_01_22_045605_create_studentloginfroms_table', 5),
 (21, '2026_01_27_090741_create_insurance_pacages_table', 5),
 (22, '2026_01_27_091027_create_orders_table', 5),
-(23, '2026_01_27_091158_create_claims_table', 5);
+(23, '2026_01_27_091158_create_claims_table', 5),
+(24, '2026_02_14_100000_create_video_call_tables', 6);
 
 -- --------------------------------------------------------
 
@@ -654,6 +788,14 @@ INSERT INTO `visit_types` (`id`, `name`, `created_at`, `updated_at`) VALUES
 --
 
 --
+-- Indexes for table `agents`
+--
+ALTER TABLE `agents`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `agents_email_unique` (`email`),
+  ADD KEY `agents_user_id_foreign` (`user_id`);
+
+--
 -- Indexes for table `cache`
 --
 ALTER TABLE `cache`
@@ -664,6 +806,38 @@ ALTER TABLE `cache`
 --
 ALTER TABLE `cache_locks`
   ADD PRIMARY KEY (`key`);
+
+--
+-- Indexes for table `call_feedback`
+--
+ALTER TABLE `call_feedback`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `call_feedback_call_session_id_foreign` (`call_session_id`),
+  ADD KEY `call_feedback_user_id_foreign` (`user_id`),
+  ADD KEY `call_feedback_agent_id_foreign` (`agent_id`);
+
+--
+-- Indexes for table `call_metrics`
+--
+ALTER TABLE `call_metrics`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `call_queue`
+--
+ALTER TABLE `call_queue`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `call_queue_user_id_foreign` (`user_id`);
+
+--
+-- Indexes for table `call_sessions`
+--
+ALTER TABLE `call_sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `call_sessions_channel_name_unique` (`channel_name`),
+  ADD KEY `call_sessions_user_id_foreign` (`user_id`),
+  ADD KEY `call_sessions_agent_id_foreign` (`agent_id`),
+  ADD KEY `call_sessions_call_queue_id_foreign` (`call_queue_id`);
 
 --
 -- Indexes for table `claims`
@@ -864,6 +1038,36 @@ ALTER TABLE `visit_types`
 --
 
 --
+-- AUTO_INCREMENT for table `agents`
+--
+ALTER TABLE `agents`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `call_feedback`
+--
+ALTER TABLE `call_feedback`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `call_metrics`
+--
+ALTER TABLE `call_metrics`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `call_queue`
+--
+ALTER TABLE `call_queue`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `call_sessions`
+--
+ALTER TABLE `call_sessions`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `claims`
 --
 ALTER TABLE `claims`
@@ -891,7 +1095,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -986,6 +1190,34 @@ ALTER TABLE `visit_types`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `agents`
+--
+ALTER TABLE `agents`
+  ADD CONSTRAINT `agents_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `call_feedback`
+--
+ALTER TABLE `call_feedback`
+  ADD CONSTRAINT `call_feedback_agent_id_foreign` FOREIGN KEY (`agent_id`) REFERENCES `agents` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `call_feedback_call_session_id_foreign` FOREIGN KEY (`call_session_id`) REFERENCES `call_sessions` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `call_feedback_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `call_queue`
+--
+ALTER TABLE `call_queue`
+  ADD CONSTRAINT `call_queue_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `call_sessions`
+--
+ALTER TABLE `call_sessions`
+  ADD CONSTRAINT `call_sessions_agent_id_foreign` FOREIGN KEY (`agent_id`) REFERENCES `agents` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `call_sessions_call_queue_id_foreign` FOREIGN KEY (`call_queue_id`) REFERENCES `call_queue` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `call_sessions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `claims`

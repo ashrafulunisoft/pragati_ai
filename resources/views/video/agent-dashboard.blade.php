@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.receptionist')
 
 @section('title', 'Agent Dashboard - Video Call')
 
 @push('styles')
-<script src="https://cdn.agora.io/sdk/web/AgoraRTC_N-4.22.0.js"></script>
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.22.0.js"></script>
 <style>
     .video-container {
         display: grid;
@@ -335,13 +335,20 @@
     }
 
     async function startCallWithData(data) {
+        console.log('Agent joining channel with data:', data);
+        
+        if (!data.app_id) {
+            alert('Error: App ID is missing from server response');
+            return;
+        }
+        
         await initAgora(data.app_id);
         
         channel = data.channel;
         uid = data.uid;
         sessionId = data.session_id;
         
-        await client.join(data.app_id, channel, null, uid);
+        await client.join(data.app_id, channel, data.token, uid);
         
         localTracks = await AgoraRTC.createMicrophoneAndCameraTracks();
         localTracks[1].play('local-video');

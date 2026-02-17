@@ -11,6 +11,9 @@ use App\Http\Controllers\VideoCallController;
 
 // Customer routes (authenticated)
 Route::middleware(['auth'])->group(function () {
+    // Customer video call page
+    Route::get('/video/call', [VideoCallController::class, 'customerCall'])->name('video.call');
+    
     // Request video call
     Route::post('/video/request-call', [VideoCallController::class, 'customerRequestCall'])->name('video.request.call');
     
