@@ -13,7 +13,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register MCP service
+        $this->app->singleton('mcp', function ($app) {
+            return new \App\Services\MCPService();
+        });
     }
 
     /**

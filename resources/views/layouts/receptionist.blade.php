@@ -20,17 +20,17 @@
 
     <style>
         :root {
-            --bg-page: radial-gradient(circle at center, #101d42 0%, #060b1d 100%);
-            --sidebar-bg: #111a30;
-            --accent-indigo: #4f46e5;
-            --accent-blue: #3b82f6;
-            --accent-pink: #db2777;
-            --glass-card: rgba(15, 23, 42, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --neon-blue: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.2);
-            --neon-indigo: 0 8px 25px rgba(79, 70, 229, 0.4);
+            --bg-page: linear-gradient(135deg, #4ab59a 0%, #0d5540 100%);
+            --sidebar-bg: #4ab697;
+            --accent-emerald: #10b981;
+            --accent-teal: #14b8a6;
+            --accent-green: #22c55e;
+            --glass-card: rgba(52, 135, 116, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --neon-emerald: 0 0 20px rgba(117, 242, 200, 0.4), 0 0 40px rgba(16, 185, 129, 0.2);
+            --neon-teal: 0 8px 25px rgba(20, 184, 166, 0.4);
             --sidebar-width: 280px;
-            --text-muted: #94a3b8;
+            --text-muted: #000000;
         }
 
         body {
@@ -38,7 +38,7 @@
             background: var(--bg-page);
             background-attachment: fixed;
             min-height: 100vh;
-            color: #fff;
+            color: #fff6f6;
             margin: 0;
             overflow-x: hidden;
         }
@@ -92,8 +92,8 @@
         }
 
         .sidebar-item.active {
-            background: var(--accent-indigo);
-            box-shadow: var(--neon-indigo);
+            background: var(--accent-emerald);
+            box-shadow: var(--neon-emerald);
         }
 
         .sidebar-submenu {
@@ -118,7 +118,7 @@
 
         /* Help Center */
         .help-center-box {
-            background: linear-gradient(180deg, var(--accent-indigo) 0%, var(--accent-blue) 100%);
+            background: linear-gradient(180deg, var(--accent-emerald) 0%, var(--accent-teal) 100%);
             border-radius: 24px;
             padding: 1.5rem;
             margin-top: auto;
@@ -134,7 +134,7 @@
             display: flex;
             align-items: center; justify-content: center;
             margin: -40px auto 1rem;
-            border: 4px solid #111a30;
+            border: 4px solid #0a4232;
             font-size: 1.2rem; font-weight: 800;
         }
 
@@ -169,10 +169,10 @@
         .summary-card h2 { font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
         .summary-icon {
             width: 42px; height: 42px;
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(16, 185, 129, 0.15);
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            color: var(--accent-blue);
+            color: var(--accent-emerald);
         }
 
         /* Charts */
@@ -185,9 +185,9 @@
         }
         .bar-col {
             flex: 1;
-            background: linear-gradient(180deg, var(--accent-indigo), var(--accent-blue));
+            background: linear-gradient(180deg, var(--accent-emerald), var(--accent-teal));
             border-radius: 8px 8px 0 0;
-            box-shadow: var(--neon-blue);
+            box-shadow: var(--neon-emerald);
         }
 
         /* Recent Visits Log Container & Font Fix */
@@ -282,7 +282,7 @@
             width: 160px;
             height: 160px;
             border-radius: 50%;
-            background: conic-gradient(var(--accent-blue) 0% 40%, #10b981 40% 60%, #f59e0b 60% 80%, #ef4444 80% 100%);
+            background: conic-gradient(var(--accent-emerald) 0% 40%, var(--accent-teal) 40% 60%, var(--accent-green) 60% 80%, #ef4444 80% 100%);
             position: relative;
             display: flex;
             align-items: center;
@@ -327,8 +327,8 @@
         }
 
         .input-custom:focus {
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.3) !important;
+            border-color: var(--accent-emerald) !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.3) !important;
             background: rgba(0, 0, 0, 0.45) !important;
             transform: translateY(-2px);
         }
@@ -343,10 +343,10 @@
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(35px);
             -webkit-backdrop-filter: blur(35px);
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.2);
             border-radius: 40px;
             padding: 3.5rem;
-            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(59, 130, 246, 0.05);
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(16, 185, 129, 0.05);
             position: relative;
         }
 
@@ -399,7 +399,7 @@
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, #5046e5, #3b82f6);
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal));
             border: none;
             border-radius: 100px;
             padding: 16px;
@@ -409,12 +409,12 @@
             letter-spacing: 2px;
             font-size: 0.85rem;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.3);
         }
 
         .btn-gradient:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
             filter: brightness(1.1);
         }
 
@@ -445,7 +445,7 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: #3b82f6;
+            color: var(--accent-emerald);
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
@@ -457,7 +457,7 @@
             right: 18px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--accent-blue);
+            color: var(--accent-emerald);
             opacity: 0.6;
             font-size: 0.9rem;
             pointer-events: none;
@@ -520,7 +520,7 @@
         .notification-avatar {
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue));
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal));
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -612,17 +612,17 @@
         }
 
         .page-link:hover {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
             color: #fff !important;
             transform: translateY(-2px);
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
         }
 
         .page-item.active .page-link {
-            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue));
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal));
             border-color: transparent;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
             color: #fff !important;
         }
 
@@ -652,10 +652,9 @@
     <!-- Mobile Navigation Bar -->
     <div class="mobile-top-nav">
 
-        <div class="d-flex justify-content-end  mb-2 text-white">
-                <img class="bg-white" alt="UCB Bank Logo" src="{{ asset('vms/logo/ucb-3.png') }}" style="height: 52px; width: 82px; border-radius:5px;">
-
-            </div>
+        <div class="text-center gap-3 mb-3 ">
+                <img class="bg-white " src="{{ asset('vms/logo/pragatiLogo.png') }}" style="height: 80px; width: 150px; border-radius:10px;" alt="UCB Bank Logo">
+        </div>
         <button class="btn text-white p-0" onclick="toggleSidebar()">
             <i class="fas fa-bars fs-4"></i>
         </button>
@@ -667,8 +666,8 @@
     <div id="page-receptionist-dashboard" class="vms-page">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
-            <div class="d-flex align-items-center gap-3 mb-3 ">
-                <img class="bg-white " src="{{ asset('vms/logo/ucb-bank-logo-bg_removed.png') }}" style="height: 80px; width: 100vh; border-radius:10px;" alt="UCB Bank Logo">
+            <div class="text-center gap-3 mb-3 ">
+                <img class="bg-white " src="{{ asset('vms/logo/pragatiLogo.png') }}" style="height: 80px; width: 150px; border-radius:10px;" alt="UCB Bank Logo">
             </div>
 
             <nav>
@@ -678,7 +677,7 @@
                 </a>
 
                 <!-- Visitor Management - Permission Based -->
-                @can('view visitors')
+                {{-- @can('view visitors')
                 <div class="sidebar-dropdown">
                     <a href="#" class="sidebar-item d-flex align-items-center" onclick="toggleSubmenu(event, 'visitor-submenu')">
                         <i class="fas fa-users"></i> Visitor Management
@@ -722,10 +721,10 @@
                         @endcan
                     </div>
                 </div>
-                @endcan
+                @endcan --}}
 
                 <!-- Notification Bell for Hosts -->
-                @can('approve visit')
+                {{-- @can('approve visit')
                 <a href="#" class="sidebar-item d-flex align-items-center justify-content-between" onclick="event.preventDefault(); toggleNotificationPanel()">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-bell"></i>
@@ -733,10 +732,10 @@
                     </div>
                     <span id="notification-badge" class="badge bg-danger rounded-pill" style="display: none;">0</span>
                 </a>
-                @endcan
+                @endcan --}}
 
                 <!-- Visit Management - Permission Based -->
-                @can('view visitors')
+                {{-- @can('view visitors')
                 <div class="sidebar-dropdown">
                     <a href="#" class="sidebar-item d-flex align-items-center" onclick="toggleSubmenu(event, 'visit-submenu')">
                         <i class="fas fa-calendar-check"></i> Visit Management
@@ -768,14 +767,14 @@
                         @endcan
                     </div>
                 </div>
-                @endcan
+                @endcan --}}
 
                 <!-- Reports - Permission Based -->
-                @can('view visitors')
+                {{-- @can('view visitors')
                 <a href="{{ route('visitor.report') }}" class="sidebar-item {{ request()->routeIs('visitor.report') ? 'active' : '' }}">
                     <i class="fas fa-chart-line"></i> Reports
                 </a>
-                @endcan
+                @endcan --}}
 
                 <!-- Settings - Permission Based -->
                 @can('manage settings')
@@ -787,6 +786,31 @@
                 <!-- Profile - Always visible -->
                 <a href="{{ route('profile') }}" class="sidebar-item {{ request()->routeIs('profile') ? 'active' : '' }}">
                     <i class="fas fa-user"></i> My Profile
+                </a>
+
+                <!-- Insurance - Packages -->
+                <a href="{{ route('packages.index') }}" class="sidebar-item {{ request()->routeIs('packages.*') ? 'active' : '' }}">
+                    <i class="fas fa-box"></i> Packages
+                </a>
+
+                <!-- Insurance - My Policies -->
+                <a href="{{ route('orders.index') }}" class="sidebar-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-file-contract"></i> My Policies
+                </a>
+
+                <!-- Insurance - My Claims -->
+                <a href="{{ route('claims.index') }}" class="sidebar-item {{ request()->routeIs('claims.*') ? 'active' : '' }}">
+                    <i class="fas fa-clipboard-list"></i> My Claims
+                </a>
+
+                <!-- AI Agent - Always visible -->
+                <a href="{{ route('chatbot.index') }}" class="sidebar-item {{ request()->routeIs('chat*') ? 'active' : '' }}">
+                    <i class="fas fa-comment-dots"></i> AI Agent
+                </a>
+
+                <!-- Video Call - Always visible -->
+                <a href="{{ route('video.agent.dashboard') }}" class="sidebar-item {{ request()->routeIs('video.*') ? 'active' : '' }}">
+                    <i class="fas fa-video"></i> Video Call
                 </a>
 
                 <!-- Settings - Always visible -->

@@ -24,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // ✅ Your custom middleware
         'role.redirect' => \App\Http\Middleware\RedirectUserByRole::class,
 
+        // ✅ MCP Security Middleware
+        'mcp.malicious.login' => \App\Http\Middleware\McpMaliciousLoginMiddleware::class,
+
     ]))
 
     ->withExceptions(function (Exceptions $exceptions): void {

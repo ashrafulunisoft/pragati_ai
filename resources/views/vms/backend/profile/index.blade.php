@@ -32,28 +32,28 @@
                     @csrf
                     <div class="row g-3">
                         <div class="col-12">
-                            <label class="form-label">Full Name</label>
+                            <label class="form-label text-white">Full Name</label>
                             <input type="text"
                                    class="input-dark"
                                    value="{{ Auth::user()->name }}"
                                    readonly>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Email Address</label>
+                            <label class="form-label text-white">Email Address</label>
                             <input type="email"
                                    class="input-dark"
                                    value="{{ Auth::user()->email }}"
                                    readonly>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Role</label>
+                            <label class="form-label text-white">Role</label>
                             <input type="text"
                                    class="input-dark"
                                    value="{{ ucfirst(auth()->user()->getRoleNames()->first()) ?? 'User' }}"
                                    readonly>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Member Since</label>
+                            <label class="form-label text-white">Member Since</label>
                             <input type="text"
                                    class="input-dark"
                                    value="{{ Auth::user()->created_at->format('F j, Y') }}"
@@ -76,10 +76,10 @@
                         @foreach(auth()->user()->getAllPermissions() as $permission)
                         <div class="col-6">
                             <div class="checkbox-label">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="fas fa-check-circle text-success"></i>
-                                    <span class="small fw-600">{{ ucfirst($permission->name) }}</span>
-                                </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-check-circle" style="color: var(--accent-emerald);"></i>
+                                <span class="small fw-600 text-white">{{ ucfirst($permission->name) }}</span>
+                            </div>
                             </div>
                         </div>
                         @endforeach
@@ -101,9 +101,9 @@
                 </h6>
                 <form action="{{ route('profile.send-reset-email') }}" method="POST">
                     @csrf
-                    <div class="row g-3">
+                    <div class="row g-3 ">
                         <div class="col-md-6">
-                            <label class="form-label">Current Password</label>
+                            <label class="form-label text-white">Current Password</label>
                             <div class="position-relative">
                                 <input type="password"
                                        class="input-dark"
@@ -113,7 +113,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">New Password</label>
+                            <label class="form-label text-white">New Password</label>
                             <div class="position-relative">
                                 <input type="password"
                                        class="input-dark"
@@ -123,7 +123,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Confirm New Password</label>
+                            <label class="form-label text-white">Confirm New Password</label>
                             <div class="position-relative">
                                 <input type="password"
                                        class="input-dark"
@@ -191,7 +191,7 @@
                     @can('view visitors')
                     <div class="col-6 col-md-3">
                         <div class="text-center">
-                            <h3 class="fw-800 mb-1 text-primary">
+                            <h3 class="fw-800 mb-1" style="color: var(--accent-emerald);">
                                 {{ App\Models\Visit::where('meeting_user_id', Auth::id())->count() }}
                             </h3>
                             <p class="sub-label mb-0">Total Visits Hosted</p>
@@ -200,7 +200,7 @@
                     @endcan
                     <div class="col-6 col-md-3">
                         <div class="text-center">
-                            <h3 class="fw-800 mb-1 text-success">
+                            <h3 class="fw-800 mb-1" style="color: var(--accent-emerald);">
                                 {{ App\Models\Visit::where('status', 'completed')->where('meeting_user_id', Auth::id())->count() }}
                             </h3>
                             <p class="sub-label mb-0">Completed Visits</p>
@@ -208,7 +208,7 @@
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="text-center">
-                            <h3 class="fw-800 mb-1 text-warning">
+                            <h3 class="fw-800 mb-1" style="color: var(--accent-amber);">
                                 {{ App\Models\Visit::where('status', 'pending')->where('meeting_user_id', Auth::id())->count() }}
                             </h3>
                             <p class="sub-label mb-0">Pending Requests</p>
@@ -216,7 +216,7 @@
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="text-center">
-                            <h3 class="fw-800 mb-1 text-info">
+                            <h3 class="fw-800 mb-1" style="color: var(--accent-teal);">
                                 {{ App\Models\Visit::whereDate('schedule_time', today())->where('meeting_user_id', Auth::id())->count() }}
                             </h3>
                             <p class="sub-label mb-0">Today's Visits</p>

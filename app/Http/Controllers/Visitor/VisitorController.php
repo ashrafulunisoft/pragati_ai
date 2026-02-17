@@ -7,6 +7,9 @@ use App\Models\User;
 use App\Models\Visitor;
 use App\Models\Visit;
 use App\Models\VisitType;
+use App\Models\pragati\Order;
+use App\Models\pragati\Claim;
+use App\Models\UserInfo;
 use App\Services\EmailNotificationService;
 use App\Services\SmsNotificationService;
 use App\Events\VisitWaitingForApproval;
@@ -28,6 +31,7 @@ class VisitorController extends Controller
      */
     public function dashboard()
     {
+        // dd("Hello"); 
         // Get visitor statistics based on user permissions
         $stats = [
             'total_visitors' => Visitor::count(),
@@ -72,11 +76,41 @@ class VisitorController extends Controller
 
         $pendingVisits = $pendingVisitsQuery->orderBy('created_at', 'desc')->limit(5)->get();
 
+        // Get user profile info (by email since table doesn't have user_id)
+        $userInfo = UserInfo::where('email', auth()->user()->email)->first();
+
+        // Get insurance orders/policies for current user
+        $userOrders = Order::with(['package'])
+            ->where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Get insurance claims for current user
+        $userClaims = Claim::with(['package', 'order'])
+            ->where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Calculate insurance stats
+        $insuranceStats = [
+            'total_policies' => Order::where('user_id', auth()->id())->count(),
+            'active_policies' => Order::where('user_id', auth()->id())->where('status', 'active')->count(),
+            'total_claims' => Claim::where('user_id', auth()->id())->count(),
+            'pending_claims' => Claim::where('user_id', auth()->id())->whereIn('status', ['submitted', 'under_review'])->count(),
+        ];
+
+        //  dd("Hello"); 
         return view('vms.backend.visitor.dashboard', compact(
             'stats',
             'recentVisits',
             'todayVisits',
-            'pendingVisits'
+            'pendingVisits',
+            'userInfo',
+            'userOrders',
+            'userClaims',
+            'insuranceStats'
         ));
     }
 
