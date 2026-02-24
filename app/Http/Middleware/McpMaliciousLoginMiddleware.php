@@ -33,76 +33,78 @@ class McpMaliciousLoginMiddleware
         $ipAttempts    = Redis::get($ipKey) ?? 0;
         $emailAttempts = Redis::get($emailKey) ?? 0;
 
-        // Log that we're analyzing this login attempt
-        Log::info('[MCP Middleware] Analyzing login attempt', [
-            'ip' => $ip,
-            'email' => $email,
-            'ip_attempts' => $ipAttempts,
-            'email_attempts' => $emailAttempts
-        ]);
-
-        // Get full MCP response with decision, attack_type, risk_score, confidence, recommended_action
-        // Now analyzing ALL login attempts, not just when thresholds are exceeded
-        $mcp = McpSecurityService::analyzeLogin([
-            'ip' => $ip,
-            'email' => $email,
-            'ip_attempts' => $ipAttempts,
-            'email_attempts' => $emailAttempts,
-        ]);
-
-        // Note: MCP_DECISION is already logged by McpSecurityService::analyzeLogin()
-        // No need to log again here to avoid duplicates
-
-        // Block if:
-        // 1. Decision is MALICIOUS AND threshold is exceeded, OR
-        // 2. Risk score is HIGH (>= 80) AND threshold is exceeded
-        $shouldBlock = false;
-        $blockReason = '';
-
-        if ($mcp['decision'] === 'MALICIOUS' && ($ipAttempts >= 5 || $emailAttempts >= 3)) {
-            $shouldBlock = true;
-            $blockReason = 'MALICIOUS decision detected';
-        } elseif ($mcp['risk_score'] >= 80 && ($ipAttempts >= 5 || $emailAttempts >= 3)) {
-            $shouldBlock = true;
-            $blockReason = 'High risk score (' . $mcp['risk_score'] . ') detected';
-        }
-
-        if ($shouldBlock) {
-            // Block for 1 hour
-            Redis::setex("blocked:ip:$ip", 3600, 1);
-
-            // Log warning
-            Log::warning('[MCP Middleware] IP blocked - ' . $blockReason, [
+        // Only use MCP AI analysis when login limits are exceeded (5+ IP attempts or 3+ email attempts)
+        // This saves API calls and improves performance
+        if ($ipAttempts >= 5 || $emailAttempts >= 3) {
+            Log::info('[MCP Middleware] Threshold exceeded, calling AI analysis', [
                 'ip' => $ip,
                 'email' => $email,
-                'attack_type' => $mcp['attack_type'],
-                'risk_score' => $mcp['risk_score'],
-                'decision' => $mcp['decision'],
                 'ip_attempts' => $ipAttempts,
                 'email_attempts' => $emailAttempts
             ]);
 
-            // Trigger event for email alert (wrapped in try-catch to prevent email errors from blocking response)
-            try {
-                event(new McpAttackDetected(
-                    [
-                        'ip' => $ip,
-                        'email' => $email
-                    ],
-                    $mcp
-                ));
-            } catch (\Exception $e) {
-                // Log email error but don't block the response
-                Log::error('[MCP Middleware] Failed to send security alert email', [
-                    'error' => $e->getMessage(),
-                    'ip' => $ip,
-                    'email' => $email
-                ]);
+            // Get full MCP response with decision, attack_type, risk_score, confidence, recommended_action
+            $mcp = McpSecurityService::analyzeLogin([
+                'ip' => $ip,
+                'email' => $email,
+                'ip_attempts' => $ipAttempts,
+                'email_attempts' => $emailAttempts,
+            ]);
+
+            // Note: MCP_DECISION is already logged by McpSecurityService::analyzeLogin()
+            // No need to log again here to avoid duplicates
+
+            // Block if:
+            // 1. Decision is MALICIOUS, OR
+            // 2. Risk score is HIGH (>= 80)
+            $shouldBlock = false;
+            $blockReason = '';
+
+            if ($mcp['decision'] === 'MALICIOUS') {
+                $shouldBlock = true;
+                $blockReason = 'MALICIOUS decision detected';
+            } elseif ($mcp['risk_score'] >= 80) {
+                $shouldBlock = true;
+                $blockReason = 'High risk score (' . $mcp['risk_score'] . ') detected';
             }
 
-            return response()->json([
-                'error' => 'AI Security System: ' . $blockReason . '. Access blocked for 1 hour.'
-            ], 403);
+            if ($shouldBlock) {
+                // Block for 1 hour
+                Redis::setex("blocked:ip:$ip", 3600, 1);
+
+                // Log warning
+                Log::warning('[MCP Middleware] IP blocked - ' . $blockReason, [
+                    'ip' => $ip,
+                    'email' => $email,
+                    'attack_type' => $mcp['attack_type'],
+                    'risk_score' => $mcp['risk_score'],
+                    'decision' => $mcp['decision'],
+                    'ip_attempts' => $ipAttempts,
+                    'email_attempts' => $emailAttempts
+                ]);
+
+                // Trigger event for email alert (wrapped in try-catch to prevent email errors from blocking response)
+                try {
+                    event(new McpAttackDetected(
+                        [
+                            'ip' => $ip,
+                            'email' => $email
+                        ],
+                        $mcp
+                    ));
+                } catch (\Exception $e) {
+                    // Log email error but don't block response
+                    Log::error('[MCP Middleware] Failed to send security alert email', [
+                        'error' => $e->getMessage(),
+                        'ip' => $ip,
+                        'email' => $email
+                    ]);
+                }
+
+                return response()->json([
+                    'error' => 'AI Security System: ' . $blockReason . '. Access blocked for 1 hour.'
+                ], 403);
+            }
         }
 
         return $next($request);
