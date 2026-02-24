@@ -82,14 +82,23 @@ class McpMaliciousLoginMiddleware
                 'email_attempts' => $emailAttempts
             ]);
 
-            // Trigger event for email alert
-            event(new McpAttackDetected(
-                [
+            // Trigger event for email alert (wrapped in try-catch to prevent email errors from blocking response)
+            try {
+                event(new McpAttackDetected(
+                    [
+                        'ip' => $ip,
+                        'email' => $email
+                    ],
+                    $mcp
+                ));
+            } catch (\Exception $e) {
+                // Log email error but don't block the response
+                Log::error('[MCP Middleware] Failed to send security alert email', [
+                    'error' => $e->getMessage(),
                     'ip' => $ip,
                     'email' => $email
-                ],
-                $mcp
-            ));
+                ]);
+            }
 
             return response()->json([
                 'error' => 'AI Security System: ' . $blockReason . '. Access blocked for 1 hour.'
