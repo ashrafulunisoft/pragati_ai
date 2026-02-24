@@ -46,13 +46,16 @@ PROMPT;
             'email_attempts' => $data['email_attempts']
         ]);
 
-        // Default response
+        // Calculate risk score first
+        $riskScore = self::getRiskScore($data);
+        
+        // Default response - decision and recommended_action based on risk_score
         $defaultResponse = [
-            'decision' => 'SAFE',
-            'attack_type' => 'normal_user',
-            'risk_score' => self::getRiskScore($data),
+            'decision' => $riskScore >= 80 ? 'MALICIOUS' : ($riskScore >= 50 ? 'SUSPICIOUS' : 'SAFE'),
+            'attack_type' => $riskScore >= 80 ? 'brute_force' : ($riskScore >= 50 ? 'credential_stuffing' : 'normal_user'),
+            'risk_score' => $riskScore,
             'confidence' => 0.5,
-            'recommended_action' => 'monitor'
+            'recommended_action' => self::getRecommendedAction($riskScore)
         ];
 
         try {
@@ -95,6 +98,19 @@ PROMPT;
 
             // Ensure all required fields exist
             $mcp = array_merge($defaultResponse, $mcp);
+            
+            // Override decision and recommended_action based on actual risk_score
+            // (not AI's lenient response)
+            $mcp['recommended_action'] = self::getRecommendedAction($mcp['risk_score']);
+            
+            // Override decision based on risk_score
+            if ($mcp['risk_score'] >= 80) {
+                $mcp['decision'] = 'MALICIOUS';
+                $mcp['attack_type'] = 'brute_force';
+            } elseif ($mcp['risk_score'] >= 50) {
+                $mcp['decision'] = 'SUSPICIOUS';
+                $mcp['attack_type'] = 'credential_stuffing';
+            }
 
             Log::info('[MCP Security] Analysis result', [
                 'mcp' => $mcp
@@ -163,5 +179,24 @@ PROMPT;
         }
 
         return min(100, $baseScore);
+    }
+    
+    /**
+     * Get recommended action based on risk score
+     *
+     * @param int $riskScore Risk score (0-100)
+     * @return string Recommended action
+     */
+    public static function getRecommendedAction(int $riskScore): string
+    {
+        if ($riskScore >= 80) {
+            return 'block_ip';
+        } elseif ($riskScore >= 50) {
+            return 'otp';
+        } elseif ($riskScore >= 30) {
+            return 'captcha';
+        } else {
+            return 'monitor';
+        }
     }
 }
