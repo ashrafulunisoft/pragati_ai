@@ -1,59 +1,644 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# AI Insurance Chatbot Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
-   
-## About Laravel
+An enterprise-grade multilingual AI chatbot platform built with <a href="https://laravel.com">Laravel</a>, <a href="https://laravel.com/docs/octane">Laravel Octane</a>, <a href="https://roadrunner.dev">RoadRunner</a>, <a href="https://reverb.laravel.com">Laravel Reverb</a>, Docker, Redis, MySQL, NGINX, and GitLab CI/CD.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The platform is designed for intelligent insurance automation and customer support. It can understand and respond naturally in multiple languages while handling insurance-related workflows including policy purchase, claim tracking, package details, customer order management, and coverage explanations.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# 🚀 Features
 
-## Learning Laravel
+* 🤖 AI Chatbot Integration
+* 🌍 Multilingual Chat Support
+* 🧠 MCP Minimax Model Integration
+* 🔄 Support for Multiple AI Models
+* 💬 Real-Time Chat Messaging
+* 🔔 Real-Time Notifications using Laravel Reverb
+* ⚡ High Performance with Laravel Octane + RoadRunner
+* 📑 Insurance Policy Management
+* 💳 Insurance Purchase Assistance
+* 📦 Insurance Package Details
+* 🛡️ Coverage Amount Explanation
+* 📋 Claim Management
+* 👤 Customer Order Tracking
+* 📈 Intelligent Insurance Q&A
+* 🧾 Customer Support Automation
+* 🐳 Fully Dockerized Infrastructure
+* 🔐 Secure Authentication & Authorization
+* 🚀 GitLab CI/CD Deployment
+* 🌐 NGINX Reverse Proxy
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# 🏗️ Tech Stack
 
-## Laravel Sponsors
+| Layer                 | Technology                       |
+| --------------------- | -------------------------------- |
+| Backend               | PHP 8.3, Laravel                 |
+| AI Layer              | MCP Minimax Model                |
+| Alternative AI Models | OpenAI, Claude, Gemini, DeepSeek |
+| Realtime              | Laravel Reverb                   |
+| Performance           | Laravel Octane + RoadRunner      |
+| Queue & Cache         | Redis                            |
+| Database              | MySQL 8                          |
+| Reverse Proxy         | NGINX                            |
+| Containerization      | Docker & Docker Compose          |
+| CI/CD                 | GitLab CI/CD                     |
+| Database Management   | phpMyAdmin                       |
+| Frontend              | React / Next.js / Vue            |
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+# 📦 Core Capabilities
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🤖 AI Insurance Assistant
 
-## Contributing
+The chatbot can:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+* Answer insurance-related questions
+* Explain policy details
+* Describe insurance coverage
+* Handle claim-related queries
+* Assist with insurance purchases
+* Track customer orders
+* Provide package comparisons
+* Answer premium-related questions
+* Guide customers through claim processes
+* Support multilingual communication
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 🌍 Multilingual Support
 
-## Security Vulnerabilities
+Supported capabilities:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+* English
+* Bangla
+* Hindi
+* Arabic
+* Urdu
+* Spanish
+* French
+* Dynamic language detection
 
-## License
+The AI automatically detects and responds in the customer's language.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+# 🧠 AI Model Architecture
+
+```text id="m8r2q5"
+Customer Message
+        │
+        ▼
+Laravel API Gateway
+        │
+        ▼
+AI Service Layer
+        │
+ ┌──────┼───────────────┐
+ │      │               │
+ ▼      ▼               ▼
+Minimax OpenAI       Gemini
+ │
+ ▼
+Insurance Knowledge Engine
+        │
+        ▼
+Realtime Response via Reverb
+```
+
+---
+
+# 📁 Project Structure
+
+```bash id="k3v8x1"
+project-root/
+│
+├── app/
+│   ├── AI/
+│   ├── Services/
+│   ├── Models/
+│   ├── Events/
+│   ├── Jobs/
+│   └── Http/
+│
+├── bootstrap/
+├── config/
+├── database/
+├── docker/
+│   ├── nginx/
+│   ├── mysql/
+│   ├── redis/
+│   └── phpmyadmin/
+│
+├── resources/
+├── routes/
+├── storage/
+│
+├── .gitlab-ci.yml
+├── docker-compose.yml
+├── Dockerfile
+└── README.md
+```
+
+---
+
+# ⚙️ Requirements
+
+* PHP 8.3+
+* Composer
+* Docker
+* Docker Compose
+* Node.js 20+
+* GitLab Account
+* VPS Server
+
+---
+
+# 🐳 Docker Services
+
+| Service        | Port |
+| -------------- | ---- |
+| Laravel App    | 8000 |
+| NGINX          | 80   |
+| MySQL          | 3306 |
+| Redis          | 6379 |
+| phpMyAdmin     | 8081 |
+| Laravel Reverb | 8080 |
+
+---
+
+# 🐋 Docker Compose Setup
+
+## Start Containers
+
+```bash id="v7n5m2"
+docker compose up -d
+```
+
+---
+
+## Stop Containers
+
+```bash id="q2x6k8"
+docker compose down
+```
+
+---
+
+## Rebuild Containers
+
+```bash id="d5p1r4"
+docker compose up -d --build
+```
+
+---
+
+# 🔧 Local Laravel Setup
+
+## Install Dependencies
+
+```bash id="u6m9z2"
+composer install
+npm install
+```
+
+---
+
+## Copy Environment File
+
+```bash id="w3k8v7"
+cp .env.example .env
+```
+
+---
+
+## Generate Application Key
+
+```bash id="y4q2x6"
+php artisan key:generate
+```
+
+---
+
+# 🐬 MySQL Configuration
+
+```env id="f8r1m5"
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=insurance_ai
+DB_USERNAME=insurance_user
+DB_PASSWORD=strong_password
+```
+
+---
+
+# 🔴 Redis Configuration
+
+```env id="a2v9p4"
+REDIS_HOST=redis
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+```
+
+---
+
+# ⚡ Laravel Octane Setup
+
+## Install Octane
+
+```bash id="n7m2v6"
+composer require laravel/octane
+```
+
+---
+
+## Install RoadRunner
+
+```bash id="r4x8k1"
+composer require spiral/roadrunner-cli spiral/roadrunner-http
+```
+
+---
+
+## Install Octane Server
+
+```bash id="t9q5m3"
+php artisan octane:install --server=roadrunner
+```
+
+---
+
+# ▶️ Run Laravel Octane
+
+```bash id="s8v1p7"
+php artisan octane:start --server=roadrunner --host=0.0.0.0 --port=8000
+```
+
+---
+
+# 📡 Laravel Reverb Setup
+
+## Install Reverb
+
+```bash id="c7m3q2"
+composer require laravel/reverb
+```
+
+---
+
+## Configure Reverb
+
+```bash id="b5x1v9"
+php artisan reverb:install
+```
+
+---
+
+## Run Reverb Server
+
+```bash id="j6p4m8"
+php artisan reverb:start
+```
+
+---
+
+# 🔔 Broadcasting Configuration
+
+```env id="z4r8m1"
+BROADCAST_CONNECTION=reverb
+
+REVERB_APP_ID=insurance-ai
+REVERB_APP_KEY=insurance-key
+REVERB_APP_SECRET=insurance-secret
+
+REVERB_HOST=0.0.0.0
+REVERB_PORT=8080
+REVERB_SCHEME=https
+```
+
+---
+
+# 🤖 MCP Minimax AI Integration
+
+## Supported AI Providers
+
+| Provider    | Status    |
+| ----------- | --------- |
+| MCP Minimax | Primary   |
+| OpenAI      | Supported |
+| Claude      | Supported |
+| Gemini      | Supported |
+| DeepSeek    | Supported |
+
+---
+
+# 🧠 AI Features
+
+* Context-aware conversations
+* Insurance knowledge reasoning
+* Intelligent package recommendation
+* Claim explanation engine
+* Customer history understanding
+* Multi-turn conversations
+* Real-time response streaming
+
+---
+
+# 📑 Insurance Management Modules
+
+## 📦 Insurance Package Module
+
+Features:
+
+* Package listing
+* Coverage details
+* Premium calculation
+* Policy comparison
+* Eligibility checking
+
+---
+
+## 🛡️ Coverage Management
+
+The AI can explain:
+
+* Coverage amount
+* Deductibles
+* Exclusions
+* Premium benefits
+* Claim limitations
+* Policy validity
+
+---
+
+## 📋 Claims Management
+
+Supported operations:
+
+* Claim status checking
+* Claim submission guidance
+* Required document explanation
+* Claim timeline tracking
+* Settlement information
+
+---
+
+## 👤 Customer Management
+
+Features:
+
+* Customer profile
+* Order tracking
+* Purchase history
+* Chat history
+* AI interaction logs
+
+---
+
+# 🌐 NGINX Reverse Proxy
+
+```nginx id="h8m2v5"
+server {
+    listen 80;
+
+    server_name your-domain.com;
+
+    client_max_body_size 100M;
+
+    location / {
+        proxy_pass http://app:8000;
+
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /app {
+        proxy_pass http://reverb:8080;
+
+        proxy_http_version 1.1;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+
+        proxy_set_header Host $host;
+    }
+}
+```
+
+---
+
+# 🚀 GitLab CI/CD
+
+## Deployment Pipeline
+
+```text id="p2v9x7"
+Developer Push
+        │
+        ▼
+GitLab CI/CD
+        │
+        ▼
+Docker Build
+        │
+        ▼
+VPS Deployment
+        │
+        ▼
+Docker Compose Restart
+        │
+        ▼
+Production Ready
+```
+
+---
+
+# 📁 `.gitlab-ci.yml`
+
+```yaml id="m6q3v1"
+stages:
+  - deploy
+
+deploy_production:
+  stage: deploy
+
+  only:
+    - main
+
+  before_script:
+    - apt-get update -y
+    - apt-get install -y openssh-client
+
+  script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+
+    - ssh -o StrictHostKeyChecking=no root@$SERVER_IP "
+        cd /var/www/insurance-ai &&
+        git pull origin main &&
+        docker compose down &&
+        docker compose up -d --build
+      "
+```
+
+---
+
+# 🧪 Testing
+
+## Run Backend Tests
+
+```bash id="x7m4q1"
+php artisan test
+```
+
+---
+
+## Run Frontend Tests
+
+```bash id="u9v2k5"
+npm run test
+```
+
+---
+
+# 🔥 Performance Optimization
+
+* Laravel Octane Workers
+* RoadRunner Persistent Workers
+* Redis Queue Optimization
+* NGINX Reverse Proxy
+* Query Optimization
+* AI Response Caching
+* Lazy Loading
+* WebSocket Scaling
+
+---
+
+# 🔐 Security Best Practices
+
+* HTTPS / WSS
+* API Rate Limiting
+* AI Request Validation
+* CSRF Protection
+* JWT Authentication
+* Encrypted Environment Variables
+* Secure AI API Key Storage
+* Role-Based Access Control
+
+---
+
+# 👨‍💻 Development Commands
+
+## Run Vite
+
+```bash id="c5r8m2"
+npm run dev
+```
+
+---
+
+## Run Queue Worker
+
+```bash id="j2v6p9"
+php artisan queue:work
+```
+
+---
+
+## Run Scheduler
+
+```bash id="n1m8q4"
+php artisan schedule:work
+```
+
+---
+
+## Run Reverb
+
+```bash id="k7x3v5"
+php artisan reverb:start
+```
+
+---
+
+## Run Octane
+
+```bash id="s4m9q1"
+php artisan octane:start --server=roadrunner
+```
+
+---
+
+# 📈 Future Improvements
+
+* Voice AI Assistant
+* AI Call Center
+* OCR Document Reading
+* AI Claim Fraud Detection
+* Insurance Recommendation Engine
+* AI Agent Dashboard
+* Mobile Applications
+* Multi-Tenant Support
+
+---
+
+# 📊 Real-Time AI Chat Flow
+
+```text id="v8q2m6"
+Customer Message
+        │
+        ▼
+Laravel API
+        │
+        ▼
+AI Processing Layer
+        │
+        ▼
+Insurance Knowledge Engine
+        │
+        ▼
+Realtime Streaming via Reverb
+        │
+        ▼
+Customer Receives AI Response
+```
+
+---
+
+# 🤝 Contributing
+
+1. Fork Repository
+2. Create Feature Branch
+3. Commit Changes
+4. Push Branch
+5. Open Merge Request
+
+---
+
+# 📜 License
+
+MIT License
+
+---
+
+# 🙌 Credits
+
+Built with:
+
+* Laravel
+* Laravel Reverb
+* Laravel Octane
+* RoadRunner
+* MCP Minimax
+* Redis
+* MySQL
+* Docker
+* GitLab CI/CD
+* NGINX
+* AI Language Models
