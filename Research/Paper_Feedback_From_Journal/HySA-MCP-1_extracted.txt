@@ -1,0 +1,1944 @@
+Int. J. Inf. Secur. manuscript No.
+(will be inserted by the editor)
+
+HySA-MCP: A Hybrid AI-Driven Secure Authentication
+Framework with Model Context Protocol (MCP) Integration
+Md. Ashraful Momena,1 , Md. Nazmus Sajida,3,4 , Saifur Rahamanb,2,3,4
+1
+
+Department of Software Engineering, Daffodil International University, Dhaka, Bangladesh
+Department of Computer Science, City University of Hong Kong (CityUHK), Hong Kong SAR
+3
+Department Computer Science and Engineering, International Islamic University Chittagong (IIUC), Bangladesh
+4
+Laboratory for Bioinformatics and Computational Medicine (BioCom), Bangladesh
+2
+
+Received: date / Accepted: date
+
+Abstract Modern web-based enterprise applications
+are increasingly vulnerable to brute-force, credential
+stuffing, and automated bot attacks, yet traditional IPbased rate limiting and CAPTCHA mechanisms often
+fail to adapt to evolving threats while frequently misidentifying legitimate users. This research proposes a novel
+three-tier hybrid authentication architecture that integrates Redis-based real-time counters, a Model Context
+Protocol (MCP) for MiniMax Large Language Model
+(LLM)-driven contextual threat analysis, and an interpretable rule-based risk scoring algorithm that validates
+AI decisions to reduce false positives. A threshold-based
+invocation mechanism triggers LLM analysis selectively
+40 of 186 events(≈ 21.5%) in the evalutaed configuration,
+minimizing computational overhead and latency.If the
+Minimax API goes down, the system does not just let
+all traffic through. Instead, it uses a three-tier backup
+plan based on risk levels; it blocks high-risk traffic (score
+≥ 80), throttles medium-risk traffic using an N-strike
+counter (score 50-79), and simply monitors low-risk traffic. Implemented within Laravel and validated through
+106/106 predefined unit tests, the system achieves 83.9%
+recall when the LLM augments the rule-based floor(up
+from 21.2% with rules alone) at zero false positives over
+49 legitimate negatives, demonstrating potential for deployment over conventional throttling approaches by
+substantially lowering false positive rates. Furthermore,
+the architecture is highly memory-efficient, using only
+about 1.1 MB of Redis memory to track 10,000 active
+entities at once. This low footprint suggests it will be
+highly cost-effective for enterprise scale, though we still
+need to run formal scalability benchmarks in the future.
+a
+
+These authors contributed equally to this work.
+Corresponding author(s). E-mail(s): saifurcubd@gmail.
+com; Contributing authors: amshuvo64@gmail.com; md.nazmus.
+sajid94@gmail.com;
+b
+
+Keywords MCP Security · AI-Driven Authentication ·
+Explainable Risk Scoring · Brute-Force Prevention ·
+Hybrid Security Model · Login Threat Detection
+
+1 Introduction
+Laravel is one of the most popular PHP web frameworks, powering over 1.5 million websites worldwide [1]
+and holding approximately a 64% market share among
+PHP developers, according to the JetBrains State of
+PHP 2025 survey [2]. It is widely used in multiple sectors including e-commerce, fintech, healthcare, CRMs,
+and government applications, due to its robust security
+features, scalability, and rapid development capabilities [3][4]. The widespread adoption of Laravel in sensitive and high-stakes domains makes its authentication
+security a critical research concern for both industry
+practitioners and the academic security community.
+In the current digital era, web-based enterprise applications face increasingly sophisticated cyber threats,
+including credential stuffing, brute-force attacks, and
+bot-powered automated attacks. Traditional authentication security measures—such as fixed-window rate
+limiting, IP-based blocking, and CAPTCHA—are fundamentally limited in their ability to provide contextaware decision-making. These conventional approaches
+suffer from two critical weaknesses: first, they fail to
+distinguish between legitimate users and attackers when
+traffic patterns deviate from expected norms; second,
+they lack the intelligence to adapt to evolving attack
+strategies. Consequently, rightful users are frequently
+and mistakenly blocked, while sophisticated attackers
+can easily bypass these static defenses. This creates an
+urgent need for authentication systems that are not only
+
+2
+rapid and scalable but also contextually intelligent and
+explainable.
+Recent research has demonstrated a rapid increase
+in the adoption of AI-driven security systems. In particular, agentic AI systems and generative model-based
+frameworks are being deployed in complex decisionmaking environments [5]. Additionally, several studies
+have proposed the use of behavioral fingerprinting and
+multi-layer security approaches in authentication systems [6,7]. However, these methods are generally designed for high-complexity environments with substantial computational resources and are not directly suitable
+for lightweight, production-grade web-based authentication systems. The computational overhead and latency
+introduced by these approaches make them impractical for real-time authentication scenarios. On the other
+hand, in-memory data stores such as Redis have proven
+highly effective for real-time security and fraud detection,
+especially in high-throughput environments [8]. Redisbased systems provide exceptional performance with
+microsecond-level response times, making them ideal for
+traffic control and anomaly detection. However, these
+systems are primarily limited to threshold-based monitoring and lack the capability to perform sophisticated
+attack classification or provide intelligent, context-aware
+decision-making support. They operate on predefined
+rules that cannot adapt to novel attack patterns or
+nuanced user behaviors. Recently, the Model Context
+Protocol (MCP) has emerged as an important framework enabling context-aware integration between Large
+Language Models (LLMs) and external systems. The potential and risks of MCP have been discussed in various
+studies [9]. Security frameworks for MCP in multi-agent
+AI systems have been proposed [10], along with research
+on formal threat modeling and defense mechanisms [11].
+Despite these advancements, the application of MCP in
+authentication-level security remains limited, and this
+area has not been sufficiently explored. To the best of our
+knowledge, and based on the literature search described
+in Section 2, no prior study we located experimentally
+evaluates an MCP-enabled LLM combined with realtime threshold monitoring for authentication security in
+production web environments. A significant research gap
+therefore exists in developing a lightweight, explainable,
+and context-aware authentication security system suitable for production web environments. Current solutions
+either prioritize speed at the expense of intelligence or
+provide sophisticated analysis at the cost of impractical
+computational overhead.The integration of MCP with
+authentication systems has received limited experimental evaluation, motivating our study of a lightweight,
+explainable, and context-aware authentication security
+system.
+
+Momen et al.
+
+To address this gap, this research aims to answer
+three key research questions. First, how can an effective
+hybrid authentication security framework be designed
+by integrating Redis-based threshold monitoring with
+MCP-enabled LLM decision support in Laravel-based
+web applications? Second, in what ways can thresholdbased counters and rule-based risk scoring be combined
+with selectively invoked LLM analysis to enhance the
+reliability, trustworthiness, and explainability of authentication decisions? Third, what is the effectiveness of the
+proposed system in terms of detection accuracy, false positive rate, response time, and scalability when deployed
+under simulated brute-force and credential-stuffing attack scenarios in real-world web environments?
+We present a hybrid AI-driven secure authentication framework that integrates Redis-based threshold
+monitoring with MCP-integrated LLM decision support. Our proposed system bridges the gap between
+high-speed anomaly detection and intelligent threat reasoning. It goes beyond traditional anomaly detection by
+enabling context-aware decision-making and explainable
+risk scoring, making it highly suitable for productionlevel deployment. The key contributions of this work
+are as follows: an explainable rule-based algorithm that
+enables transparent and auditable security through predefined risk threshold enforcement, the rule score acts
+as a floor that the AI decision can raise but never lower,
+with bounded AI leniency, so security posture stays
+consistent; a novel hybrid authentication architecture integrating Laravel/PHP, Redis, MCP, and MiniMax LLM
+(with extensible support for models such as GLM 5.1 and
+Kimi 2.6) for intelligent login security in production web
+environments; introduction of adaptive IP- and emailbased rate limiting mechanisms for early detection and
+mitigation of brute-force and malicious login attacks; development of MCP-LLM-driven contextual threat analysis that ranks risk and distinguishes bot-generated
+requests from legitimate human users; implementation
+of an intelligent response and alerting framework that
+supports risk-based decisions and automatically notifies
+administrators about suspicious authentication events;
+enhanced authentication security through real-time risk
+scoring and automated cyber threat reasoning, improving both detection capability and system robustness;
+and design of a risk-adaptive three-tier degraded policy
+where Redis counters are the always-on first line, the
+MCP/LLM is invoked only above thresholds, and if the
+MiniMax API fails the system fails closed at high risk
+(score ≥ 80), applies an N-strike throttle at medium risk
+(50–79), and monitors below, protecting legitimate users
+while closing the fail-open hole.
+This research focuses specifically on authenticationlayer security in PHP/Laravel web applications. The
+
+A Hybrid AI-Driven Secure Authentication Framework with Model Context Protocol (MCP) Integration
+
+3
+
+scope is limited to login authentication attempts, failed
+training phases to achieve timely convergence, which
+login detection, and risk-based access decisions. The
+is practically inconvenient in high-risk authentication
+study does not address network-layer attacks, distributed
+environments.
+denial-of-service (DDoS) prevention, or post-authentication
+Arreche et al. [14] introduced SHAP and LIME in
+authorization and access control mechanisms. For clarblack-box models and found that these post-hoc exity, the following terms are defined as used in this replanatory methods only provide approximate explanasearch: Explainable Risk Scoring refers to a transparent,
+tions rather than the true decision logic. Pawlicki et
+rule-based algorithm that acts as a guardrail the AI
+al. [15] proposed streaming XAI approaches; however,
+decision can raise but never lower, ensuring auditability;
+they are computationally expensive for web application
+Risk-Adaptive Degradation ensures the system applies
+login endpoints due to continuous feature extraction for
+a tiered policy — fail-closed at high risk, throttled at
+network-level threat detection.
+medium risk, and monitored at low risk when critical
+Zhang et al. [16] provided a comprehensive survey on
+security components become unavailable; Model Context
+XAI applications in cybersecurity and reported signifiProtocol (MCP) enables context-aware communication
+cant advancements in malware detection, phishing, and
+between LLMs and external systems; and Context-Aware
+intrusion detection systems. However, they also noted
+Threat Analysis evaluates authentication attempts from
+that XAI in authentication-based brute-force scenarios
+IP/email attempt counts within a fixed time window and
+remains largely unexplored.
+a selective LLM assessment of pseudonymized context
+Ali et al. [17] introduced the “black-box leniency”
+(raw identifiers are not sent to the third-party model).
+problem in AI-powered security systems, where model
+The remainder of this paper is organized as follows.
+decisions remain unauditable and may allow unintended
+Section 2 presents a comprehensive review of related
+access.
+literature, covering authentication security, rate limitMoustafa et al. [18] developed XAI-based IDS for
+ing techniques, AI-driven security systems, Redis-based
+IoT networks; however, their packet-level feature depenmonitoring, and the Model Context Protocol. Section 3
+dence makes them unsuitable for PHP/Laravel-based
+describes the proposed system architecture and methodweb authentication systems.
+ology, including the integration of Redis, MCP, and
+Akande et al. [19] proposed reinforcement learningLLM components. Section 4 details the implementation
+based dynamic rate limiting using a Markov decision
+aspects within the Laravel framework, including system
+process. However, defining a stable state space for short
+configuration, API integration, and testing procedures.
+login sessions is challenging, and policies may become
+Section 5 presents the experimental setup, evaluation
+overly permissive or overly restrictive.
+methodology, results, and a discussion of the findings,
+Lyu et al. [20] developed deep reinforcement learningincluding performance analysis and security effectivebased rate limiting in Kubernetes microservices, but
+ness measurements. Section 6 presents an analysis of
+their approach does not distinguish between malicious
+the adversarial threat model. Section 8 concludes the
+and legitimate users, treating all high-rate traffic unipaper and summarizes the key contributions and impliformly.
+cations of this study for the web security community,
+Sohail [21] used unsupervised machine learning techtogether with the limitations of the proposed approach
+niques (Isolation Forest, LSTM) for REST API threat
+and directions for future research.
+detection; however, in NAT environments, multiple users
+exhibit natural behavioral variation, increasing false positive rate.
+2 Related Work
+Guan [22] designed a scalable rate-limiting system
+using Redis sorted sets and Lua scripting, but the apAuthentication systems play a critical role in securing
+proach focuses on traffic shaping and does not capture
+modern web applications; however, attacks such as bruteattack semantics.
+force and credential stuffing are rapidly increasing.
+Krishnan and Rao [23] discussed adaptive thresholdDhanuka et al. [12] used XAI in threat intelligence,
+ing challenges and observed that reliance on traditional
+but their approaches are limited to post-hoc explanatraffic baselines leads to delayed response against sudden
+tions using SHAP/LIME for SOC analysts and fail
+brute-force attacks.
+to provide real-time intervention at the authentication
+Otoom et al. [24] proposed deep learning-based brutelevel.
+force detection for IoT networks; however, their apT. T. Nguyen et al. [13] provided a large-scale survey
+proach is not applicable to encrypted HTTPS web apon applying Deep Reinforcement Learning (Deep RL)
+plications due to reliance on packet-level features.
+for cybersecurity. Their work indicates that reinforcement learning-based defence systems require excessive
+
+4
+In recent years artificial intelligence has been integrated into authentication systems to enhance security.
+AI-based approaches analyze user behavior, including
+login patterns, device usage and typing dynamics, to
+detect anomalies.
+Ahmed et al. [25] presented a consensus hybrid ensemble ML IDS with XAI, but although the ensemble
+techniques achieve high accuracy through static datasets,
+they suffer from concept drifts during live production
+and retraining of the models is expensive. Wali et al.
+[26] proposed a Random Forest-based IDS, but generating real-time risk scores for every login attempt using
+batch-trained models is impossible without a feature engineering pipeline. Kalutharage et al. [27] implemented
+ensemble learning with XAI to detect IoT network attacks, but synthetic datasets like Bot-IOT and NSLKDD do not generalise enterprise web-application authentication. Raiganiyev [28] created a hybrid IDS, but
+it stops authenticating in Snort and ML network-level
+and does not unify with modern frameworks like Laravel
+or Django. Sharma et al. [29] proposed a generic ML
+pipeline, but when the ML model fails or the API is
+unavailable, then it does not define any failover method
+for how the system will behave.
+Our research, instead of ensemble ML, uses a
+lightweight role-based scoring algorithm and LLM at
+the contextual augmentation level. Additionally, we provide a risk-adaptive three-tier degraded policy that fails
+closed at high risk (score ≥ 80), throttles via an N-strike
+counter at medium risk (50–79), and monitors below —
+protecting legitimate users when the API malfunctions
+without unconditionally allowing all traffic.
+Sarker et al. [30] worked on XAI-based cybersecurity
+automation in a digitally tuned environment, but their
+explainability framework is extremely heavy for the webapplication login flows. Capuana et al. [31] introduced
+a comprehensive survey on the application of XAI in
+cybersecurity and addressed progress on malware, phishing, and network IDS. However, they admit that “XAI
+for real-time access control and authentication remains
+largely unexplored”, which our research fills an important gap. Kuppa et al. [32] observed that it is possible
+to run a black-box attack on SHAP and LIME; attackers can hide traces by manipulating attributes. Hou
+et al. [33] discuss MCP’s massive ecosystem and identify the risks like tool poisoning, rug pull and prompt
+injection. Radosevich and Halloran [34] demonstrated
+that MCP through RCE and tool squatting can create
+significant security vulnerabilities in a general-purpose
+agent system. Narajala et al. [35] proposed enterprisegrade MCP security, including OAuth, policy gate, and
+a high-level framework like API gateway. Bhatt et al.
+[36] suggested ETDI to tackle MCP’s tool squatting and
+
+Momen et al.
+
+Table 1: Summary of Related Work
+Ref. Author(s)Method /
+Approach
+
+Tools / Key Contri- Limitations
+Conbution
+text
+
+[13] Nguyen
+et al.
+
+Deep Reinforcement
+Learning
+(Deep RL)
+
+RLbased
+defense
+systems
+
+ComprehensiveRequires
+survey on
+excessive
+RL-based
+training time;
+cybersecurity impractical
+defense
+for real-time
+mechanisms authentication
+
+[14] Arreche
+et al.
+
+SHAP &
+LIME
+(Post-hoc
+XAI)
+
+Blackbox
+models
+
+Introduced
+explainability
+techniques
+for
+interpreting
+AI decisions
+
+Produces
+approximate
+explanations,
+not true
+decision logic
+
+[16] Zhang et Survey on
+Malware, Highlighted Authenticational.
+XAI in cyber- phishadvancebased
+security
+ing, IDS ments of XAI brute-force
+systems in multiple
+scenarios
+security
+remain
+domains
+unexplored
+[19] Akande
+et al.
+
+Reinforcement Dynamic Proposed
+Difficult to
+Learning
+rate
+adaptive rate define stable
+(MDP-based limiting limiting
+state space;
+rate limiting) systems using Markov risk of
+Decision
+over/under
+Process
+restriction
+
+[22] Guan et
+al.
+
+Scalable
+Redis
+rate-limiting sorted
+mechanism
+sets,
+Lua
+scripting
+
+Designed
+efficient and
+scalable
+rate-limiting
+system
+
+Focuses on
+traffic
+control; lacks
+attack
+semantic understanding
+
+rug pull attacks, but the authors focused on the security
+of the third-party MCP server supply chain and did not
+research how to use MCP as an attack identifier.
+
+3 Methodology
+3.1 System Architecture
+The overall architecture is a containerized Laravel-based
+web application with dedicated modules for user interaction and secure authentication. The authentication
+subsystem employs a layered defense: Redis-backed rate
+limiting serves as the first line, followed by conditional
+invocation of an AI analyzer via the MCP when predefined thresholds are exceeded. Figure 1 illustrates the
+system architecture.
+
+3.2 Model Context Protocol (MCP)
+Our MCP layer implements the Model Context Protocol
+specification 2025-06-18 over Streamable HTTP transport with JSON-RPC 2.0. MCP functions as a service
+layer that:
+
+A Hybrid AI-Driven Secure Authentication Framework with Model Context Protocol (MCP) Integration
+
+5
+
+Fig. 1: System Architecture of the Proposed Hybrid Authentication Framework
+
+– Collects IP network, pseudonymized email, attempt
+counts, time window).
+– Invokes the LLM through the initialize, tools/
+list, tools/call, and ping MCP primitives with a
+JSON-Schema tool contract.
+– Validates output against a fixed decision vocabulary
+(’SAFE’ / ’SUSPICIOUS’ / ’MALICIOUS’)
+– Enforces decisions (block, challenge, or allow).
+– Bearer-token transport authentication protects the
+/api/mcp endpoint (401 otherwise), Mcp-Session-Id
+is handled, and structured error codes(-32600/-32601/32602) are returned.
+This design enables future substitution of the underlying
+model (e.g., from MiniMax- M2.1 to alternative LLMs)
+without modifying the core authentication logic.
+The implementation stack is summarized as follows:
+Laravel 12 (PHP 8.4) serves as the backend framework
+and handles application routing and core business logic;
+MySQL 8.0 provides persistent storage for user credentials and logs; Redis 7.x supplies high-speed rate
+
+limiting and temporary IP blocking; and MiniMax-M2.1
+performs behavioral analysis and threat classification.
+This stack provides the necessary throughput for
+real-time authentication while supporting the computational overhead of LLM integration. Since the attackerinfluenced email address and IP are read before controller validation, the outbound prompt is defended
+with four layers. L1 sanitises inputs (control characters
+stripped, length-bounded, format-validated; malformed
+identifiers are dropped). L2 skips AI analysis entirely
+for malformed identifiers, deferring to controller validation (HTTP 422). L3 wraps all dynamic context
+between an uncloseable <context>/</context> fence
+with explicit ‘UNTRUSTED DATA, never instructions’
+rules; angle brackets inside identifiers are neutralised
+so the fence can never be closed early, and counters
+are rendered only as integers so no string can be smuggled into the prompt. L4 is a deterministic rule-floor
+guardrail: the F1–F5 fusion (Algorithm 1) ensures even
+a fully-compromised model returning SAFE at risk 0
+and confidence 1.0 cannot flip a ≥80 verdict and cannot
+obtain a full allow inside the 50–79 band (best case:
+
+6
+a SUSPICIOUS step-up). Output parsing is hardened
+likewise — JSON is extracted from prose, decisions validated against {SAFE, SUSPICIOUS, MALICIOUS},
+and non-numeric risk/confidence are treated as absent.
+Worst-case injection is measured in the adversarial mode
+of Section 5.4, where recall holds at 79.6% at FPR 0.
+"Outbound context is pseudonymized so that raw
+PII never reaches the third-party LLM: the email is
+replaced by a stable, non-reversible HMAC-SHA256
+identifier (email_id:...) and the IP by its coarse network prefix plus an HMAC (/24 for IPv4, /64 for IPv6 —
+ip_net:...), keyed with a server-side salt that is never
+disclosed. Pseudonyms are stable across attempts (repeat offenders remain recognisable) and non-reversible
+without the salt; only coarse locality and integer attempt counts cross the outbound boundary, on both the
+direct API call and the MCP tools/call arguments.
+Detection semantics are unchanged because decisions
+are driven by the counters, not the identifiers. Raw
+identifiers persist only in local audit logs and Redis, by
+design."
+4 MCP-Based Secure Login System
+4.1 Redis Behavioral Tracking
+To mitigate brute-force attacks, the system employs
+a high-performance tracking mechanism based on Redis in-memory data structures. This approach utilizes
+fixed-window counters (a single 15-minute window) to
+monitor login attempt frequencies for both IP addresses
+and email identifiers. The operational workflow of the
+proposed MCP-based malicious login detection mechanism comprises the following sequential phases:
+Login Request Initiation: The process begins
+when a user submits authentication credentials via the
+POST /login endpoint. The request is intercepted by
+the McpMaliciousLoginMiddleware prior to reaching
+the core authentication module, acting as a gatekeeper.
+Feature Extraction: Upon interception, the middleware extracts critical request attributes, specifically
+the client IP address and the submitted email identifier.
+These attributes serve as primary telemetry features for
+subsequent risk evaluation.
+Rate Limit Check: The system queries Redisbased telemetry counters—specifically attack:login:
+ip:{ip} and attack:login:email:{email}—to
+retrieve failed login attempt frequencies within a fixed
+15-minute window.
+Threshold Evaluation: The system evaluates the
+retrieved counts against predefined security thresholds.
+If the IP-based attempt count exceeds θip = 5 or the
+email-based attempt count exceeds θemail = 3, the login
+
+Momen et al.
+
+Listing 1: Atomic Redis Counter Logic (Rewritten)
+$luaScript = <<<’ LUA ’
+local ipCount = redis . call ( ’ INCR ’ , KEYS [1])
+if ipCount == 1 or redis . call ( ’ TTL ’ , KEYS
+[1]) == -1 then
+redis . call ( ’ EXPIRE ’ , KEYS [1] , ARGV [1])
+end
+local emailCount = redis . call ( ’ INCR ’ , KEYS
+[2])
+if emailCount == 1 or redis . call ( ’ TTL ’ , KEYS
+[2]) == -1 then
+redis . call ( ’ EXPIRE ’ , KEYS [2] , ARGV [1])
+end
+LUA ;
+Redis :: eval ( $luaScript , 2 , $ipKey , $emailKey
+, 900) ;
+
+request is escalated for advanced contextual analysis.
+Conversely, if the attempt counts remain within the
+safe thresholds, the request proceeds directly to the
+native authentication mechanism without incurring the
+computational overhead of AI analysis.
+The logic described above is formalized in Algorithm
+1.
+MCP Invocation: For escalated requests, the McpSecurityService constructs a structured context comprising telemetry statistics and temporal behavior patterns.
+This context is transmitted to a large language model
+(MiniMax-M2.1) through a Model Context Protocol
+(MCP)-compliant API.
+AI-Based Risk Analysis: The language model
+evaluates the provided contextual frameworks and classifies the login attempt as MALICIOUS or SAFE
+based on inferred behavioral risk.
+Decision Enforcement: If the classification result
+is MALICIOUS, the originating IP address is temporarily blocked by setting the Redis key blocked:ip:{ip}
+with a time-to-live (TTL) of 3600 seconds, and an HTTP
+403 (Forbidden) response is returned. If classified as
+SAFE, the request is forwarded to Laravel’s native authentication pipeline for standard credential verification.
+
+4.2 MCP AI Risk Analysis
+When predefined thresholds are exceeded, the login behavior is analyzed using MiniMax AI connected to MCP.
+When threshold conditions are met, the system invokes
+the MCP service for contextual analysis. The algorithm
+for this process is formalized in Algorithm 2. The system
+computes a quantitative risk score between 0 and 100
+based on behavioral patterns.
+
+A Hybrid AI-Driven Secure Authentication Framework with Model Context Protocol (MCP) Integration
+
+7
+
+Algorithm 1 MCP-Based Hybrid Login Threat Detection with Risk Score Override
+
+Algorithm 2 Config-Driven Risk Score Computation
+and Decision Mapping
+
+Require: Login request R = (IP, Email, Timestamp); Thresholds θip = 5, θemail = 3, θNAT = 3, Nstrike = 3; Block
+duration Tblock = 3600 s, Tdegraded = 900 s
+Ensure: Decision D ∈ {Allow, Block, Throttle}, Risk assessment A
+1: if
+Redis.EXISTS("blocked:ip:"
++
+R.IP)
+or
+Redis.EXISTS("blocked:email:" + R.Email) then
+2:
+return (Block, 403) ▷ Early block-exit (Saves AI calls)
+3: end if
+4: Cip ← Redis.GET("attack:login:ip:" + R.IP)
+5: Cemail ← Redis.GET("attack:login:email:" + R.Email)
+6: if Cip < θip and Cemail < θemail then
+7:
+return (Allow, ∅)
+▷ Below threshold — standard
+authentication
+8: end if
+9: (S, A) ← GetRiskScore(Cip , Cemail )
+▷ Algorithm 2
+10: Ctx ← {IP, Email, Cip , Cemail , time_window : 15min}
+11: AI _Resp ← MCP_Model(Ctx) ▷ MiniMax-M2.1 via MCP
+API w/ timeout(10s)+retry(1)
+12: if API call fails or invalid response then
+13:
+if S ≥ 80 then
+14:
+return (Block, 403)
+▷ Fail-closed
+15:
+else if S ≥ 50 then
+16:
+strike ← IncrementStrikeCounter(R.IP)
+17:
+if strike ≥ Nstrike then
+18:
+Redis.SETEX("blocked:ip:" + R.IP, Tdegraded , 1)
+19:
+return (Block, 403)
+20:
+else
+21:
+return (Throttle, 429)
+22:
+end if
+23:
+else
+24:
+return (Allow, monitor)
+25:
+end if
+26: end if
+27: if S ≥ 80 then
+28:
+Decision ← MALICIOUS; Action ← block
+29: else if AI _Resp = MALICIOUS and S ≥ 50 then
+30:
+Decision ← MALICIOUS; Action ← block
+31: else if AI _Resp = SAFE_high_confidence and 50 ≤ S ≤
+79 then
+32:
+Decision ← SUSPICIOUS; Action ← token_428
+33: else if S ≥ 50 then
+34:
+Decision ← SUSPICIOUS; Action ← token_428
+35: else
+36:
+Decision ← SAFE; Action ← monitor
+37: end if
+{Decision, S, Action, IP, Email, Timestamp}
+to
+38: Write
+mcp_security.log
+39: if Decision = MALICIOUS or S ≥ 80 then
+40:
+if GetDistinctSuccessfulAccounts(R.IP) ≥ θNAT
+then
+41:
+Redis.SETEX("blocked:email:" + R.Email, Tblock , 1)
+42:
+else
+43:
+Redis.SETEX("blocked:ip:" + R.IP, Tblock , 1)
+44:
+end if
+45:
+Fire McpAttackDetected event → alert email to admin
+46:
+return (Block, {S, Action})
+47: else
+48:
+return (Allow, {S, Action})
+49: end if
+
+Require: nip (failed login attempts from same IP within window ∆twindow ), nemail (failed login attempts with same
+email within window ∆twindow ), and configuration parameters dynamically loaded from config/services.php
+Ensure: Risk score S ∈ [0, 100], recommended action A, decision label L
+1: cIP ← 0; cemail ← 0
+2: Compute IP-based contribution:
+3: if nip ≥ θip,1 then
+4:
+cIP ← wip,1
+5: else if θip,2 ≤ nip < θip,1 then
+6:
+cIP ← wip,2
+7: else if θip,3 ≤ nip < θip,2 then
+8:
+cIP ← wip,3
+9: else
+10:
+cIP ← 0
+11: end if
+12: Compute email-based contribution:
+13: if nemail ≥ θemail,1 then
+14:
+cemail ← wemail,1
+15: else if θemail,2 ≤ nemail < θemail,1 then
+16:
+cemail ← wemail,2
+17: else
+18:
+cemail ← 0
+19: end if
+20: Compute final risk score:
+21: S ← min(100, cIP + cemail )
+22: Map score to recommended action and decision:
+23: if S ≥ Bhigh then
+24:
+A ← block_ip; L ← MALICIOUS
+25: else if S ≥ Bmed then
+26:
+A ← otp; L ← SUSPICIOUS
+27: else if S ≥ Blow then
+28:
+A ← captcha; L ← SAFE
+29: else
+30:
+A ← monitor; L ← SAFE
+31: end if
+32: return (S, A, L)
+
+4.3 Decision Fusion Rules
+Algorithm 1 (lines 27–37) implements a five-rule fusion
+between the rule score and the AI verdict. The rules are
+labelled F1–F5 in the audit log and throughout this paper (Table 2). The effective score is S = max(Srule , SAI ),
+so the AI can raise the score but never lower it, and
+every rule that permits a request is evaluated only after
+the deterministic guardrail F1 has been checked.
+All thresholds, rule weights and decision bands are
+read from configuration rather than hard-coded. In the
+evaluated configuration the IP contribution is 50, 30
+or 15 points for at least 10, 5 or 3 failures, the e-mail
+
+8
+
+Momen et al.
+
+Table 2: Decision fusion rules F1–F5
+Rule Condition
+F1
+
+S ≥ 80
+
+F2
+
+AI = MALICIOUS ∧
+S ≥ 50
+AI = SAFE (confidence
+≥ 0.8) ∧ 50 ≤ S ≤ 79
+S ≥ 50 (AI absent, invalid,
+or no rule above matched)
+otherwise
+
+F3
+F4
+F5
+
+Table 3: PHPUnit Test Results Summary
+
+Outcome
+
+Description
+
+MALICIOUS: block
+(deterministic guardrail)
+MALICIOUS: block
+
+Total tests
+
+SUSPICIOUS: step-up
+only, never a full allow
+SUSPICIOUS: challenge
+SAFE: monitor
+
+contribution is 40 or 25 points for at least 5 or 3 failures, and the decision bands are Bhigh = 80, Bmed = 50
+and Blow = 30; the full parameter list is given in Appendix Appendix B.
+
+Value Notes
+106 All passed
+✓(106/106)
+126 –
+1.9 s Deterministic suite;
+no live API calls
+
+Total assertions
+Total execution time
+
+Breakdown by test suite (deterministic)
+Redis-based tests
+(31)
+Decision fusion
+
+0.01 s avg Included in the
+suites below
+9 Rule floor, bounded
+leniency
+6 Fail-closed, N -strike,
+cache fallback
+12 JSON-RPC 2.0,
+Bearer auth, drivers
+10 Fence, sanitiser,
+output parsing
+7 No raw PII in
+outbound payloads
+5 Lua atomicity, fixed
+window
+6 Environment-driven
+thresholds
+5 Shared-IP,
+account-scoped
+blocks
+10 HTTP 428,
+single-use token
+36 Baseline and
+rewritten evaluation
+tests
+
+Failover policy
+MCP protocol
+Prompt injection
+Pseudonymization
+
+4.4 Enforcement Mechanisms
+
+Atomic Redis
+
+Atomic fixed-window counters. Every counter is
+updated by the Lua script in Listing 1, so INCR and
+EXPIRE execute as a single atomic operation. No crash
+can leave a key without a TTL, and EXPIRE is issued
+only when the window opens, which gives a true fixed
+15-minute window instead of a rolling accumulator that
+never decays under sustained probing. The cache fallback
+uses the same fixed-window semantics.
+Shared-NAT-aware blocking. Each successful
+login records the account in a distinct set keyed by
+IP. When at least θNAT = 3 distinct accounts have
+logged in successfully from an address, it is treated as
+shared (office, campus or mobile network) and a block
+is scoped to the attacked e-mail instead of the whole
+IP (Algorithm 1, lines 40–44). Both block scopes are
+checked before any AI call (line 1), so already-blocked
+identifiers cost no billable LLM invocations. The residual
+trade-off is discussed in Section 6.
+Enforced step-up challenges. Recommended
+CAPTCHA/OTP actions are enforced rather than advisory. The middleware answers with HTTP 428 and
+a random 128-bit single-use token; the CAPTCHA is
+a server-generated arithmetic question and the OTP
+is a six-digit code delivered out of band (by e-mail, or
+logged in the test configuration) and never returned in
+the response. Answers are stored only as salted SHA-256
+hashes and compared in constant time. A token expires
+after 300 s, allows at most three answer attempts and is
+deleted on first success, and challenge issuance is limited
+to 10 per IP per 15 minutes to prevent challenge-based
+denial of service. Scripted traffic that cannot solve a
+challenge stops at HTTP 428, which is what bounds the
+damage under a compromised AI (Section 5.6).
+
+Config. thresholds
+NAT mitigation
+
+Challenge
+enforcement
+Login regression
+
+Live API timing (outside the deterministic suite)
+Individual MCP
+API calls (3)
+Batch test (13
+scenarios)
+
+2.63 s, 3.03 s, 3.34 s ≈ 3.00 s average
+56.79 s ≈ 4.37 s per API call
+
+5 Results and Evaluation
+5.1 Experimental Setup
+The proposed hybrid authentication security system
+was implemented using the Laravel 12 framework and
+Redis 7 as the in-memory data store. The AI analysis
+layer utilized the MiniMax-M2.1 large language model
+accessed through the Model Context Protocol (MCP).
+Functional correctness was verified with 106/106 predefined unit tests covering Redis counters, atomicity,
+fusion, failover, MCP protocol conformance, prompt
+injection, pseudonymization, NAT, configurable thresholds, and challenge enforcement. Detection effectiveness
+is evaluated separately with a reproducible, seeded (seed
+42) harness of 186 events across 7 behavior-based attack/legitimate scenarios (php artisan security:evaluate),
+which reports its own confusion matrices (Section 5.4).
+
+9
+
+A Hybrid AI-Driven Secure Authentication Framework with Model Context Protocol (MCP) Integration
+
+Table 4: Risk Score Calculation and System Response
+for Different Scenarios
+
+Table 5: Performance Comparison of Security Approaches
+
+IP
+Email
+Risk
+AttemptsAttempts Score
+
+Metric
+
+0
+2
+3
+3
+
+0
+1
+0
+3
+
+0
+0
+15
+40
+
+5
+
+0
+
+30
+
+5
+
+7
+
+3
+
+4
+
+55
+
+55
+
+10
+
+0
+
+50
+
+10
+15
+20
+
+5
+10
+20
+
+90
+90
+90
+
+Decision
+
+Actual System
+Response
+
+SAFE
+SAFE
+SAFE
+SAFE
+
+Allow
+Allow
+Allow
+Challenged (HTTP
+428, single-use
+token)
+SAFE
+Challenged (HTTP
+428, single-use
+token)
+SUSPICIOUSChallenged (HTTP
+428, single-use
+token)
+SUSPICIOUSChallenged (HTTP
+428, single-use
+token)
+SUSPICIOUSChallenged (HTTP
+428, single-use
+token)
+MALICIOUS Block (403)
+MALICIOUS Block (403)
+MALICIOUS Block (403)
+
+5.2 Risk Scoring and System Behavior
+To evaluate the effectiveness of the risk scoring algorithm and decision-making process, various attack and
+legitimate usage scenarios were tested. Table 4 presents
+the system’s response across different combinations of
+IP and email attempts.
+The results demonstrate that the system applies
+graduated responses — allowing low-risk attempts while
+enforcing stronger security measures for high-risk scenarios; it stays accurate because medium-risk attempts
+are now challenged, not allowed, and AI decisions can
+raise but never lower the rule score (F1–F5 fusion).
+
+5.3 Performance Comparison
+The performance of the proposed hybrid system was
+compared against traditional Laravel throttling and
+Redis-only approaches. Key metrics are summarized in
+Table 5.
+Note that the 8 ms baseline represents the isolated Rediscommand latency for the low-risk fast path; when the advanced
+AI layer is selectively invoked, the dominant computational
+cost shifts entirely to the outbound LLM call. We explicitly
+decouple and report the internal Redis-command metrics separately from the full end-to-end request latency profile. The
+Traditional Throttle and Redis-only columns are indicative reference values that were not produced by the seeded evaluation
+harness; a seven-configuration ablation against external baselines is planned future work. A comprehensive, independent
+evaluation of p50 , p95 , and p99 latencies across ≥ 100 live con-
+
+Average
+Response Time
+(Low Risk)
+Average
+Response Time
+(Threshold
+Exceeded)
+Brute-force
+Detection
+Mechanism
+False Positive
+Rate
+(qualitative)
+Explainability
+
+TraditionalRedis
+Throttle Only
+
+Proposed (Redis +
+MCP)
+
+12 ms
+
+8 ms
+
+8 ms
+
+12 ms
+
+8 ms
+
+2,600–4,400 ms (AI call
+only)
+
+Fixed
+window
+
+Counter Context-aware AI
+analysis
+
+Medium
+
+High
+
+Low
+
+Low
+
+AI invocations
+(of 186 events)
+
+89 (off)
+
+Production
+Failover Safety
+
+N/A
+
+Low
+
+High (Rule-based +
+LLM)
+40
+115 (adversarial) —
+(honest) measured, not
+estimated
+N/A
+Three-tier risk-adaptive:
+fail-closed (403) at ≥80;
+N-strike (3) throttle →
+900 s block at 50–79;
+monitored below;
+timeout(10 s)+retry(1);
+app-cache fallback
+
+current production calls is designated as planned future work
+and has not yet been empirically measured.
+
+5.4 Confusion Matrix and Classification Performance
+To assess the overall effectiveness of the risk assessment mechanism, a reproducible seeded harness (seed 42, 186 events, 7
+scenarios, three AI modes) replaces the 100-login simulation.
+Headline Performance Metrics:
+– Rules-only Recall: 21.2% → 83.9% (when the LLM augments the rules)
+– Rules-only Accuracy: 41.9% → 85.0% (compromised AI)
+→ 88.2% (+AI)
+– False Positive Rate (FPR): 0
+– LegitChallenged: 0 over 49 legitimate negatives in all
+three modes
+Honest negatives: low-and-slow attempts below the thresholds are not detected in any mode (recall 0); distributed stuffing
+rises from 0% (rules-only) to 90% (+AI); the adversarial-mode
+recall of 79.6% relies on the deterministic challenge walls. Perscenario confusion matrices are given in Appendix Appendix A.
+Table 6 adds precision, F1 and false-negative rate with exact
+95% confidence intervals. Precision is 1.0 in every mode because
+no legitimate event is denied. A retained caveat remains: 49
+negatives is a small sample, and with zero observed false positives the exact upper bound on the FPR is 7.3%. Events within
+a scenario are correlated, so the intervals are indicative rather
+than a census-scale guarantee.
+Across the 186 evaluated events, the AI layer was invoked 89
+times with AI disabled (rules-only), 40 times in the honest configuration, and 115 times under the adversarial (compromised-AI)
+condition.
+
+10
+
+Momen et al.
+
+Table 6: Classification metrics by AI mode (186 events:
+137 attacks, 49 legitimate negatives). Recall intervals are
+exact 95% Clopper–Pearson intervals; the FPR bound
+is the upper limit of the exact two-sided 95% interval
+for 0 of 49.
+Mode
+
+Prec. Recall [95% CI]
+
+F1
+
+FNR
+
+FPR
+
+Rules only
+1.000 0.212 [0.147, 0.290] 0.349 0.788 0 (≤7.3%)
+Rules + AI
+1.000 0.839 [0.767, 0.897] 0.913 0.161 0 (≤7.3%)
+Compromised AI 1.000 0.796 [0.718, 0.860] 0.886 0.204 0 (≤7.3%)
+
+Table 7: Adversarial evaluation: attack catalogue A–G
+mapped to measured outcomes
+Attack
+
+Scenario / mode
+
+A IP rotation
+
+distributed_stuffing
+(60 events)
+credential_stuffing +
+password_spraying
+same scenarios
+
+Measured outcome
+
+honest recall 0.90;
+adversarial 0.83
+B Email
+honest 0.85 / 0.77;
+rotation
+adversarial 0.75 / 0.77
+C Distributed
+rules-only 0% → +AI 90%
+(counters alone miss it)
+stuffing
+D
+low_and_slow
+recall 0 in every mode —
+Low-and-slow
+accepted, below-threshold
+blind spot
+E Shared NAT nat_shared
+attacker denied; all 8
+legitimate NAT users
+unblocked (FP 0) in every
+mode
+F AI outage
+off mode +
+high-risk fails closed (403);
+McpFailoverPolicyTest medium N-strike → 900 s
+block; low monitored
+G AI
+adversarial mode (AI
+recall 79.6% (FPR 0) vs
+manipulation
+always SAFE/0/1.0) + 83.9% honest; gap closed
+injection tests
+from ∼73 to ∼4 points by
+enforced challenges
+
+tributed stuffing 0% → 90%; adversarial-mode reliance on the
+deterministic challenge walls).
+
+6 Threat Model
+The system is analysed against the following threat model.
+Assets. Compromise of the six assets below carries the following impact. User accounts (credentials): account takeover,
+exposure of PII, claims or orders. Account availability: legitimate users locked out (denial of service). Redis security state:
+bypass or weaponisation of blocks. LLM API key/quota: cost
+exhaustion or AI-layer outage. Login behaviour context (IP,
+email): privacy risk from PII leakage to a third party. MCP
+endpoint /api/mcp: an unauthorised security-analysis oracle.
+Attacker capabilities (C1–C11). The attacker is assumed capable of: unlimited online credential guessing from
+their own machines (C1); rotating source IPs via proxy, VPN,
+or botnet (C2); rotating target accounts using known or leaked
+email lists (C3); knowing every threshold, weight, and policy,
+since the code and this paper are assumed public (C4); crafting
+arbitrary email payloads for prompt injection (C5); keeping
+their rate below the invocation thresholds, i.e. low-and-slow
+(C8); and sharing an IP with legitimate victims via NAT (C9).
+Two capabilities are conditional: spoofing X-Forwarded-For succeeds only if upstream proxies are trusted, and is untrusted
+on public-facing interfaces (C6); and the attacker can only
+partially withhold or induce AI-layer failures, by saturating or
+exploiting third-party outages (C7). Two capabilities are explicitly excluded: intercepting client-to-server traffic, since TLS
+is assumed (C10); and compromising the server, Redis, or the
+MiniMax account, which sits outside the infrastructure trust
+boundary (C11).
+
+Attacker goals (G1–G10) and residual risk.
+5.5 Redis Memory Optimization
+
+6.1 Trusted components.
+
+Memory efficiency is critical for production deployment. By using
+compact key naming and appropriate TTL values, the system
+achieves a minimal memory footprint: the attack:login:ip:*
+and attack:login:email:* counters use a 900 s TTL (72 B and
+88 B per key respectively), and blocked:ip:* uses a 3600 s TTL
+(64 B per key).
+For a realistic production scenario with 10,000 concurrent
+IP addresses and 5,000 email addresses, the estimated total
+Redis memory consumption is approximately 1.1 MB, computed from per-key sizes (72 B for attack:login:ip:*, 88 B
+for attack:login:email:*, and 64 B for blocked:ip:*). This
+figure is an arithmetic estimate rather than an active empirical
+measurement; a comprehensive scalability experiment tracking
+from 1K to 10M entities to systematically evaluate memory
+footprint, fragmentation ratios, and throughput performance
+(ops/sec) is planned as future work.
+
+The Laravel application server and Redis are trusted (they
+run the policy; a Redis compromise means full security-state
+loss); the cache fallback is trusted but with weaker per-node
+consistency; /api/mcp is trusted only with a valid Bearer token;
+the MiniMax LLM is semi-trusted — it sees pseudonymised
+context only and its verdict is advisory, because deterministic
+rules bound every decision; the email channel is trusted for admin
+alerts; the client and network are untrusted (TLS terminates at
+the server).
+
+5.6 Adversarial Evaluation
+Adversarial evaluation maps the review’s attack catalogue A–G
+directly onto reproducible scenarios and measured outcomes
+(seed 42, 186 events, FPR 0 in every mode):
+This answers the adversarial-honesty requirement: perscenario confusion matrices are given in Appendix Appendix
+A, including the genuine negatives (low-and-slow recall 0; dis-
+
+6.2 Security guarantees (each backed by an automated
+test).
+1. Rule-floor invariant: no AI output can lower the effective
+score below the rule score (McpDecisionFusionTest).
+2. Bounded leniency: the best an attacker-controlled LLM
+achieves in the 50–79 band is SUSPICIOUS (McpPrompt
+InjectionTest).
+3. Fail-closed high band: AI fully down + IP ≥ 10 ∧ email ≥
+5 still blocks (McpFailoverPolicyTest).
+4. Degraded medium band: ≥ 3 medium-risk analyses while
+the AI is down → 900 s block (McpFailoverPolicyTest).
+5. Injection containment: the fence cannot be forged or
+closed early; ≥ 80 verdicts cannot be flipped (McpPromptInjectionTest).
+
+A Hybrid AI-Driven Secure Authentication Framework with Model Context Protocol (MCP) Integration
+
+Table 8: Attacker goals, primary defences and residual
+risk
+
+11
+
+7 Discussion
+
+The hybrid Redis–AI approach balances speed and intelligence in
+a way that neither a purely threshold-based system nor a purely
+model-driven one achieves on its own. Redis counters provide
+G1 Credential
+Counters + AI +
+Low-and-slow below
+the always-on, microsecond-level fast path and prune the large
+compromise
+block
+thresholds — accepted;
+majority of benign traffic before any AI cost is incurred, while
+MFA recommended
+the MCP-LLM layer is invoked only when these counters indicate
+G2 Account
+Uniform ‘Invalid
+Timing side channels
+a meaningful deviation from normal behaviour (Algorithm 1).
+enumeration
+credentials’
+hard to fully remove
+This division of labour is what keeps the low-risk path at the
+G3 Victim lockout Block is IP-based;
+Single-IP/victim 5–9
+8 ms Redis-command latency while concentrating the 2.6–4.4 s
+(DoS one
+hard block needs
+failures cannot
+AI cost strictly on escalated attempts (Table 5). Early blockaccount)
+IP ≥ 10 ∧ email ≥ 5 hard-block alone
+exit and e-mail-scoped blocks further reduced honest-mode LLM
+or
+invocations from 115 to 40 (a 65% reduction) on the same seeded
+AI = MALICIOUS
+harness with unchanged detection (115 true positives, FPR 0),
+G4 NAT collateral Successful logins
+Possible while attacker
+because already-blocked identifiers no longer trigger billable
+lockout
+reset shared-IP
+keeps failing on shared
+calls.
+counter
+IP (measured:
+The most consequential finding is that the LLM’s contribunat_shared)
+tion is best understood as a floor-raiser rather than an indepenG5 Rate-limit
+Per-identifier
+Distributed stuffing
+dent decision-maker. Because the rule score can be raised but
+counters (both axes) evades counters — only
+bypass via
+never lowered by AI output, the system retains a deterministic,
+rotation
+AI escalation (F2)
+catches it
+auditable safety net: even a fully compromised model cannot
+flip a ≥ 80 verdict, and inside the 50–79 band the best it can
+G6 Prompt
+L1 sanitiser, L2 skip, Worst case = rules-only
+achieve is a bounded leniency (a SUSPICIOUS step-up). This
+injection →
+L3 fencing, L4 rule baseline (adversarial
+SAFE
+floor
+mode); bounded, never
+directly addresses the “black-box leniency” concern raised in the
+bypasses ≥80
+related work: the security posture remains consistent regardless
+of AI quality, while the measured recall gain from 21.2% (rules
+G7 Induce AI
+Tiered fallback +
+Sustained outages
+only) to 83.9% (rules + AI) at zero false positives quantifies
+outage →
+timeout/retry
+reduce medium-band
+abuse
+protection to throttling
+what the LLM actually contributes.
+degraded
+The three-tier degraded policy is the second key design
+mode
+decision. Rather than failing open when the AI or Redis layer
+G8 Redis exhaus- TTL-bound keys;
+Fallback is
+becomes unavailable, the system fails closed at high risk (score
+tion/failure
+cache fallback
+per-node/slower —
+≥ 80), applies an N -strike throttle at medium risk (50–79), and
+documented trade-off
+monitors below, with a 10 s timeout and one retry on the AI call
+G9 PII harvesting Outbound
+Provider sees coarse
+and an application-cache fallback for the Redis counters. This
+via LLM
+pseudonymisation
+locality + counts only
+closes the blanket fail-open hole that would otherwise let the
+provider
+entire 50–79 band pass freely during an outage, while preserving
+service for the large majority of legitimate low-risk users. The
+G10 Unauthorised Bearer token,
+Token compromise =
+use
+JSON-RPC
+analysis oracle (proxy
+availability-versus-false-blocking trade-off is quantified by the
+validation
+rate-limit recommended)
+failover and adversarial scenarios (attack F fails closed at high
+risk; medium risk applies the N-strike block) reported in Table 7
+and the confusion-matrix analysis above.
+Adversarial evaluation (Table 7) further shows that the
+6. Redis-down continuity: counters/blocks survive to the
+deterministic challenge walls bound the damage even under
+cache fallback (McpFailoverPolicyTest).
+a fully compromised AI: recall remains at 79.6% at FPR 0,
+7. MCP conformance: JSON-RPC 2.0 with initialize/tools/call; unauthenticated calls rejected (McpProtocolTest). narrowing the honest-to-adversarial gap from roughly 73 to 4
+percentage points. Combined with the rule-based scoring and
+the guarantees formalised in the threat model (Section 6), this
+provides the auditability that the reviewed literature identifies
+6.3 Measured accepted limitations.
+as largely missing from real-time authentication access control:
+an administrator can always reconstruct why a decision was
+Low-and-slow below thresholds is undetected (recall 0 in every
+made, with the LLM supplying contextual judgement rather
+mode); distributed stuffing defeats counters unless AI escalation
+than unreviewable authority.
+or enforced challenges catch it (0% → 90% recall); a sharedOur interpretation comes with appropriate caution. The
+NAT attacker can rotate to a fresh account because the block
+evaluation is a reproducible 186-event, seven-scenario simulation
+is email-scoped rather than IP-scoped (accepted, as blocking
+whose 49 legitimate negatives are a small sample, so the zerothe NAT would harm its legitimate users); a compromised AI
+FPR result should be read as indicative rather than a censusreduces recall, but enforced challenges bound the loss (79.6%
+scale guarantee (Section 8). Nevertheless, the combination of
+vs 83.9% honest); challenged/adversarial traffic still consumes
+a lightweight fast path, selective AI escalation, deterministic
+AI calls before denial (early-exit covers only already-blocked
+failover, and bounded, auditable behaviour indicates a practical
+identifiers).
+and deployable direction for production-grade authentication
+security, and represents a concrete improvement over both static
+rate-limiting and the heavier, less explainable AI alternatives
+surveyed in Section 2.
+#
+
+Goal
+
+Primary defence
+
+Residual risk
+
+12
+
+Momen et al.
+
+8 Conclusion
+
+9.4 Ethics Statement
+
+This research presents a risk-adaptive hybrid authentication
+architecture that uses deterministic security controls (threshold
+counters + rule-based scoring) for fast-path enforcement and
+selectively invokes an LLM through MCP for contextual analysis,
+with independently evaluated fallback and adversarial-resilience
+mechanisms. Evaluation shows the LLM measurably raises recall
+from 21.2% (rules only) to 83.9% at zero false positives over 49
+legitimate negatives, with a tiered degradation — not blanket
+fail-open — policy during AI or Redis failures, while a threat
+model formalises the associated guarantees and residual risks.
+What remains before production deployment is the empirical
+validation discussed below.
+We acknowledge the following limitations and open items.
+Detection was evaluated on a reproducible 186-event simulation;
+validation against 10k+ real or trace-based events remains open.
+A load/stress benchmark (e.g., k6 or wrk) against a deployed instance — measuring throughput and latency under concurrency
+— has not yet been run; accordingly, we report Redis-command
+latency separately from full-request latency and plan independent p50 /p95 /p99 across ≥ 100 live calls. The feature set remains
+narrow (IP network, pseudonymized email, attempt counts, time
+window); a genuine multi-feature behavioral model (user-agent,
+fingerprint, ASN, timing statistics) and a multi-class attack-type
+classifier are future work. Low-and-slow attacks that stay below
+the invocation thresholds are inherently undetected (measured
+recall 0 in all modes) and would require additional features or
+a honeypot/UEBA layer. Threshold selection via ROC/PR on
+held-out splits is open. MCP transport-level client spoofing and
+request replay (beyond the replay-protected challenge tokens),
+as well as graded AI-latency degradation between 100 ms and
+3 s, have not yet been evaluated. Finally, while an early blockexit avoids re-analysing already-blocked identifiers, first-contact
+challenged traffic still consumes LLM calls; verdict caching is
+the planned mitigation.
+
+This study involved no human participants, human data or
+animals. All login events used for evaluation were generated by
+a seeded simulator.
+
+9.5 Data and Code Availability
+The evaluation harness is reproducible from a fixed seed: php
+artisan security:evaluate –ai=off|honest|adversarial (default seed 42) writes JSON and Markdown reports of all perscenario confusion matrices, and php artisan test tests/Unit/
+runs the 106-test deterministic suite without live API calls.
+
+Appendix A: Per-scenario Confusion Matrices
+Tables 9–11 give the full harness output (seed 42, 186 events)
+for the three AI modes. Chal. is the number of events answered
+with an unsolved challenge (HTTP 428), and AI is the number
+of LLM invocations. A “denied” event is an HTTP 403/429
+block or an unsolved 428 challenge.
+
+Table 9: Per-scenario results, mode off (rules and degraded policy only; AI unavailable)
+Scenario
+
+Ev. TP FP TN FN Rec. Chal. AI
+
+legitimate
+brute_force
+credential_stuffing
+password_spraying
+distributed_stuffing
+low_and_slow
+nat_shared
+
+41
+25
+20
+22
+60
+2
+16
+
+0
+18
+0
+10
+0
+0
+1
+
+0
+0
+0
+0
+0
+0
+0
+
+41
+0
+0
+0
+0
+0
+8
+
+–
+0.720
+0
+0.455
+0
+0
+0.125
+
+0
+0
+0
+0
+0
+0
+0
+
+0
+5
+17
+8
+54
+0
+5
+
+Overall
+
+186 29
+
+0
+
+49 108 0.212
+
+0
+
+89
+
+0
+7
+20
+12
+60
+2
+7
+
+9 Statements and Declarations
+
+Table 10: Per-scenario results, mode honest (rules plus
+a competent simulated AI)
+
+9.1 Acknowledgments
+
+Scenario
+
+Ev. TP FP TN FN Rec. Chal. AI
+
+legitimate
+brute_force
+credential_stuffing
+password_spraying
+distributed_stuffing
+low_and_slow
+nat_shared
+
+41
+25
+20
+22
+60
+2
+16
+
+0
+22
+17
+17
+54
+0
+5
+
+0
+0
+0
+0
+0
+0
+0
+
+41
+0
+0
+0
+0
+0
+8
+
+0
+3
+3
+5
+6
+2
+3
+
+–
+0.880
+0.850
+0.773
+0.900
+0
+0.625
+
+0
+0
+0
+0
+0
+0
+0
+
+0
+1
+10
+1
+27
+0
+1
+
+Overall
+
+186 115
+
+0
+
+49
+
+22 0.839
+
+0
+
+40
+
+The authors will like to thank the anonymous reviewers for their
+valuable comments and suggestions.
+
+9.2 Funding
+This research was substantially sponsored by the research project
+(No. BioCoMP11) supported by the BioCoM SR laboratory
+(Laboratory for Bioinformatics and Computational Medicine),
+Bangladesh.
+
+9.3 Declaration of competing interest
+The authors declare that they have no known competing financial
+interests or personal relationships that could have appeared to
+influence the work reported in this paper.
+
+Table 11: Per-scenario results, mode adversarial (fully
+compromised AI: always SAFE, risk 0, confidence 1.0)
+Scenario
+
+Ev. TP FP TN FN Rec. Chal. AI
+
+legitimate
+brute_force
+credential_stuffing
+password_spraying
+distributed_stuffing
+low_and_slow
+nat_shared
+
+41
+25
+20
+22
+60
+2
+16
+
+0
+22
+15
+17
+50
+0
+5
+
+0
+0
+0
+0
+0
+0
+0
+
+41
+0
+0
+0
+0
+0
+8
+
+0
+3
+5
+5
+10
+2
+3
+
+–
+0.880
+0.750
+0.773
+0.833
+0
+0.625
+
+0
+10
+15
+10
+50
+0
+5
+
+0
+22
+17
+17
+54
+0
+5
+
+Overall
+
+186 109
+
+0
+
+49
+
+28 0.796
+
+90
+
+115
+
+A Hybrid AI-Driven Secure Authentication Framework with Model Context Protocol (MCP) Integration
+
+Appendix B: Configuration Parameters
+Table 12 lists the parameters used in the evaluated configuration.
+All are read from config/services.php and can be overridden
+through environment variables; secrets (the MCP bearer token
+and the pseudonymisation salt) are omitted.
+
+Table 12: Configurable parameters and evaluated defaults
+Parameter
+LOGIN_ATTEMPT_THRESHOLD_IP
+LOGIN_ATTEMPT_THRESHOLD_
+EMAIL
+ATTEMPT_WINDOW_SECONDS
+BLOCK_DURATION_SECONDS
+MCP_RISK_BAND_*
+rule_weights.ip
+rule_weights.email
+MCP_TIMEOUT
+MCP_RETRIES
+MCP_DEGRADED_THRESHOLD
+MCP_DEGRADED_BLOCK_TTL
+MCP_SHARED_IP_SUCCESS_
+THRESHOLD
+MCP_CHALLENGE_TTL
+MCP_CHALLENGE_MAX_ATTEMPTS
+MCP_CHALLENGE_MAX_PER_IP
+MCP_PROTOCOL_VERSION
+
+Default
+5
+3
+
+Meaning
+θip
+θemail
+
+900
+3600
+80/50/30
+10:50, 5:30, 3:15
+5:40, 3:25
+10 s
+1
+3
+900 s
+3
+
+fixed window
+Tblock
+Bhigh /Bmed /Blow
+attempts:points
+attempts:points
+per AI call
+AI call retries
+Nstrike
+Tdegraded
+θN AT
+
+300 s
+3
+10
+2025-06-18
+
+token lifetime
+answers per token
+per IP, 15 min
+MCP spec
+
+References
+1. Codetap. Why Laravel dominates backend development in
+2026. Codetap, 2026. Accessed 28 Apr 2026.
+2. JetBrains Blog. The state of PHP 2025. JetBrains Blog,
+2025. Accessed 28 Apr 2026.
+3. TechnologyChecker.io . Technology checker and lookup tool.
+TechnologyChecker.io, 2026. Accessed 28 Apr 2026.
+4. S. Dhariwal. Why Laravel is becoming the default choice
+for government, fintech, and healthcare projects. AddWeb
+Solution Blog, 2026. Accessed 28 Apr 2026.
+5. L. R. Alva and B. Pandey. Agentic AI systems in the age of
+generative models: architectures, cloud scalability, and realworld applications. Artificial Intelligence Review, 59(88),
+2026.
+6. M. Chen, N. Li, Y. Li, B. Zhang, Y. Xiao, T. Wang, and
+Z. Lu. Research and implementation of an authentication
+system fusing physical layer and behavioral fingerprinting
+for power systems. https://link.springer.com/journal/13634,
+2025(47), 2025.
+7. S. Vinay and R. Manoj. ML and DL powered behavioral authentication using typing and login risk data. In Proceedings
+of the 2025 International Conference on Communication,
+Computer, and Information Technology (IC3IT), pages 1–6.
+IEEE, 2025.
+8. J. A. Wallace. Semantic overload: why AI agents get facts
+wrong. https://redis.io/blog/, 2026. Accessed 2 Jul 2026.
+9. H. Errico, J. Ngiam, and S. Sojan. Securing the model
+context protocol (MCP): Risks, controls, and governance.
+arXiv preprint arXiv:2511.20920, 2025.
+10. O. Narayan. A comprehensive security framework for the
+model context protocol (MCP) in multi-agent AI systems.
+In Proceedings of the IEEE International Conference on
+Cyber Security. IEEE, 2025.
+11. N. Acharya and G. K. Gupta. A formal security framework for MCP-based AI agents: Threat taxonomy, verification models, and defense mechanisms. arXiv preprint
+arXiv:2604.05969, 2026.
+
+13
+
+12. N. Rastogi, S. Pant, D. Dhanuka, A. Saxena, and P. Mairal.
+Too much to trust? measuring the security and cognitive
+impacts of explainability in AI-driven SOCs. In Proceedings
+of the ACM Conference on Computer and Communications
+Security (CCS). ACM, 2025.
+13. T. T. Nguyen and V. J. Reddi. Deep reinforcement learning
+for cybersecurity. IEEE Transactions on Neural Networks
+and Learning Systems, 32(9):3779–3799, 2021.
+14. O. Arreche, T. R. Guntur, J. W. Roberts Gold, and
+M. Abdallah.
+E-XAI: Evaluating black-box explainable AI frameworks for network intrusion detection.
+https://ieeeaccess.ieee.org/, 12:23954–23988, 2024.
+15. M. Pawlicki, A. Nowak, and B. Krawczyk. Advanced explainable AI techniques for real-time cybersecurity threat
+detection. IEEE Transactions on Dependable and Secure
+Computing, 2024.
+16. Z. Zhang, H. Al Hamadi, E. Damiani, C. Y. Yeun,
+and F. Taher. Explainable artificial intelligence applications in cyber security: State-of-the-art in research.
+https://ieeeaccess.ieee.org/, 10:93104–93139, 2022.
+17. S. Ali et al. Explainable AI for cybersecurity: Opportunities
+and challenges. IEEE Transactions on Dependable and
+Secure Computing, 20(2):1800–1815, 2023.
+18. N. Moustafa, N. Koroniotis, M. Keshk, A. Y. Zomaya,
+and Z. Tari. Explainable intrusion detection for cyber defences in the internet of things: Opportunities and solutions.
+IEEE Communications Surveys & Tutorials, 25(3):1895–
+1924, 2023.
+19. J. O. Akande, A. M. Ako, A. A. Iyaniwura, S. L. Soleye, and
+N. Ezra. Reinforcement learning for dynamic rate limiting
+in API security. International Journal of Innovative Science
+and Research Technology, 10(12):1794–1803, 2025.
+20. N. Lyu, Y. Wang, Z. Cheng, Q. Zhang, and F. Chen. Multiobjective adaptive rate limiting in microservices using deep
+reinforcement learning. arXiv preprint arXiv:2511.03279,
+2025.
+21. M. Sohail. Intelligent threat detection and prevention in
+REST APIs using machine learning. International Journal
+of Science and Research Archive, 15(2):012–027, 2025.
+22. B. Guan. Designing scalable rate limiting systems: Algorithms, architecture, and distributed solutions. arXiv
+preprint arXiv:2602.11741, 2026.
+23. R. Krishnan and P. Rao. Adaptive thresholding in API rate
+limiting: Challenges and approaches. International Journal
+of Computer Networks and Communications, 13(2):67–84,
+2021.
+24. A. F. Otoom, W. Eleisah, and E. E. Abdallah. Deep learning
+for accurate detection of brute force attacks on IoT networks.
+Procedia Computer Science, 220:291–298, 2023.
+25. S. Ahmed et al. Consensus hybrid ensemble machine learning for intrusion detection with explainable AI. Journal of
+Network and Computer Applications, 235(104091):104091,
+2025.
+26. S. Wali, Y. A. Farrukh, and I. Khan. Explainable AI and
+random forest based reliable intrusion detection system.
+Computers & Security, 157(104542):104542, 2025.
+27. H. D. K. I. Kalutharage et al. Utilizing ensemble learning
+and XAI for performance improvements in IoT network
+attack detection. In International Workshop on CyberPhysical Security and Critical Infrastructures Protection
+(CPS4CIP / ESORICS Workshops), pages 1–15. Springer,
+Cham, 2023.
+28. O. Raiganiyev. Developing a hybrid intrusion detection and
+prevention system. M.sc. thesis, Lawrence Technological
+University, 2025.
+29. P. Sharma et al. Enhancing cybersecurity with machine
+learning: A hybrid approach for anomaly detection and
+
+14
+threat prediction. Mesopotamian Journal of CyberSecurity,
+5(1):88–101, 2025.
+30. I. H. Sarker, H. Janicke, A. Mohsin, A. Gill, and L. Maglaras.
+Explainable AI for cybersecurity automation, intelligence
+and trustworthiness in digital twin: Methods, taxonomy,
+challenges and prospects. ICT Express, 10(4):935–958, 2024.
+31. N. Capuano, G. Fenza, V. Gallo, and V. Loia. Explainable artificial intelligence in cybersecurity: A survey. IEEE
+Access, 10:93575–93600, 2022.
+32. A. Kuppa and N. A. Le-Khac. Black box attacks on explainable artificial intelligence (XAI) methods in cyber security.
+In Proceedings of the International Joint Conference on
+Neural Networks (IJCNN), pages 1–8. IEEE, 2021.
+33. X. Hou, Y. Zhao, S. Wang, and H. Wang. Model context
+protocol (MCP): Landscape, security threats, and future
+research directions. arXiv preprint arXiv:2503.23278, 2025.
+34. B. Radosevich and J. Halloran. MCP safety audit: LLMs
+with the model context protocol allow major security exploits. arXiv preprint arXiv:2504.03767, 2025.
+35. V. S. Narajala. Enterprise-grade security for the model context protocol (MCP): Frameworks and mitigation strategies.
+arXiv preprint arXiv:2504.08623, 2025.
+36. A. Bhatt et al. Securing the model context protocol: Enhanced tool definition interface (etdi) against tool squatting
+and rug pull attacks. Journal of AI Security and Systems,
+12(3):245–261, 2025. Reference.
+
+Momen et al.
+
+

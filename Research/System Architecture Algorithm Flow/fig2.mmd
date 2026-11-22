@@ -1,0 +1,50 @@
+flowchart TD
+    A["Login Request<br/>POST /login (email, password,<br/>challenge_token?, challenge_answer?)"] --> S0{"email valid?<br/>(sanitizer)"}
+    S0 -- "No" --> V422["Controller validation → 422"]
+    S0 -- "Yes" --> B1{"blocked:ip OR<br/>blocked:email?"}
+    B1 -- "Yes" --> R403A["403 (early-exit,<br/>zero AI cost)"]
+    B1 -- "No" --> C["Read counters<br/>C_ip, C_email"]
+
+    C --> G{"C_ip ≥ 5 OR<br/>C_email ≥ 3 ?"}
+    G -- "No" --> P["next() → LoginController"]
+    G -- "Yes" --> F1["S_rule = Algorithm 2<br/>(config-driven weights)"]
+
+    F1 --> F2["PrivacyService → pseudonymised<br/>context (HMAC email, /24-IP)"]
+    F2 --> DRV{"MCP_DRIVER"}
+    DRV -- "direct" --> LLM["Upstream LLM<br/>(timeout 10s, retry 1)"]
+    DRV -- "mcp" --> RPC["JSON-RPC 2.0<br/>initialize → tools/call"]
+    RPC --> LLM
+    LLM --> PAR{"verdict valid JSON?"}
+    PAR -- "No / exception" --> DEG["AI unavailable →<br>degraded policy"]
+    PAR -- "Yes" --> FUSE["S = max(S_rule, S_AI)<br/>F1..F5 fusion"]
+
+    FUSE --> D1{"MALICIOUS or<br/>S ≥ 80 ?"}
+    D1 -- "Yes" --> NAT{"SCARD(success:emails:ip)<br/>≥ 3 ?"}
+    NAT -- "Yes (shared NAT)" --> BE["blocked:email ← attacker<br/>(+ circuit breaker ≥5)"]
+    NAT -- "No" --> BI["blocked:ip ← whole IP"]
+    BE --> R403["403 + alert event"]
+    BI --> R403
+
+    D1 -- "No" --> D2{"recommended_action"}
+    D2 -- "captcha / otp<br/>(AI available)" --> TOK{"challenge token<br/>solved?"}
+    TOK -- "Yes" --> P
+    TOK -- "No" --> RL{"issued > max/ip ?"}
+    RL -- "Yes" --> R429B["429"]
+    RL -- "No" --> R428["428 + single-use<br/>challenge issue"]
+    D2 -- "monitor" --> P
+
+    DEG --> T1{"risk band"}
+    T1 -- "≥ 80" --> BI
+    T1 -- "50–79" --> STK{"strike ≥ 3 ?"}
+    STK -- "Yes" --> R429["429 + 900s block"]
+    STK -- "No" --> P
+    T1 -- "< 50" --> P
+
+    P --> L["LoginController::login()"]
+    L --> M{"blocked (re-check)?"}
+    M -- "Yes" --> MB["reject"]
+    M -- "No" --> N{"Auth::attempt()"}
+    N -- "fail" --> Q["INCR ip+email (atomic Lua,<br/>TTL armed on first failure)"]
+    Q --> RR["'Invalid credentials'"]
+    N -- "success" --> SS2["SADD success:emails:ip<br/>+ DEL counters/blocks"]
+    SS2 --> T["redirect by role"]

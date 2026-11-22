@@ -7,11 +7,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::rename('insurance_pacages', 'insurance_packages');
+        // The create migration already creates `insurance_packages`, so only
+        // rename if the legacy misspelled table exists on older databases.
+        if (Schema::hasTable('insurance_pacages') && !Schema::hasTable('insurance_packages')) {
+            Schema::rename('insurance_pacages', 'insurance_packages');
+        }
     }
 
     public function down(): void
     {
-        Schema::rename('insurance_packages', 'insurance_pacages');
+        if (Schema::hasTable('insurance_packages') && !Schema::hasTable('insurance_pacages')) {
+            Schema::rename('insurance_packages', 'insurance_pacages');
+        }
     }
 };

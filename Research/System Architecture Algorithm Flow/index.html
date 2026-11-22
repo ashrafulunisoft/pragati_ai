@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>System Architecture &amp; Algorithm Flow — Diagrams</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --ink: #1b1f2a;
+    --muted: #5b6172;
+    --accent: #2563eb;
+    --border: #e4e7ef;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  header {
+    padding: 32px 24px 20px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 6px; font-size: 26px; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 60px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px 22px;
+    margin: 0 0 28px;
+    box-shadow: 0 1px 3px rgba(16,24,40,.06);
+  }
+  .card h2 { margin: 0 0 4px; font-size: 18px; }
+  .card .sub { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+  .diagram {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    overflow-x: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60px;
+  }
+  .diagram svg { max-width: 100%; height: auto; }
+  .actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+  button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+  button.secondary { background: #eef1f6; color: var(--ink); border: 1px solid var(--border); }
+  button:hover { filter: brightness(1.06); }
+  .error { color: #b91c1c; white-space: pre-wrap; font-family: monospace; font-size: 12px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 0 0 40px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>System Architecture &amp; Algorithm Flow</h1>
+  <p>Adaptive AI-Based Login Intrusion Detection — MCP + Rule Engine · Pragati AI / VMS UCBL</p>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>Figure 1 — High-Level System Architecture</h2>
+    <p class="sub">Components and data flow across client, Laravel, Redis, MCP AI, and notification layers.</p>
+    <div class="diagram" id="fig1"></div>
+    <div class="actions">
+      <button onclick="downloadSVG('fig1', 'figure1-system-architecture')">Download SVG</button>
+      <button class="secondary" onclick="downloadSVG('fig1', 'figure1-system-architecture')">Vector (paper-ready)</button>
+    </div>
+    <script type="text/mermaid" data-target="fig1">
+flowchart LR
+    subgraph CL["Client"]
+        U["User / Attacker<br/>(login attempt)"]
+    end
+
+    subgraph APP["Laravel Application (Pragati AI / VMS)"]
+        MW["McpMaliciousLoginMiddleware<br/>Layer 1 - Rule Engine"]
+        LC["LoginController<br/>Auth + counter update"]
+        SVC["McpSecurityService<br/>Layer 2 - Hybrid scorer + MCP client"]
+    end
+
+    subgraph DB["Redis (15-min TTL)"]
+        IPK["attack:login:ip (IP)"]
+        EK["attack:login:email (email)"]
+        BK["blocked:ip (IP)"]
+    end
+
+    subgraph AI["MCP AI Engine (MiniMax)"]
+        MM["POST /v1/chat/completions<br/>MiniMax-M2.1"]
+    end
+
+    subgraph NT["Notification"]
+        EV["McpAttackDetected event<br/>email alert"]
+    end
+
+    U -->|"POST /login"| MW
+    MW -->|"1. read counters"| IPK
+    MW -->|"1. read counters"| EK
+    MW -->|"2. threshold reached - analyzeLogin()"| SVC
+    SVC -->|"3. context + risk score"| MM
+    MM -->|"4. JSON response"| SVC
+    SVC -->|"5. decision / action"| MW
+    MW -->|"6a. block (1 hr)"| BK
+    MW -->|"6b. block - alert"| EV
+    MW -->|"6c. allow"| LC
+    LC -->|"fail - incr"| IPK
+    LC -->|"fail - incr"| EK
+    LC -->|"success - reset"| IPK
+    LC -->|"success - reset"| EK
+    LC -->|"success - reset"| BK
+    </script>
+  </div>
+
+  <div class="card">
+    <h2>Figure 2 — Algorithm Flowchart (Detailed)</h2>
+    <p class="sub">Full decision flow: login → Redis → rule engine → MCP → response → fallback → block/allow.</p>
+    <div class="diagram" id="fig2"></div>
+    <div class="actions">
+      <button onclick="downloadSVG('fig2', 'figure2-algorithm-flowchart')">Download SVG</button>
+    </div>
+    <script type="text/mermaid" data-target="fig2">
+flowchart TD
+    A["Login Request<br/>POST /login (email + password)"] --> B["McpMaliciousLoginMiddleware<br/>(pre-login AI layer)"]
+
+    B --> C{"Email present?"}
+    C -- "No" --> P["Proceed to LoginController"]
+    C -- "Yes" --> D["Read Redis counters<br/>attack:login:ip / attack:login:email"]
+
+    D --> E{"Threshold exceeded?<br/>ipAttempts >= 5 OR emailAttempts >= 3"}
+    E -- "No" --> P
+
+    E -- "Yes" --> F["McpSecurityService::analyzeLogin()"]
+
+    F --> F1["Step 1 - getRiskScore()<br/>rule-based deterministic score"]
+    F1 --> F2["Step 2 - build default response<br/>decision + action from score"]
+    F2 --> F3["Step 3 - call MiniMax AI<br/>POST /v1/chat/completions"]
+
+    F3 --> G{"AI response valid?"}
+    G -- "Yes" --> G1["Parse JSON + merge with default<br/>override decision/action from risk_score"]
+    G -- "No (exception / invalid JSON)" --> G2["FALLBACK<br/>use rule-based default<br/>(fail-open)"]
+
+    G1 --> H["Return structured response<br/>decision, attack_type, risk_score, confidence, action"]
+    G2 --> H
+
+    H --> I{"decision == MALICIOUS<br/>OR risk_score >= 80 ?"}
+
+    I -- "Yes" --> J["BLOCK<br/>Redis setex blocked:ip (3600 s)<br/>fire McpAttackDetected - email alert"]
+    J --> K["Return 403<br/>Access blocked for 1 hour"]
+
+    I -- "No" --> P
+
+    P --> L["LoginController::login()"]
+    L --> M{"blocked:ip exists?"}
+    M -- "Yes" --> MB["Reject<br/>Access temporarily blocked"]
+    M -- "No" --> N["Auth::attempt(email, password)"]
+
+    N --> O{"Credentials valid?"}
+    O -- "No" --> Q["Increment Redis counters<br/>incr ip + incr email (expire 900 s)"]
+    Q --> R["Return Invalid credentials"]
+    O -- "Yes" --> S["Reset counters + blocked key<br/>session regenerate"]
+    S --> T["Redirect by role<br/>admin -> /admin/dashboard<br/>else -> /dashboard"]
+    </script>
+  </div>
+
+  <div class="card">
+    <h2>Figure 3 — Sequence Diagram (Request Lifecycle)</h2>
+    <p class="sub">Interaction between user, middleware, Redis, MCP service, AI, and controller.</p>
+    <div class="diagram" id="fig3"></div>
+    <div class="actions">
+      <button onclick="downloadSVG('fig3', 'figure3-sequence-diagram')">Download SVG</button>
+    </div>
+    <script type="text/mermaid" data-target="fig3">
+sequenceDiagram
+    autonumber
+    actor U as User/Attacker
+    participant MW as McpMaliciousLoginMiddleware
+    participant RD as Redis
+    participant SVC as McpSecurityService
+    participant AI as MiniMax MCP
+    participant LC as LoginController
+
+    U->>MW: POST /login (email, password)
+    MW->>RD: GET attack:login:ip (IP) + email
+    RD-->>MW: ipAttempts, emailAttempts
+
+    alt threshold NOT exceeded
+        MW->>LC: next() (allow)
+    else threshold exceeded
+        MW->>SVC: analyzeLogin(ip, email, attempts)
+        SVC->>SVC: getRiskScore() (rule-based)
+        SVC->>AI: POST /v1/chat/completions
+
+        alt AI success
+            AI-->>SVC: JSON (decision, risk_score, ...)
+            SVC->>SVC: override decision/action from risk_score
+        else AI failure / invalid
+            SVC->>SVC: FALLBACK - rule-based default (fail-open)
+        end
+
+        SVC-->>MW: decision, attack_type, risk_score, action
+
+        alt MALICIOUS or risk_score >= 80
+            MW->>RD: SETEX blocked:ip (3600 s)
+            MW-->>U: 403 Access blocked for 1 hour
+        else SAFE / SUSPICIOUS
+            MW->>LC: next() (allow)
+        end
+    end
+
+    LC->>LC: Auth::attempt(email, password)
+
+    alt auth fails
+        LC->>RD: INCR ip + email (EXPIRE 900 s)
+        LC-->>U: Invalid credentials
+    else auth succeeds
+        LC->>RD: DEL counters + blocked:ip
+        LC-->>U: Redirect by role
+    end
+    </script>
+  </div>
+
+</div>
+
+<footer>Rendered with Mermaid · Diagrams match <code>app/Http/Middleware/McpMaliciousLoginMiddleware.php</code> and <code>app/Services/McpSecurityService.php</code>.</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'default',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, curve: 'basis', nodeSpacing: 45, rankSpacing: 55 },
+    sequence: { mirrorActors: false, actorMargin: 60 }
+  });
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    const blocks = document.querySelectorAll('script[type="text/mermaid"]');
+    for (let i = 0; i < blocks.length; i++) {
+      const src = (blocks[i].textContent || '').trim();
+      const targetId = blocks[i].dataset.target;
+      const target = document.getElementById(targetId);
+      if (!target) continue;
+      try {
+        const { svg } = await mermaid.render('mmd-' + targetId, src);
+        target.innerHTML = svg;
+      } catch (e) {
+        target.innerHTML = '<div class="error">Mermaid error:\n' + (e && e.message ? e.message : e) + '</div>';
+      }
+    }
+  });
+
+  function downloadSVG(containerId, filename) {
+    const container = document.getElementById(containerId);
+    const svg = container && container.querySelector('svg');
+    if (!svg) { alert('Diagram not rendered yet.'); return; }
+    const clone = svg.cloneNode(true);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('style', 'background-color:#ffffff;');
+    const source = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone);
+    const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename + '.svg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+</script>
+
+</body>
+</html>

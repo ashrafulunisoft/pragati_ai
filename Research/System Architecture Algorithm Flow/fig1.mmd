@@ -1,0 +1,60 @@
+flowchart LR
+    subgraph CL["Client"]
+        U["User / Attacker<br/>(login attempt)"]
+    end
+
+    subgraph APP["Laravel Application (HySA-MCP)"]
+        MW["McpMaliciousLoginMiddleware<br/>Layer 1 — Rule Engine<br/>(sanitize, early block-exit, gate)"]
+        SVC["McpSecurityService<br/>Layer 2 — Fusion F1–F5<br/>max(S_rule, S_AI) + degraded policy"]
+        CH["ChallengeService<br/>single-use CAPTCHA / OTP<br/>(HTTP 428)"]
+        LC["LoginController<br/>Auth + atomic counter update<br/>+ NAT success-set"]
+        PS["PrivacyService<br/>HMAC pseudonymization<br/>(outbound boundary)"]
+    end
+
+    subgraph MCPL["MCP Integration Layer (driver switch)"]
+        DX["direct driver<br/>chat/completions"]
+        MCPS["MCP Server /api/mcp<br/>JSON-RPC 2.0, Bearer, 2025-06-18"]
+        TOOL["analyze_login_risk tool<br/>JSON-Schema input"]
+    end
+
+    subgraph LLM["Upstream LLM (substitutable)"]
+        MM["Gemini gemini-3.1-flash-lite<br/>(previously MiniMax-M2.1)"]
+    end
+
+    subgraph DB["Redis (fixed 15-min window, atomic Lua)"]
+        IPK["attack:login:ip"]
+        EK["attack:login:email"]
+        BK["blocked:ip / blocked:email<br/>(NAT-scoped, 3600s)"]
+        SS["success:emails:ip<br/>(shared-NAT evidence)"]
+        CB["blocked:accounts:ip<br/>(abuse circuit breaker)"]
+        DG["mcp:degraded:ip<br/>(N-strike)"]
+    end
+
+    subgraph NT["Notification"]
+        EV["McpAttackDetected event<br/>email alert"]
+    end
+
+    U -->|"POST /login"| MW
+    MW -->|"1. blocked? (zero AI cost)"| BK
+    MW -->|"2. read counters"| IPK
+    MW -->|"2. read counters"| EK
+    MW -->|"3. ip>=5 OR email>=3, analyzeLogin()"| SVC
+    SVC -->|"4. pseudonymised context"| PS
+    PS --> DX
+    PS -->|"tools/call"| MCPS
+    MCPS --> TOOL
+    TOOL --> MM
+    DX --> MM
+    MM -->|"JSON verdict"| SVC
+    SVC -->|"5. MALICIOUS / S>=80, blockIp()"| MW
+    MW -->|"scoped by NAT evidence"| BK
+    MW -->|"SCARD >= 3 ?"| SS
+    MW -->|">=5 blocked accts, quarantine"| CB
+    MW -->|"AI-down 50-79, strikes"| DG
+    MW -->|"6. captcha/otp, 428"| CH
+    CH -->|"solve, verify, pass"| MW
+    MW -->|"block, alert"| EV
+    MW -->|"7. SAFE / solved, next()"| LC
+    LC -->|"fail, INCR (Lua)"| IPK
+    LC -->|"fail, INCR"| EK
+    LC -->|"success, SADD + reset"| SS

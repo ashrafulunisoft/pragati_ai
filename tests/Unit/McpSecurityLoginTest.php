@@ -258,13 +258,19 @@ class McpSecurityLoginTest extends TestCase
     public function test_mcp_analysis_logs_to_file(): void
     {
         $logFile = storage_path('logs/mcp_security.log');
-        
+
         // Clear the log file before test
         file_put_contents($logFile, '');
-        
-        // Get initial file size
-        $initialSize = filesize($logFile);
-        
+
+        // Deterministic AI (no live API dependency)
+        \Illuminate\Support\Facades\Http::fake([
+            '*' => \Illuminate\Support\Facades\Http::response([
+                'choices' => [['message' => ['content' => json_encode([
+                    'decision' => 'SAFE', 'confidence' => 0.5,
+                ])]]],
+            ], 200),
+        ]);
+
         // Call MCP analysis (this should write to log)
         $result = McpSecurityService::analyzeLogin([
             'ip' => '192.168.99.100',
@@ -301,9 +307,18 @@ class McpSecurityLoginTest extends TestCase
     public function test_mcp_log_contains_all_fields(): void
     {
         $logFile = storage_path('logs/mcp_security.log');
-        
+
         // DON'T clear the log file - append to existing logs from previous test
-        
+
+        // Deterministic AI (no live API dependency)
+        \Illuminate\Support\Facades\Http::fake([
+            '*' => \Illuminate\Support\Facades\Http::response([
+                'choices' => [['message' => ['content' => json_encode([
+                    'decision' => 'SAFE', 'confidence' => 0.5,
+                ])]]],
+            ], 200),
+        ]);
+
         // Call MCP analysis with different IP
         McpSecurityService::analyzeLogin([
             'ip' => '10.0.0.50',
@@ -340,42 +355,52 @@ class McpSecurityLoginTest extends TestCase
      */
     public function test_blocking_when_high_risk_score(): void
     {
-        // Simulate high risk scenario
+        /*
+         * Problem 5 fix: this test used to simulate the block itself
+         * (compute score -> setex the block key -> assert it exists), which
+         * only verified its own copy of the logic (circular evaluation).
+         * It now drives the REAL middleware decision path with a faked AI
+         * verdict and asserts on the middleware's actual response + state.
+         */
         $ip = '192.168.99.200';
+        $email = 'test@example.com';
         $ipKey = "attack:login:ip:$ip";
-        $emailKey = "attack:login:email:test@example.com";
+        $emailKey = "attack:login:email:$email";
         $blockedKey = "blocked:ip:$ip";
-        
-        // Set high attempt counts (above threshold)
-        Redis::setex($ipKey, 900, 10);  // 10 IP attempts (>=5 threshold)
-        Redis::setex($emailKey, 900, 5); // 5 email attempts (>=3 threshold)
-        
-        // Get the values
-        $ipAttempts = (int) Redis::get($ipKey);
-        $emailAttempts = (int) Redis::get($emailKey);
-        
-        // Verify threshold is exceeded
-        $this->assertGreaterThanOrEqual(5, $ipAttempts);
-        $this->assertGreaterThanOrEqual(3, $emailAttempts);
-        
-        // Calculate risk score
-        $riskScore = McpSecurityService::getRiskScore([
-            'ip_attempts' => $ipAttempts,
-            'email_attempts' => $emailAttempts,
+
+        // High attempt counts (above threshold)
+        Redis::setex($ipKey, 900, 10);
+        Redis::setex($emailKey, 900, 5);
+
+        // Deterministic AI verdict: MALICIOUS
+        \Illuminate\Support\Facades\Http::fake([
+            '*' => \Illuminate\Support\Facades\Http::response([
+                'choices' => [['message' => ['content' => json_encode([
+                    'decision' => 'MALICIOUS', 'attack_type' => 'brute_force',
+                    'risk_score' => 90, 'confidence' => 0.9, 'recommended_action' => 'block_ip',
+                ])]]],
+            ], 200),
         ]);
-        
-        // Risk score should be >= 80 (high)
-        $this->assertGreaterThanOrEqual(80, $riskScore, 'Risk score should be >= 80 for high attempts');
-        
-        // Simulate blocking
-        if ($riskScore >= 80) {
-            Redis::setex($blockedKey, 3600, 1);
-        }
-        
-        // Verify IP is blocked
+
+        \Illuminate\Support\Facades\Event::fake([\App\Events\McpAttackDetected::class]);
+
+        $middleware = new \App\Http\Middleware\McpMaliciousLoginMiddleware();
+        $request = \Illuminate\Http\Request::create('/login', 'POST', [
+            'email' => $email, 'password' => 'x',
+        ], [], [], ['REMOTE_ADDR' => $ip]);
+
+        $response = $middleware->handle($request, fn () => response('ALLOWED'));
+
+        // The middleware itself must return 403 and apply the 1-hour block
+        $this->assertSame(403, $response->getStatusCode());
         $this->assertEquals('1', Redis::get($blockedKey));
-        
-        // Cleanup
+        $ttl = Redis::ttl($blockedKey);
+        $this->assertGreaterThan(3500, $ttl);
+        $this->assertLessThanOrEqual(3600, $ttl);
+
+        // Admin alert event fired with the verdict
+        \Illuminate\Support\Facades\Event::assertDispatched(\App\Events\McpAttackDetected::class);
+
         Redis::del([$ipKey, $emailKey, $blockedKey]);
     }
     
@@ -385,7 +410,17 @@ class McpSecurityLoginTest extends TestCase
     public function test_mcp_recommended_action(): void
     {
         $logFile = storage_path('logs/mcp_security.log');
-        
+
+        // Deterministic AI (no live API dependency)
+        \Illuminate\Support\Facades\Http::fake([
+            '*' => \Illuminate\Support\Facades\Http::response([
+                'choices' => [['message' => ['content' => json_encode([
+                    'decision' => 'MALICIOUS', 'attack_type' => 'brute_force',
+                    'risk_score' => 90, 'confidence' => 0.9,
+                ])]]],
+            ], 200),
+        ]);
+
         // Call MCP analysis with high attempts to trigger different actions
         $result = McpSecurityService::analyzeLogin([
             'ip' => '172.16.0.100',
@@ -410,38 +445,53 @@ class McpSecurityLoginTest extends TestCase
     }
     
     /**
-     * Test that medium risk score (50-79) doesn't block
+     * Test that medium risk score (50-79) doesn't hard-block, but now (M10)
+     * enforces the OTP step-up: HTTP 428 + single-use challenge, never a block.
      */
     public function test_medium_risk_does_not_block(): void
     {
+        /*
+         * Problem 5 fix: also used to assert its own recomputed condition.
+         * The real middleware runs with medium counters (ip=5, email=3)
+         * and a SAFE AI verdict: fusion keeps it SUSPICIOUS (step-up).
+         * Major-fix M10: `otp` is now ENFORCED as a 428 challenge instead of
+         * being silently allowed - still NOT a hard block (no blocked key).
+         */
         $ip = '192.168.99.250';
+        $email = 'medium@example.com';
         $ipKey = "attack:login:ip:$ip";
-        $emailKey = "attack:login:email:medium@example.com";
+        $emailKey = "attack:login:email:$email";
         $blockedKey = "blocked:ip:$ip";
-        
-        // Set medium attempt counts
-        Redis::setex($ipKey, 900, 5);  // 5 IP attempts
-        Redis::setex($emailKey, 900, 2); // 2 email attempts
-        
-        // Calculate risk score
-        $riskScore = McpSecurityService::getRiskScore([
-            'ip_attempts' => 5,
-            'email_attempts' => 2,
+
+        Redis::setex($ipKey, 900, 5);
+        Redis::setex($emailKey, 900, 3); // rule score 55 (medium band)
+
+        \Illuminate\Support\Facades\Http::fake([
+            '*' => \Illuminate\Support\Facades\Http::response([
+                'choices' => [['message' => ['content' => json_encode([
+                    'decision' => 'SAFE', 'attack_type' => 'normal_user',
+                    'risk_score' => 55, 'confidence' => 0.9,
+                ])]]],
+            ], 200),
         ]);
-        
-        // Risk score should be medium (30-79)
-        $this->assertGreaterThanOrEqual(30, $riskScore);
-        $this->assertLessThan(80, $riskScore);
-        
-        // Should NOT block for medium risk
-        $shouldBlock = ($riskScore >= 80);
-        $this->assertFalse($shouldBlock, 'Medium risk should not block');
-        
-        // Verify IP is NOT blocked
+
+        $middleware = new \App\Http\Middleware\McpMaliciousLoginMiddleware();
+        $request = \Illuminate\Http\Request::create('/login', 'POST', [
+            'email' => $email, 'password' => 'x',
+        ], [], [], ['REMOTE_ADDR' => $ip]);
+
+        $response = $middleware->handle($request, fn () => response('ALLOWED'));
+
+        // Step-up enforcement: 428 with an OTP challenge (M10)
+        $this->assertSame(428, $response->getStatusCode());
+        $body = json_decode($response->getContent(), true);
+        $this->assertSame('otp', $body['required_action']);
+        $this->assertNotEmpty($body['challenge']['token']);
+
+        // ...but never a hard block
         $this->assertNull(Redis::get($blockedKey));
-        
-        // Cleanup
-        Redis::del([$ipKey, $emailKey, $blockedKey]);
+
+        Redis::del([$ipKey, $emailKey, $blockedKey, "blocked:email:$email", 'challenge:issued:ip:'.$ip]);
     }
     
     // ============================================================================
@@ -592,10 +642,27 @@ class McpSecurityLoginTest extends TestCase
     public function test_all_scenarios_logged(): void
     {
         $logFile = storage_path('logs/mcp_security.log');
-        
-        // Clear and start fresh
+
+        // Reset logger channel stream pointer and clear file
+        \Illuminate\Support\Facades\Log::forgetChannel('mcp_security');
         file_put_contents($logFile, '');
-        
+
+        // Deterministic AI: a low-confidence SAFE verdict without a risk_score
+        // leaves the rule floor untouched, so every assertion below exercises
+        // the real fusion pipeline (rules -> decision/action/logging).
+        // (Previously this test relied on live MiniMax responses happening to
+        // echo the rule scores - non-deterministic and slow.)
+        \Illuminate\Support\Facades\Http::fake([
+            '*' => \Illuminate\Support\Facades\Http::response([
+                'choices' => [
+                    ['message' => ['content' => json_encode([
+                        'decision' => 'SAFE',
+                        'confidence' => 0.5,
+                    ])]],
+                ],
+            ], 200),
+        ]);
+
         // Test ALL scenarios
         $scenarios = [
             // [ip_attempts, email_attempts, expected_score, expected_action]

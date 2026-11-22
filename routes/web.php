@@ -440,22 +440,36 @@ Route::get('/test-sms', function () {
     //     })->name('dashboard');
     // });
 
-// MCP Security Logs Route (Live View)
+/*
+ * MCP Security Logs Route (Live View)
+ *
+ * SECURITY FIX (B2, 2026-11-19): these views expose raw IPs, emails, block
+ * decisions and OTP_ISSUED codes, so they are now restricted to
+ * authenticated admins only. Previously they were unauthenticated, which
+ * let anyone read (and therefore bypass) issued OTP codes.
+ */
 Route::get('/security-logs', function () {
+    abort_unless(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('super-admin')), 403);
+
     $logPath = storage_path('logs/mcp_security.log');
-    
+
     if (!file_exists($logPath)) {
         return response('<pre>No security logs found yet.</pre>');
     }
-    
-    $log = file_get_contents($logPath);
-    return response("<pre>$log</pre>");
-});
 
-// MCP Security Logs API (JSON - for live monitoring)
+    $log = file_get_contents($logPath);
+
+    // Defensive redaction: never render OTP codes even to logged-in users
+    $log = preg_replace('/"code"\s*:\s*"\d{6}"/', '"code":"[REDACTED]"', $log);
+
+    return response("<pre>$log</pre>");
+})->middleware('auth')->name('security.logs');
+
+// MCP Security Logs API (JSON - for live monitoring) — admin-only (B2 fix)
 Route::get('/api/security-logs', function () {
+    abort_unless(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('super-admin')), 403);
     $logPath = storage_path('logs/mcp_security.log');
-    
+
     if (!file_exists($logPath)) {
         return response()->json([
             'status' => 'success',
@@ -463,8 +477,10 @@ Route::get('/api/security-logs', function () {
             'message' => 'No security logs found yet'
         ]);
     }
-    
+
     $content = file_get_contents($logPath);
+    // Defensive redaction (B2): OTP codes must never leave the server
+    $content = preg_replace('/"code"\s*:\s*"\d{6}"/', '"code":"[REDACTED]"', $content);
     $lines = array_filter(explode("\n", trim($content)));
     
     $logs = array_map(function($line) {
@@ -485,4 +501,4 @@ Route::get('/api/security-logs', function () {
         'count' => count($logs),
         'logs' => array_reverse($logs)
     ]);
-})->name('api.security.logs');
+})->middleware('auth')->name('api.security.logs');

@@ -1,0 +1,98 @@
+\RequirePackage{fix-cm}
+\documentclass[smallextended]{svjour3}
+\smartqed
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\journalname{International Journal of Information Security}
+
+\begin{document}
+
+\title{HySA-MCP: A Hybrid AI-Driven Secure Authentication Framework with Model Context Protocol (MCP) Integration}
+\titlerunning{HySA-MCP: Hybrid AI-Driven Authentication}
+
+\author{Md. Ashraful Momen \and Md. Nazmus Sajid \and Saifur Rahaman}
+\authorrunning{Momen, Sajid, and Rahaman}
+
+\institute{
+Md. Ashraful Momen \at
+Department of Software Engineering, Daffodil International University, Dhaka, Bangladesh\\
+\email{amshuvo64@gmail.com}
+\and
+Md. Nazmus Sajid \at
+Department of Computer Science and Engineering, International Islamic University Chittagong, Bangladesh\\
+Laboratory for Bioinformatics and Computational Medicine (BioCom), Bangladesh\\
+\email{md.nazmus.sajid94@gmail.com}
+\and
+Saifur Rahaman (Corresponding Author) \at
+Department of Computer Science, City University of Hong Kong (CityUHK), Hong Kong SAR\\
+\email{saifurcubd@gmail.com}
+}
+
+\date{Received: date / Accepted: date}
+\maketitle
+
+\begin{abstract}
+Modern web enterprise applications are increasingly vulnerable to distributed brute-force, automated credential stuffing, and bot-driven attacks. Traditional rate limiters lack contextual intelligence, frequently misidentifying legitimate traffic while proving brittle against below-threshold rotation. We propose HySA-MCP, a hybrid authentication architecture combining Redis in-memory tracking with streamable Model Context Protocol (MCP) Large Language Model analysis (validated live using Google Gemini gemini-3.1-flash-lite) and an interpretable rule-based risk floor. In empirical evaluations across identical 259-event traces, HySA-MCP achieved 70.79\% $\pm$ 8.77\% recall across five live random seeds at 0\% false positives across 232 pooled legitimate negative sessions (a 6.4$\times$ improvement over native Laravel throttling at 11.11\%). Sub-threshold fast-path authentication executes with a median latency of 1.38~ms. When upstream outages occur, a tiered degraded policy enforces fail-closed blocking while bounding retry amplification to 2.00$\times$. Furthermore, an automated Abuse Circuit Breaker limits adversary exploration to at most five victim accounts, eliminating collateral damage in shared NAT topologies.
+
+\keywords{MCP Security \and AI-Driven Authentication \and Explainable Risk Scoring \and Brute-Force Prevention \and Credential Stuffing \and Model Context Protocol}
+\end{abstract}
+
+\section{Introduction}
+Laravel powers over 1.5 million websites worldwide and holds a 64\% market share among PHP developers. However, static rate limiting is fundamentally limited in handling modern distributed attacks...
+
+\section{Methodology and Architecture}
+The framework operates across three tiers: telemetry sanitization, Redis atomic fixed-window counters, and Model Context Protocol decision fusion...
+
+\begin{algorithm}[H]
+\caption{HySA-MCP Hybrid Request Classification and Enforcement}
+\begin{algorithmic}[1]
+\Require Request $R = (ip, email)$, Counters $(c_{ip}, c_{email})$, Thresholds $(\theta_{ip}, \theta_{email})$
+\Ensure HTTP Status Code $\in \{200, 403, 428, 429\}$
+\State $ip \gets \text{SanitizeIP}(R.ip)$; $email \gets \text{SanitizeEmail}(R.email)$
+\If{$\text{IsBlocked}(ip) \lor \text{IsBlocked}(email)$}
+    \State \Return $(403, \text{BLOCKED})$ \Comment{Redis fast-path early drop in $\le 1.5$ ms}
+\EndIf
+\If{$c_{ip} < \theta_{ip} \land c_{email} < \theta_{email}$}
+    \State \Return $(200, \text{ALLOWED})$ \Comment{Sub-threshold fast path (no AI call)}
+\EndIf
+\State $S_{rule} \gets \text{ComputeRuleScore}(c_{ip}, c_{email})$
+\State $ctx \gets \text{PseudonymizeContext}(ip, email, c_{ip}, c_{email})$
+\State $verdict \gets \text{InvokeMcpTool}(\text{"analyze\_login\_risk"}, ctx)$
+\State $S \gets \max(S_{rule}, verdict.risk\_score)$ \Comment{Deterministic rule floor}
+\If{$S \ge 80 \lor verdict.decision = \text{"MALICIOUS"}$}
+    \State $\text{ApplyBlock}(ip, email, S)$
+    \State \Return $(403, \text{BLOCKED})$
+\ElsIf{$S \ge 50$}
+    \State \Return $\text{IssueChallenge}(ip, email, 428)$ \Comment{Terminal HTTP 428 Step-up}
+\Else
+    \State \Return $(200, \text{ALLOWED})$
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+
+\section{Experimental Evaluation}
+Evaluations conducted across identical 259-event traces and multi-seed live Gemini deployments demonstrate state-of-the-art resilience...
+
+\section{Limitations}
+We explicitly analyze four structural boundaries: (1) Sub-threshold joint rotation (Attack H); (2) Low-and-slow attacks exceeding window TTL; (3) Residual NAT-gaming exploration before circuit breaker trips; and (4) Upstream LLM latency...
+
+\section{Conclusion}
+HySA-MCP harmonizes microsecond fast-path enforcement with explainable AI threat intelligence...
+
+\begin{thebibliography}{99}
+\bibitem{ref1} BuiltWith: Laravel Usage Statistics (2025)
+\bibitem{ref2} JetBrains: State of Developer Ecosystem (2025)
+\bibitem{ref3} OWASP: Broken Authentication Top 10 (2021)
+\bibitem{ref4} Anthropic: Model Context Protocol Specification (2024)
+\bibitem{ref5} Google: Gemini Technical Report (2024)
+\end{thebibliography}
+
+\end{document}

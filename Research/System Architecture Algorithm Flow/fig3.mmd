@@ -1,0 +1,67 @@
+sequenceDiagram
+    autonumber
+    actor U as User/Attacker
+    participant MW as Middleware (Rule Engine)
+    participant RD as Redis
+    participant SVC as SecurityService (Fusion)
+    participant AI as Upstream LLM (via MCP/direct)
+    participant CH as ChallengeService
+    participant LC as LoginController
+
+    U->>MW: POST /login (email, password)
+    MW->>RD: GET blocked:ip / blocked:email
+    alt already blocked
+        MW-->>U: 403 (early-exit, zero AI cost)
+    else not blocked
+        MW->>RD: GET attack:login:ip / attack:login:email
+        alt below both thresholds
+            MW->>LC: next()
+        else threshold crossed
+            MW->>SVC: analyzeLogin(pseudonymised ctx)
+            SVC->>AI: prompt (fenced <context>)
+            alt AI responds
+                AI-->>SVC: JSON {decision, risk_score, ...}
+                SVC->>SVC: S = max(S_rule, S_AI) → F1..F5
+            else AI down / invalid
+                SVC->>SVC: degraded policy (tiered)
+            end
+            SVC-->>MW: verdict + action
+            alt MALICIOUS or S ≥ 80
+                MW->>RD: NAT check (SCARD success:emails:ip)
+                alt shared NAT
+                    MW->>RD: SETEX blocked:email (scope=account)
+                    Note over MW,RD: circuit breaker: ≥5 blocked accounts → IP quarantine
+                else single user
+                    MW->>RD: SETEX blocked:ip (scope=ip)
+                end
+                MW-->>U: 403 + admin email alert
+            else captcha / otp (AI available)
+                alt valid token presented
+                    MW->>CH: verify(token, answer)
+                    CH-->>MW: pass (token consumed)
+                    MW->>LC: next()
+                else no/expired token
+                    MW->>CH: issue (single-use, hashed)
+                    MW-->>U: 428 + challenge (OTP never in body)
+                end
+            else AI-down 50–79 (degraded)
+                MW->>RD: INCR mcp:degraded:ip (N-strike)
+                alt strike ≥ 3
+                    MW-->>U: 429 + 900s block
+                else
+                    MW->>LC: next() (monitored)
+                end
+            else SAFE / monitor
+                MW->>LC: next()
+            end
+        end
+    end
+
+    LC->>LC: Auth::attempt(email, password)
+    alt auth fails
+        LC->>RD: atomic Lua INCR+EXPIRE (ip, email)
+        LC-->>U: Invalid credentials
+    else auth succeeds
+        LC->>RD: SADD success:emails:ip + DEL counters/blocks
+        LC-->>U: redirect by role
+    end

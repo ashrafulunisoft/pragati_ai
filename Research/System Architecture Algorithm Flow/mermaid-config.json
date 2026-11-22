@@ -1,0 +1,6 @@
+{
+  "securityLevel": "loose",
+  "theme": "default",
+  "flowchart": { "htmlLabels": true, "curve": "basis" },
+  "sequence": { "mirrorActors": false }
+}
